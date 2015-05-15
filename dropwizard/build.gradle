@@ -1,0 +1,12 @@
+ff {
+    repository {
+        publish {
+            artifactId = 'metrics-dropwizard'
+        }
+    }
+}
+
+dependencies {
+    compile project(':api')
+    compile 'io.dropwizard.metrics:metrics-core:3.1.2'
+}

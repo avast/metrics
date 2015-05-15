@@ -1,0 +1,7 @@
+ff {
+    repository {
+        publish {
+            artifactId = 'metrics-api'
+        }
+    }
+}

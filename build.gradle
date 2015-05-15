@@ -1,0 +1,33 @@
+buildscript {
+    repositories {
+        maven { url 'http://integration.ff.int.avast.com:9999/artifactory/libs-release' }
+        maven { url 'http://integration.ff.int.avast.com:9999/artifactory/libs-snapshot' }
+    }
+
+    dependencies {
+        classpath 'com.github.prokod:gradle-yar-plugin:0.2-SNAPSHOT'
+        classpath 'com.avast:ff-gradle-common-plugin:1.1.48'
+    }
+}
+
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
+    apply plugin: 'ya-release'
+    apply plugin: 'ff.gradle.common'
+
+    group = 'com.avast.metrics'
+    version = '1.0-SNAPSHOT'
+
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+}
+
+ff {
+    repository {
+        publish {
+            artifactId = 'metrics-parent'
+        }
+    }
+}
