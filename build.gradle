@@ -5,7 +5,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.github.prokod:gradle-yar-plugin:0.2-SNAPSHOT'
+        classpath 'com.github.prokod:gradle-yar-plugin:0.2.0'
         classpath 'com.avast:ff-gradle-common-plugin:1.1.48'
     }
 }
@@ -22,6 +22,10 @@ allprojects {
 
     sourceCompatibility = '1.8'
     targetCompatibility = '1.8'
+
+    release {
+        taggingFormat = "v#{v}"
+    }
 }
 
 ff {
