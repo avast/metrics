@@ -10,10 +10,13 @@ import com.codahale.metrics.MetricRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class MetricsMonitor implements Monitor {
+
+    public static final String NAME_SEPARATOR = "/";
 
     protected final MetricRegistry registry;
     protected final List<String> names = new ArrayList<>();
@@ -31,6 +34,11 @@ public class MetricsMonitor implements Monitor {
     @Override
     public Monitor named(String name) {
         return new MetricsMonitor(this, name);
+    }
+
+    @Override
+    public String getName() {
+        return constructMetricName(Optional.empty());
     }
 
     @Override
@@ -61,9 +69,13 @@ public class MetricsMonitor implements Monitor {
     }
 
     private String constructMetricName(String finalName) {
+        return constructMetricName(Optional.ofNullable(finalName));
+    }
+
+    private String constructMetricName(Optional<String> finalName) {
         List<String> copy = new ArrayList<>(names);
-        copy.add(finalName);
-        return copy.stream().collect(Collectors.joining("/"));
+        finalName.ifPresent(copy::add);
+        return copy.stream().collect(Collectors.joining(NAME_SEPARATOR));
     }
 
 }

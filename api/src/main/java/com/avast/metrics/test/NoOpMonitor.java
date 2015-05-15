@@ -26,6 +26,11 @@ public class NoOpMonitor implements Monitor {
     }
 
     @Override
+    public String getName() {
+        return "";
+    }
+
+    @Override
     public Meter newMeter(String String) {
         return new Meter() {
             @Override

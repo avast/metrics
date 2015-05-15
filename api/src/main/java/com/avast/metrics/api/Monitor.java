@@ -6,6 +6,8 @@ public interface Monitor {
 
     Monitor named(String name);
 
+    String getName();
+
     Meter newMeter(String name);
 
     Counter newCounter(String name);
