@@ -68,11 +68,11 @@ public class MetricsMonitor implements Monitor {
         return new MetricsHistogram(registry.histogram(constructMetricName(name)));
     }
 
-    private String constructMetricName(String finalName) {
+    protected String constructMetricName(String finalName) {
         return constructMetricName(Optional.ofNullable(finalName));
     }
 
-    private String constructMetricName(Optional<String> finalName) {
+    protected String constructMetricName(Optional<String> finalName) {
         List<String> copy = new ArrayList<>(names);
         finalName.ifPresent(copy::add);
         return copy.stream().collect(Collectors.joining(NAME_SEPARATOR));

@@ -10,8 +10,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public class TreeObjectNameFactory implements ObjectNameFactory {
+
+    public static final String SEPARATOR = "***";
 
     private static final ObjectNameFactory defaultFactory = new DefaultObjectNameFactory();
 
@@ -32,7 +35,7 @@ public class TreeObjectNameFactory implements ObjectNameFactory {
 
     private Optional<ObjectName> parseName(String domain, String name) {
         try {
-            String[] parts = name.split("/", partNames.length);
+            String[] parts = name.split(Pattern.quote(SEPARATOR), partNames.length);
 
             Hashtable<String, String> properties = new OrderedProperties();
             for (int i = 0; i < parts.length; i++) {
