@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 public class TreeObjectNameFactory implements ObjectNameFactory {
 
-    public static final String SEPARATOR = "***";
+    public static final String SEPARATOR = "@#*";
 
     private static final ObjectNameFactory defaultFactory = new DefaultObjectNameFactory();
 
