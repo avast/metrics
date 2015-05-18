@@ -25,7 +25,7 @@ public class MetricsMonitor implements Monitor {
         this.registry = new MetricRegistry();
     }
 
-    private MetricsMonitor(MetricsMonitor original, String name) {
+    protected MetricsMonitor(MetricsMonitor original, String name) {
         this.registry = original.registry;
         this.names.addAll(original.names);
         this.names.add(name);
