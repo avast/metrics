@@ -49,7 +49,9 @@ public class TreeObjectNameFactory implements ObjectNameFactory {
     }
 
     private String quote(String objectName) {
-        return objectName.replaceAll("[\\Q.?*\"\\E]", "_");
+        return objectName
+            .replaceAll(Pattern.quote(SEPARATOR), "/")
+            .replaceAll("[\\Q.?*\"\\E]", "_");
     }
 
     private static class OrderedProperties extends Hashtable<String, String> {
