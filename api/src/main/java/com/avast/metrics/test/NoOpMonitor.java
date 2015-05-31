@@ -45,6 +45,11 @@ public class NoOpMonitor implements Monitor {
             public long count() {
                 return 0;
             }
+
+            @Override
+            public String getName() {
+                return "";
+            }
         };
     }
 
@@ -70,6 +75,11 @@ public class NoOpMonitor implements Monitor {
             @Override
             public long count() {
                 return 0;
+            }
+
+            @Override
+            public String getName() {
+                return "";
             }
         };
     }
@@ -118,17 +128,45 @@ public class NoOpMonitor implements Monitor {
                 }
                 return result;
             }
+
+            @Override
+            public long count() {
+                return 0;
+            }
+
+            @Override
+            public String getName() {
+                return "";
+            }
         };
     }
 
     @Override
     public <T> Gauge<T> newGauge(String String, Supplier<T> gauge) {
-        return gauge::get;
+        return new Gauge<T>() {
+            @Override
+            public T getValue() {
+                return gauge.get();
+            }
+
+            @Override
+            public String getName() {
+                return "";
+            }
+        };
     }
 
     @Override
     public Histogram newHistogram(String String) {
-        return value -> {
+        return new Histogram() {
+            @Override
+            public void update(long value) {
+            }
+
+            @Override
+            public String getName() {
+                return "";
+            }
         };
     }
 

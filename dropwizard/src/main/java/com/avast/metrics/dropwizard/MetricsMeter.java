@@ -4,9 +4,11 @@ import com.avast.metrics.api.Meter;
 
 public class MetricsMeter implements Meter {
 
+    private final String name;
     private final com.codahale.metrics.Meter metricsMeter;
 
-    public MetricsMeter(com.codahale.metrics.Meter metricsMeter) {
+    public MetricsMeter(String name, com.codahale.metrics.Meter metricsMeter) {
+        this.name = name;
         this.metricsMeter = metricsMeter;
     }
 
@@ -24,4 +26,10 @@ public class MetricsMeter implements Meter {
     public long count() {
         return metricsMeter.getCount();
     }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
 }

@@ -6,9 +6,11 @@ import java.util.function.Supplier;
 
 public class MetricsGauge<T> implements Gauge<T> {
 
+    private final String name;
     private final com.codahale.metrics.Gauge<T> gauge;
 
-    public MetricsGauge(com.codahale.metrics.Gauge<T> gauge) {
+    public MetricsGauge(String name, com.codahale.metrics.Gauge<T> gauge) {
+        this.name = name;
         this.gauge = gauge;
     }
 
@@ -30,4 +32,10 @@ public class MetricsGauge<T> implements Gauge<T> {
             return supplier.get();
         }
     }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
 }

@@ -1,6 +1,6 @@
 package com.avast.metrics.api;
 
-public interface Counter {
+public interface Counter extends Counting {
 
     void inc();
 
@@ -9,7 +9,5 @@ public interface Counter {
     void dec();
 
     void dec(int n);
-
-    long count();
 
 }

@@ -1,11 +1,9 @@
 package com.avast.metrics.api;
 
-public interface Meter {
+public interface Meter extends Counting {
 
     void mark();
 
     void mark(long n);
-
-    long count();
 
 }

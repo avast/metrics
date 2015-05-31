@@ -1,12 +1,11 @@
 buildscript {
     repositories {
         maven { url 'http://integration.ff.int.avast.com:9999/artifactory/libs-release' }
-        maven { url 'http://integration.ff.int.avast.com:9999/artifactory/libs-snapshot' }
     }
 
     dependencies {
         classpath 'com.github.prokod:gradle-yar-plugin:0.2.0'
-        classpath 'com.avast:ff-gradle-common-plugin:1.1.48'
+        classpath 'com.avast:ff-gradle-common-plugin:1.1.49'
     }
 }
 

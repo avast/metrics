@@ -10,9 +10,11 @@ import java.util.concurrent.TimeUnit;
 
 public class MetricsTimer implements Timer {
 
+    private final String name;
     private final com.codahale.metrics.Timer metricsTimer;
 
-    public MetricsTimer(com.codahale.metrics.Timer metricsTimer) {
+    public MetricsTimer(String name, com.codahale.metrics.Timer metricsTimer) {
+        this.name = name;
         this.metricsTimer = metricsTimer;
     }
 
@@ -89,6 +91,16 @@ public class MetricsTimer implements Timer {
         return result;
     }
 
+    @Override
+    public long count() {
+        return metricsTimer.getCount();
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
     private static class Context implements TimeContext {
 
         private final com.codahale.metrics.Timer.Context ctx;
@@ -102,4 +114,5 @@ public class MetricsTimer implements Timer {
             ctx.stop();
         }
     }
+
 }
