@@ -14,10 +14,15 @@ public class JmxMetricsMonitor extends MetricsMonitor {
     private final JmxReporter reporter;
 
     public JmxMetricsMonitor(String domain) {
-        this(TreeObjectNameFactory.getInstance(), domain);
+        this(TreeObjectNameFactory.getInstance(), domain, false);
     }
 
-    public JmxMetricsMonitor(ObjectNameFactory objectNameFactory, String domain) {
+    public JmxMetricsMonitor(String domain, boolean generateUniqueNames) {
+        this(TreeObjectNameFactory.getInstance(), domain, generateUniqueNames);
+    }
+
+    public JmxMetricsMonitor(ObjectNameFactory objectNameFactory, String domain, boolean generateUniqueNames) {
+        super(generateUniqueNames);
         this.reporter = JmxReporter
             .forRegistry(registry)
             .inDomain(domain)
