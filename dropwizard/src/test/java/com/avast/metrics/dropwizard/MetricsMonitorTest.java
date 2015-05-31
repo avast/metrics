@@ -3,7 +3,9 @@ package com.avast.metrics.dropwizard;
 import com.avast.metrics.api.Counter;
 import com.avast.metrics.api.Meter;
 import com.avast.metrics.api.Timer;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.time.Duration;
 
@@ -12,6 +14,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class MetricsMonitorTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void basic() {
@@ -32,8 +37,11 @@ public class MetricsMonitorTest {
         assertTrue(timer.count() == 1);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void monitorDoesNotAllowDuplicateNames() {
+        thrown.expect(DuplicateMetricNameException.class);
+        thrown.expectMessage("Metric name test is not unique!");
+
         MetricsMonitor monitor = new MetricsMonitor(false);
 
         assertNotNull(monitor.newMeter("test"));

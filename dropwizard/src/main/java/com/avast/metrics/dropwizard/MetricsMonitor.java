@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class MetricsMonitor implements Monitor {
@@ -89,11 +90,16 @@ public class MetricsMonitor implements Monitor {
                 String generatedName = finalName + random.nextInt();
                 return metricCreator.apply(generatedName);
             } else {
-                throw new IllegalArgumentException("Metric name " + finalName + " is not unique!");
+                String nameForException = finalName.replaceAll(Pattern.quote(separator()), "/");
+                throw new DuplicateMetricNameException("Metric name " + nameForException + " is not unique!");
             }
         } else {
             return metricCreator.apply(finalName);
         }
+    }
+
+    protected String separator() {
+        return NAME_SEPARATOR;
     }
 
     protected String constructMetricName(String finalName) {
@@ -103,7 +109,7 @@ public class MetricsMonitor implements Monitor {
     protected String constructMetricName(Optional<String> finalName) {
         List<String> copy = new ArrayList<>(names);
         finalName.ifPresent(copy::add);
-        return copy.stream().collect(Collectors.joining(NAME_SEPARATOR));
+        return copy.stream().collect(Collectors.joining(separator()));
     }
 
 }

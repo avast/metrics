@@ -37,9 +37,14 @@ public class JmxMetricsMonitor extends MetricsMonitor {
     }
 
     @Override
+    protected String separator() {
+        return TreeObjectNameFactory.SEPARATOR;
+    }
+
+    @Override
     protected String constructMetricName(Optional<String> finalName) {
         List<String> copy = new ArrayList<>(names);
         finalName.ifPresent(copy::add);
-        return copy.stream().collect(Collectors.joining(TreeObjectNameFactory.SEPARATOR));
+        return copy.stream().collect(Collectors.joining(separator()));
     }
 }
