@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class MetricsMonitor implements Monitor {
@@ -79,10 +80,11 @@ public class MetricsMonitor implements Monitor {
         String finalName = constructMetricName(name);
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Creating metric '{}'", finalName);
+            String nameForLogging = finalName.replaceAll(Pattern.quote(separator()), "/");
+            LOGGER.debug("Creating metric '{}'", nameForLogging);
 
             if (registry.getNames().contains(finalName)) {
-                LOGGER.debug("Metric '{}' is already in the registry, check if the duplication is fine.", finalName);
+                LOGGER.debug("Metric '{}' is already in the registry, check if the duplication is fine.", nameForLogging);
             }
         }
 
