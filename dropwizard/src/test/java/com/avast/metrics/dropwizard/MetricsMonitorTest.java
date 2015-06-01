@@ -9,8 +9,6 @@ import org.junit.rules.ExpectedException;
 
 import java.time.Duration;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class MetricsMonitorTest {
@@ -20,7 +18,7 @@ public class MetricsMonitorTest {
 
     @Test
     public void basic() {
-        MetricsMonitor monitor = new MetricsMonitor(true);
+        MetricsMonitor monitor = new MetricsMonitor();
 
         Meter meter = monitor.newMeter("meter");
         meter.mark();
@@ -35,31 +33,6 @@ public class MetricsMonitorTest {
         Timer timer = monitor.newTimer("timer");
         timer.update(Duration.ofSeconds(20));
         assertTrue(timer.count() == 1);
-    }
-
-    @Test
-    public void monitorDoesNotAllowDuplicateNames() {
-        thrown.expect(DuplicateMetricNameException.class);
-        thrown.expectMessage("Metric name test is not unique!");
-
-        MetricsMonitor monitor = new MetricsMonitor(false);
-
-        assertNotNull(monitor.newMeter("test"));
-        monitor.newMeter("test");
-    }
-
-    @Test
-    public void monitorGeneratesUniqueNames() {
-        MetricsMonitor monitor = new MetricsMonitor(true);
-
-        Meter m1 = monitor.newMeter("test");
-        assertNotNull(m1);
-        assertEquals(m1.getName(), "test");
-
-        Meter m2 = monitor.newMeter("test");
-        assertNotNull(m2);
-        assertTrue(m2.getName().length() > "test".length());
-        System.out.println(m2.getName());
     }
 
 }

@@ -7,41 +7,33 @@ import com.avast.metrics.api.Meter;
 import com.avast.metrics.api.Monitor;
 import com.avast.metrics.api.Timer;
 import com.codahale.metrics.MetricRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class MetricsMonitor implements Monitor {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MetricsMonitor.class);
 
     public static final String NAME_SEPARATOR = "/";
 
     protected final MetricRegistry registry;
     protected final List<String> names = new ArrayList<>();
-    protected final boolean generateUniqueNames;
-    protected final Random random;
-
-    public MetricsMonitor(boolean generateUniqueNames) {
-        this.registry = new MetricRegistry();
-        this.generateUniqueNames = generateUniqueNames;
-        this.random = new Random();
-    }
 
     public MetricsMonitor() {
-        this(false);
+        this.registry = new MetricRegistry();
     }
 
     protected MetricsMonitor(MetricsMonitor original, String name) {
         this.registry = original.registry;
         this.names.addAll(original.names);
         this.names.add(name);
-        this.generateUniqueNames = original.generateUniqueNames;
-        this.random = original.random;
     }
 
     @Override
@@ -56,22 +48,22 @@ public class MetricsMonitor implements Monitor {
 
     @Override
     public Meter newMeter(String name) {
-        return checkUniqueName(name, n -> new MetricsMeter(n, registry.meter(n)));
+        return withMetricName(name, n -> new MetricsMeter(n, registry.meter(n)));
     }
 
     @Override
     public Counter newCounter(String name) {
-        return checkUniqueName(name, n -> new MetricsCounter(n, registry.counter(n)));
+        return withMetricName(name, n -> new MetricsCounter(n, registry.counter(n)));
     }
 
     @Override
     public Timer newTimer(String name) {
-        return checkUniqueName(name, n -> new MetricsTimer(n, registry.timer(n)));
+        return withMetricName(name, n -> new MetricsTimer(n, registry.timer(n)));
     }
 
     @Override
     public <T> Gauge<T> newGauge(String name, Supplier<T> gauge) {
-        return checkUniqueName(name, n -> {
+        return withMetricName(name, n -> {
             MetricsGauge.SupplierGauge<T> supplierGauge = new MetricsGauge.SupplierGauge<>(gauge);
             registry.register(n, supplierGauge);
             return new MetricsGauge<>(n, supplierGauge);
@@ -80,22 +72,21 @@ public class MetricsMonitor implements Monitor {
 
     @Override
     public Histogram newHistogram(String name) {
-        return checkUniqueName(name, n -> new MetricsHistogram(n, registry.histogram(n)));
+        return withMetricName(name, n -> new MetricsHistogram(n, registry.histogram(n)));
     }
 
-    protected <T> T checkUniqueName(String name, Function<String, T> metricCreator) {
+    protected <T> T withMetricName(String name, Function<String, T> metricCreator) {
         String finalName = constructMetricName(name);
-        if (registry.getNames().contains(finalName)) {
-            if (generateUniqueNames) {
-                String generatedName = finalName + random.nextInt();
-                return metricCreator.apply(generatedName);
-            } else {
-                String nameForException = finalName.replaceAll(Pattern.quote(separator()), "/");
-                throw new DuplicateMetricNameException("Metric name " + nameForException + " is not unique!");
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Creating metric '{}'", finalName);
+
+            if (registry.getNames().contains(finalName)) {
+                LOGGER.debug("Metric '{}' is already in the registry, check if the duplication is fine.", finalName);
             }
-        } else {
-            return metricCreator.apply(finalName);
         }
+
+        return metricCreator.apply(finalName);
     }
 
     protected String separator() {
