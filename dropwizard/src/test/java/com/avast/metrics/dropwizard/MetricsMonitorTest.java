@@ -9,6 +9,7 @@ import org.junit.rules.ExpectedException;
 
 import java.time.Duration;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class MetricsMonitorTest {
@@ -22,17 +23,17 @@ public class MetricsMonitorTest {
 
         Meter meter = monitor.newMeter("meter");
         meter.mark();
-        assertTrue(meter.count() == 1);
+        assertEquals(1, meter.count());
 
         Counter counter = monitor.newCounter("counter");
         counter.inc();
         counter.inc();
         counter.inc();
-        assertTrue(counter.count() == 3);
+        assertEquals(3, counter.count());
 
         Timer timer = monitor.newTimer("timer");
         timer.update(Duration.ofSeconds(20));
-        assertTrue(timer.count() == 1);
+        assertEquals(1, timer.count());
     }
 
 }

@@ -48,47 +48,48 @@ public class MetricsTimer implements Timer {
     }
 
     @Override
-    public <T> CompletableFuture<T> timeAsync(Callable<CompletableFuture<T>> operation, Executor executor) {
+    public <T> CompletableFuture<T> timeAsync(Callable<CompletableFuture<T>> operation, Executor executor) throws Exception {
         com.codahale.metrics.Timer.Context successContext = metricsTimer.time();
-        CompletableFuture<T> result = new CompletableFuture<>();
         try {
+            CompletableFuture<T> promise = new CompletableFuture<>();
             CompletableFuture<T> future = operation.call();
             future.handleAsync((success, failure) -> {
-                if (success != null) {
-                    result.complete(success);
-                    successContext.stop();
+                successContext.stop();
+                if (failure == null) {
+                    promise.complete(success);
                 } else {
-                    result.completeExceptionally(failure);
+                    promise.completeExceptionally(failure);
                 }
                 return null;
             });
+            return promise;
         } catch (Exception ex) {
-            result.completeExceptionally(ex);
+            successContext.stop();
+            throw ex;
         }
-        return result;
     }
 
-    public <T> CompletableFuture<T> timeAsync(Callable<CompletableFuture<T>> operation, Timer failureTimer, Executor executor) {
+    public <T> CompletableFuture<T> timeAsync(Callable<CompletableFuture<T>> operation, Timer failureTimer, Executor executor) throws Exception {
         com.codahale.metrics.Timer.Context successContext = metricsTimer.time();
         TimeContext failureContext = failureTimer.start();
-        CompletableFuture<T> result = new CompletableFuture<>();
         try {
+            CompletableFuture<T> promise = new CompletableFuture<>();
             CompletableFuture<T> future = operation.call();
             future.handleAsync((success, failure) -> {
-                if (success != null) {
-                    result.complete(success);
+                if (failure == null) {
+                    promise.complete(success);
                     successContext.stop();
                 } else {
-                    result.completeExceptionally(failure);
+                    promise.completeExceptionally(failure);
                     failureContext.stop();
                 }
                 return null;
             });
+            return promise;
         } catch (Exception ex) {
             failureContext.stop();
-            result.completeExceptionally(ex);
+            throw ex;
         }
-        return result;
     }
 
     @Override

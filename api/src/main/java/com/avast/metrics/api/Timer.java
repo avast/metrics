@@ -20,8 +20,8 @@ public interface Timer extends Counting {
 
     <T> T time(Callable<T> operation, Timer failureTimer) throws Exception;
 
-    <T> CompletableFuture<T> timeAsync(Callable<CompletableFuture<T>> operation, Executor executor);
+    <T> CompletableFuture<T> timeAsync(Callable<CompletableFuture<T>> operation, Executor executor) throws Exception;
 
-    <T> CompletableFuture<T> timeAsync(Callable<CompletableFuture<T>> operation, Timer failureTimer, Executor executor);
+    <T> CompletableFuture<T> timeAsync(Callable<CompletableFuture<T>> operation, Timer failureTimer, Executor executor) throws Exception;
 
 }
