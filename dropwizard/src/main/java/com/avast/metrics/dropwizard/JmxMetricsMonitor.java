@@ -2,6 +2,7 @@ package com.avast.metrics.dropwizard;
 
 import com.avast.metrics.api.Monitor;
 import com.codahale.metrics.JmxReporter;
+import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.ObjectNameFactory;
 
 import java.util.ArrayList;
@@ -14,10 +15,19 @@ public class JmxMetricsMonitor extends MetricsMonitor {
     private final JmxReporter reporter;
 
     public JmxMetricsMonitor(String domain) {
-        this(TreeObjectNameFactory.getInstance(), domain);
+        this(domain, new MetricRegistry());
+    }
+
+    public JmxMetricsMonitor(String domain, MetricRegistry metricRegistry) {
+        this(TreeObjectNameFactory.getInstance(), domain, metricRegistry);
     }
 
     public JmxMetricsMonitor(ObjectNameFactory objectNameFactory, String domain) {
+        this(objectNameFactory, domain, new MetricRegistry());
+    }
+
+    public JmxMetricsMonitor(ObjectNameFactory objectNameFactory, String domain, MetricRegistry metricRegistry) {
+        super(metricRegistry);
         this.reporter = JmxReporter
             .forRegistry(registry)
             .inDomain(domain)

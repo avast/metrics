@@ -31,6 +31,10 @@ public class MetricsMonitor implements Monitor {
         this.registry = new MetricRegistry();
     }
 
+    public MetricsMonitor(MetricRegistry registry) {
+        this.registry = registry;
+    }
+
     protected MetricsMonitor(MetricsMonitor original, String name) {
         this.registry = original.registry;
         this.names.addAll(original.names);
