@@ -4,6 +4,7 @@ import com.avast.metrics.api.Counter;
 import com.avast.metrics.api.Gauge;
 import com.avast.metrics.api.Histogram;
 import com.avast.metrics.api.Meter;
+import com.avast.metrics.api.Metric;
 import com.avast.metrics.api.Monitor;
 import com.avast.metrics.api.Timer;
 
@@ -156,6 +157,10 @@ public class NoOpMonitor implements Monitor {
                 return "";
             }
         };
+    }
+
+    @Override
+    public void remove(Metric metric) {
     }
 
 }

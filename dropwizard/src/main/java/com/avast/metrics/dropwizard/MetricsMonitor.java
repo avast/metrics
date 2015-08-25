@@ -4,6 +4,7 @@ import com.avast.metrics.api.Counter;
 import com.avast.metrics.api.Gauge;
 import com.avast.metrics.api.Histogram;
 import com.avast.metrics.api.Meter;
+import com.avast.metrics.api.Metric;
 import com.avast.metrics.api.Monitor;
 import com.avast.metrics.api.Timer;
 import com.codahale.metrics.MetricRegistry;
@@ -78,6 +79,11 @@ public class MetricsMonitor implements Monitor {
     @Override
     public Histogram newHistogram(String name) {
         return withMetricName(name, n -> new MetricsHistogram(n, registry.histogram(n)));
+    }
+
+    @Override
+    public void remove(Metric metric) {
+        registry.remove(metric.getName());
     }
 
     protected <T> T withMetricName(String name, Function<String, T> metricCreator) {

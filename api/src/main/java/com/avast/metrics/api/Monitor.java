@@ -4,6 +4,11 @@ import java.util.function.Supplier;
 
 public interface Monitor {
 
+    /**
+     * Returns a new instance with the given name. This method may be called multiple
+     * times - the resulting monitor will remember all its names (basically creating
+     * a hierarchy of names).
+     */
     Monitor named(String name);
 
     String getName();
@@ -17,5 +22,7 @@ public interface Monitor {
     <T> Gauge<T> newGauge(String name, Supplier<T> gauge);
 
     Histogram newHistogram(String name);
+
+    void remove(Metric metric);
 
 }
