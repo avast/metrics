@@ -89,13 +89,9 @@ public class MetricsMonitor implements Monitor {
     protected <T> T withMetricName(String name, Function<String, T> metricCreator) {
         String finalName = constructMetricName(name);
 
-        if (LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled() && !registry.getNames().contains(finalName)) {
             String nameForLogging = finalName.replaceAll(Pattern.quote(separator()), "/");
             LOGGER.debug("Creating metric '{}'", nameForLogging);
-
-            if (registry.getNames().contains(finalName)) {
-                LOGGER.debug("Metric '{}' is already in the registry, check if the duplication is fine.", nameForLogging);
-            }
         }
 
         return metricCreator.apply(finalName);

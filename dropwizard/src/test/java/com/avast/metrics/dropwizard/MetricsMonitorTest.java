@@ -3,6 +3,7 @@ package com.avast.metrics.dropwizard;
 import com.avast.metrics.api.Counter;
 import com.avast.metrics.api.Gauge;
 import com.avast.metrics.api.Meter;
+import com.avast.metrics.api.Monitor;
 import com.avast.metrics.api.Timer;
 import org.junit.Rule;
 import org.junit.Test;
@@ -19,7 +20,7 @@ public class MetricsMonitorTest {
 
     @Test
     public void basic() {
-        MetricsMonitor monitor = new MetricsMonitor();
+        Monitor monitor = new MetricsMonitor().named("test-basic");
 
         Meter meter = monitor.newMeter("meter");
         meter.mark();
@@ -38,7 +39,7 @@ public class MetricsMonitorTest {
 
     @Test
     public void removal() {
-        MetricsMonitor monitor = new MetricsMonitor();
+        Monitor monitor = new MetricsMonitor().named("test-removal");
         int value1 = 1;
         Gauge<Integer> gauge1 = monitor.newGauge("gauge", () -> value1);
         assertEquals(value1, (int) gauge1.getValue());
