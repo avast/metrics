@@ -15,7 +15,7 @@ The library is divided into submodules:
 * **metrics-dropwizard** - for now the only implementation via Dropwizard Metrics.
 
 The entry-point into the library is the interface `Monitor`. Your classes need to get an instance of a monitor which they can use to construct different metrics, e.g. meters, timers or histograms.
-Instances of the individuals metrics can be used to monitor your application. The default implementation that will most probably be used is `[JmxMetricsMonitor](dropwizard/src/main/java/com/avast/metrics/dropwizard/JmxMetricsMonitor.java)`
+Instances of the individuals metrics can be used to monitor your application. The default implementation that will most probably be used is [JmxMetricsMonitor](dropwizard/src/main/java/com/avast/metrics/dropwizard/JmxMetricsMonitor.java)
 from `metrics-dropwizard` submodule which automatically publishes the metrics via **JMX**.
 
 ### Naming of Monitors
@@ -48,4 +48,4 @@ Handler handler = new Handler(monitor.named("Handler1"));
 ```
 
 ## Unit Testing
-There is a singleton `[NoOpMonitor.INSTANCE](api/src/main/java/com/avast/metrics/test/NoOpMonitor.java)` in the `metrics-api` submodule that can be used in tests.
+There is a singleton [NoOpMonitor.INSTANCE](api/src/main/java/com/avast/metrics/test/NoOpMonitor.java) in the `metrics-api` submodule that can be used in tests.
