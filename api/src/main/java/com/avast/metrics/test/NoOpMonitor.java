@@ -163,4 +163,7 @@ public class NoOpMonitor implements Monitor {
     public void remove(Metric metric) {
     }
 
+    @Override
+    public void close() {
+    }
 }

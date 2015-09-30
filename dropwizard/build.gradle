@@ -1,8 +1,6 @@
-ff {
-    repository {
-        publish {
-            artifactId = 'metrics-dropwizard'
-        }
+avast {
+    publish {
+        artifactId = 'metrics-dropwizard'
     }
 }
 

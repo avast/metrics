@@ -1,7 +1,5 @@
-ff {
-    repository {
-        publish {
-            artifactId = 'metrics-api'
-        }
+avast {
+    publish {
+        artifactId = 'metrics-api'
     }
 }
