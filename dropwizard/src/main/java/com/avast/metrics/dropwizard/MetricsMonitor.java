@@ -7,6 +7,7 @@ import com.avast.metrics.api.Meter;
 import com.avast.metrics.api.Metric;
 import com.avast.metrics.api.Monitor;
 import com.avast.metrics.api.Timer;
+import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 
 public class MetricsMonitor implements Monitor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MetricsMonitor.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(MetricsMonitor.class);
 
     public static final String NAME_SEPARATOR = "/";
 
@@ -109,6 +110,12 @@ public class MetricsMonitor implements Monitor {
         List<String> copy = new ArrayList<>(names);
         finalName.ifPresent(copy::add);
         return copy.stream().collect(Collectors.joining(separator()));
+    }
+
+    @Override
+    public void close() {
+        LOGGER.debug("Closing monitor (all metrics will be removed from the underlying registry)");
+        registry.removeMatching(MetricFilter.ALL);
     }
 
 }

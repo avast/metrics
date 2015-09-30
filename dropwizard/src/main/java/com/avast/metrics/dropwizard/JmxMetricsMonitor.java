@@ -57,4 +57,12 @@ public class JmxMetricsMonitor extends MetricsMonitor {
         finalName.ifPresent(copy::add);
         return copy.stream().collect(Collectors.joining(separator()));
     }
+
+    @Override
+    public void close() {
+        LOGGER.debug("Stopping JmxReporter");
+        reporter.stop();
+        super.close();
+    }
+
 }
