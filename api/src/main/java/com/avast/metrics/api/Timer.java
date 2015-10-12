@@ -7,9 +7,16 @@ import java.util.concurrent.Executor;
 
 public interface Timer extends Counting {
 
-    interface TimeContext {
+    interface TimeContext extends AutoCloseable {
 
         void stop();
+
+        /**
+         * Close the resource, {@link #stop()} the time context by default.
+         */
+        default void close() {
+            stop();
+        }
     }
 
     TimeContext start();
