@@ -1,18 +1,13 @@
 package com.avast.metrics.dropwizard;
 
-import com.avast.metrics.api.Counter;
-import com.avast.metrics.api.Gauge;
-import com.avast.metrics.api.Histogram;
-import com.avast.metrics.api.Meter;
-import com.avast.metrics.api.Metric;
-import com.avast.metrics.api.Monitor;
-import com.avast.metrics.api.Timer;
+import com.avast.metrics.api.*;
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -37,20 +32,20 @@ public class MetricsMonitor implements Monitor {
         this.registry = registry;
     }
 
-    protected MetricsMonitor(MetricsMonitor original, String name) {
+    protected MetricsMonitor(MetricsMonitor original, String... names) {
         this.registry = original.registry;
         this.names.addAll(original.names);
-        this.names.add(name);
+        this.names.addAll(Arrays.asList(names));
     }
 
     @Override
-    public Monitor named(String name) {
-        return new MetricsMonitor(this, name);
+    public Monitor named(String... names) {
+        return new MetricsMonitor(this, names);
     }
 
     @Override
     public String getName() {
-        return constructMetricName(Optional.empty());
+        return constructMetricName(Optional.empty(), "/");
     }
 
     @Override
@@ -103,13 +98,13 @@ public class MetricsMonitor implements Monitor {
     }
 
     protected String constructMetricName(String finalName) {
-        return constructMetricName(Optional.ofNullable(finalName));
+        return constructMetricName(Optional.ofNullable(finalName), separator());
     }
 
-    protected String constructMetricName(Optional<String> finalName) {
+    protected String constructMetricName(Optional<String> finalName, String separator) {
         List<String> copy = new ArrayList<>(names);
         finalName.ifPresent(copy::add);
-        return copy.stream().collect(Collectors.joining(separator()));
+        return copy.stream().collect(Collectors.joining(separator));
     }
 
     @Override

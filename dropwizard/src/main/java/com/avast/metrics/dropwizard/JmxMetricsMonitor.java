@@ -1,14 +1,8 @@
 package com.avast.metrics.dropwizard;
 
-import com.avast.metrics.api.Monitor;
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.ObjectNameFactory;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class JmxMetricsMonitor extends MetricsMonitor {
 
@@ -36,26 +30,19 @@ public class JmxMetricsMonitor extends MetricsMonitor {
         this.reporter.start();
     }
 
-    private JmxMetricsMonitor(JmxMetricsMonitor original, String name) {
-        super(original, name);
+    private JmxMetricsMonitor(JmxMetricsMonitor original, String... names) {
+        super(original, names);
         this.reporter = original.reporter;
     }
 
     @Override
-    public Monitor named(String name) {
-        return new JmxMetricsMonitor(this, name);
+    public JmxMetricsMonitor named(String... names) {
+        return new JmxMetricsMonitor(this, names);
     }
 
     @Override
     protected String separator() {
         return TreeObjectNameFactory.SEPARATOR;
-    }
-
-    @Override
-    protected String constructMetricName(Optional<String> finalName) {
-        List<String> copy = new ArrayList<>(names);
-        finalName.ifPresent(copy::add);
-        return copy.stream().collect(Collectors.joining(separator()));
     }
 
     @Override

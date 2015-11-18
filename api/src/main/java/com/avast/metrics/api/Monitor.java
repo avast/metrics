@@ -9,7 +9,7 @@ public interface Monitor extends AutoCloseable {
      * times - the resulting monitor will remember all its names (basically creating
      * a hierarchy of names).
      */
-    Monitor named(String name);
+    Monitor named(String... names);
 
     String getName();
 

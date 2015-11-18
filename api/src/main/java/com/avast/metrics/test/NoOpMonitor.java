@@ -22,7 +22,7 @@ public class NoOpMonitor implements Monitor {
     public static final Monitor INSTANCE = new NoOpMonitor();
 
     @Override
-    public Monitor named(String name) {
+    public Monitor named(String... names) {
         return this;
     }
 

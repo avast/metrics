@@ -1,10 +1,6 @@
 package com.avast.metrics.dropwizard;
 
-import com.avast.metrics.api.Counter;
-import com.avast.metrics.api.Gauge;
-import com.avast.metrics.api.Meter;
-import com.avast.metrics.api.Monitor;
-import com.avast.metrics.api.Timer;
+import com.avast.metrics.api.*;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -71,6 +67,24 @@ public class MetricsMonitorTest {
         }
 
         // watch log output for javax.management.InstanceAlreadyExistsException
+    }
+
+    @Test
+    public void getName() {
+        try (Monitor m1 = new JmxMetricsMonitor("com.avast.metrics.test").named("first", "second", "third", "fourth")) {
+            final String name = m1.getName();
+
+            assertEquals("first/second/third/fourth", name);
+        }
+
+        try (Monitor m1 = new JmxMetricsMonitor("com.avast.metrics.test").named("first/sub").named("second").named("third").named("fourth/fifth")) {
+            try (Monitor m2 = new JmxMetricsMonitor("com.avast.metrics.test").named("first/sub", "second", "third").named("fourth/fifth")) {
+                final String name1 = m1.getName();
+                final String name2 = m2.getName();
+
+                assertEquals(name1, name2);
+            }
+        }
     }
 
 }
