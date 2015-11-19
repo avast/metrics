@@ -5,9 +5,6 @@ import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.ObjectNameFactory;
 
-import java.util.Arrays;
-import java.util.stream.Stream;
-
 public class JmxMetricsMonitor extends MetricsMonitor {
 
     private final JmxReporter reporter;
@@ -46,7 +43,7 @@ public class JmxMetricsMonitor extends MetricsMonitor {
 
     @Override
     public Monitor named(String name1, String name2, String... restOfNames) {
-        return new JmxMetricsMonitor(this, Stream.concat(Stream.of(name1, name2), Arrays.stream(restOfNames)).toArray(String[]::new));
+        return new JmxMetricsMonitor(named(name1).named(name2), restOfNames);
     }
 
     @Override
