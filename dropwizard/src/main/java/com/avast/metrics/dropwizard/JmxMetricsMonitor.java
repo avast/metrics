@@ -42,7 +42,7 @@ public class JmxMetricsMonitor extends MetricsMonitor {
     }
 
     @Override
-    public Monitor named(String name1, String name2, String... restOfNames) {
+    public JmxMetricsMonitor named(String name1, String name2, String... restOfNames) {
         return new JmxMetricsMonitor(named(name1).named(name2), restOfNames);
     }
 

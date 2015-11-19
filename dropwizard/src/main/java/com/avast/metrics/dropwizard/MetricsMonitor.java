@@ -44,7 +44,7 @@ public class MetricsMonitor implements Monitor {
     }
 
     @Override
-    public Monitor named(String name1, String name2, String... restOfNames) {
+    public MetricsMonitor named(String name1, String name2, String... restOfNames) {
         return new MetricsMonitor(named(name1).named(name2), restOfNames);
     }
 
