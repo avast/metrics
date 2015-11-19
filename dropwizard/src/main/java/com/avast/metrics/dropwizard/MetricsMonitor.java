@@ -14,6 +14,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MetricsMonitor implements Monitor {
 
@@ -39,8 +40,13 @@ public class MetricsMonitor implements Monitor {
     }
 
     @Override
-    public Monitor named(String... names) {
-        return new MetricsMonitor(this, names);
+    public Monitor named(String name) {
+        return new MetricsMonitor(this, name);
+    }
+
+    @Override
+    public Monitor named(String name1, String name2, String... restOfNames) {
+        return new MetricsMonitor(this, Stream.concat(Stream.of(name1, name2), Arrays.stream(restOfNames)).toArray(String[]::new));
     }
 
     @Override
