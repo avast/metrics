@@ -1,5 +1,6 @@
 package com.avast.metrics.dropwizard;
 
+import com.avast.metrics.api.Monitor;
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.ObjectNameFactory;
@@ -36,8 +37,13 @@ public class JmxMetricsMonitor extends MetricsMonitor {
     }
 
     @Override
-    public JmxMetricsMonitor named(String... names) {
-        return new JmxMetricsMonitor(this, names);
+    public JmxMetricsMonitor named(String name) {
+        return new JmxMetricsMonitor(this, name);
+    }
+
+    @Override
+    public JmxMetricsMonitor named(String name1, String name2, String... restOfNames) {
+        return new JmxMetricsMonitor(named(name1).named(name2), restOfNames);
     }
 
     @Override
