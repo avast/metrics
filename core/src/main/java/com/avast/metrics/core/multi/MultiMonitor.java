@@ -2,6 +2,7 @@ package com.avast.metrics.core.multi;
 
 import com.avast.metrics.api.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
@@ -33,7 +34,7 @@ import java.util.stream.Collectors;
  *     Monitor summaryMonitor = monitor.named("path");
  *     Monitor instanceMonitor = summaryMonitor.named("instance");
  *
- *     Monitor monitor = new MultiMonitor(instanceMonitor, summaryMonitor);
+ *     Monitor monitor = MultiMonitor.of(instanceMonitor, summaryMonitor);
  *
  *     this.errors = monitor.newMeter("errors");
  *     this.requests = monitor.newMeter("requests");
@@ -42,16 +43,29 @@ import java.util.stream.Collectors;
 public class MultiMonitor implements Monitor {
     private final List<Monitor> monitors;
 
-    public MultiMonitor(List<Monitor> monitors) {
+    /**
+     * Factory method. Read {@link MultiMonitor} limitations!
+     *
+     * @param instanceMonitor non-shared main monitor for data from a single instance
+     * @param summaryMonitor  shared summary monitor counting sums per all instances
+     * @param otherMonitors   optional other monitors
+     * @return multi monitor containing all passed monitors
+     */
+    public static Monitor of(Monitor instanceMonitor, Monitor summaryMonitor, Monitor... otherMonitors) {
+        List<Monitor> allMonitors = new ArrayList<>();
+        allMonitors.add(instanceMonitor);
+        allMonitors.add(summaryMonitor);
+        allMonitors.addAll(Arrays.asList(otherMonitors));
+
+        return new MultiMonitor(allMonitors);
+    }
+
+    private MultiMonitor(List<Monitor> monitors) {
         if (monitors.size() < 2) {
             throw new IllegalArgumentException("Multi monitor from less than 2 monitors makes no sense");
         }
 
         this.monitors = monitors;
-    }
-
-    public MultiMonitor(Monitor... monitors) {
-        this(Arrays.asList(monitors));
     }
 
     @Override
