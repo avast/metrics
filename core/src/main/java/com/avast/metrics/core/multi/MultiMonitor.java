@@ -21,6 +21,9 @@ import java.util.stream.Collectors;
  * on the first one which represents the monitored instance. Note it is impossible to return two ints at place of one int,
  * adding them together would typically produce a value that doesn't make any sense at all.
  * <p>
+ * {@link #remove(Metric)} removes the metric only from the first wrapped monitor. The summary monitor is shared by
+ * multiple instances so the remove might cause some unexpected problems in such case.
+ * <p>
  * {@link #newGauge(String, Supplier)} is also registered only to the first wrapped monitor. There would be JMX conflicts
  * with the summary monitor shared by multiple instances.
  *
@@ -96,7 +99,7 @@ public class MultiMonitor implements Monitor {
     /**
      * {@inheritDoc}
      * <p>
-     * Register the gauge only by the first wrapped monitor. There would be JMX conflicts with the "summary" monitor.
+     * Register the gauge only to the first wrapped monitor. There would be JMX conflicts with the "summary" monitor.
      *
      * @param name  gauge name
      * @param gauge method to compute the gauge value
@@ -117,9 +120,17 @@ public class MultiMonitor implements Monitor {
         return new MultiHistogram(histograms);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Remove the metric only from the first wrapped monitor. There would be JMX conflicts with the "summary" monitor
+     * which is typically shared by multiple instances.
+     *
+     * @param metric metric to unregister
+     */
     @Override
     public void remove(Metric metric) {
-        // TODO:
+        monitors.get(0).remove(metric);
     }
 
     @Override
