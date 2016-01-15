@@ -61,7 +61,7 @@ public class MetricsTimer implements Timer {
                     promise.completeExceptionally(failure);
                 }
                 return null;
-            });
+            }, executor);
             return promise;
         } catch (Exception ex) {
             successContext.stop();
@@ -84,7 +84,7 @@ public class MetricsTimer implements Timer {
                     failureContext.stop();
                 }
                 return null;
-            });
+            }, executor);
             return promise;
         } catch (Exception ex) {
             failureContext.stop();
