@@ -50,7 +50,7 @@ public class MultiMonitor implements Monitor {
         this.monitors = monitors;
     }
 
-    public MultiMonitor(Monitor[] monitors) {
+    public MultiMonitor(Monitor... monitors) {
         this(Arrays.asList(monitors));
     }
 
