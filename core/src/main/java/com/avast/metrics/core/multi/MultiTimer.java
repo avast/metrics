@@ -1,41 +1,52 @@
-package com.avast.metrics.dropwizard;
+package com.avast.metrics.core.multi;
 
 import com.avast.metrics.api.Timer;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
-public class MetricsTimer implements Timer {
+/**
+ * Timer used by {@link MultiMonitor}.
+ */
+class MultiTimer implements Timer {
+    private final List<Timer> timers;
 
-    private final String name;
-    private final com.codahale.metrics.Timer metricsTimer;
+    public MultiTimer(List<Timer> timers) {
+        if (timers.size() < 2) {
+            throw new IllegalArgumentException("Multi timer from less than 2 timers makes no sense");
+        }
 
-    public MetricsTimer(String name, com.codahale.metrics.Timer metricsTimer) {
-        this.name = name;
-        this.metricsTimer = metricsTimer;
+        this.timers = timers;
     }
 
     @Override
     public TimeContext start() {
-        return new Context(metricsTimer.time());
+        List<TimeContext> contexts = timers.stream()
+                .map(Timer::start)
+                .collect(Collectors.toList());
+
+        return new MultiContext(contexts);
     }
 
     @Override
     public void update(Duration duration) {
-        metricsTimer.update(duration.toMillis(), TimeUnit.MILLISECONDS);
+        timers.forEach(t -> t.update(duration));
     }
 
     @Override
     public <T> T time(Callable<T> operation) throws Exception {
-        return metricsTimer.time(operation);
+        try (TimeContext ignored = this.start()) {
+            return operation.call();
+        }
     }
 
     @Override
     public <T> T time(Callable<T> operation, Timer failureTimer) throws Exception {
-        com.codahale.metrics.Timer.Context successContext = metricsTimer.time();
+        TimeContext successContext = start();
         TimeContext failureContext = failureTimer.start();
         try {
             T result = operation.call();
@@ -49,7 +60,7 @@ public class MetricsTimer implements Timer {
 
     @Override
     public <T> CompletableFuture<T> timeAsync(Callable<CompletableFuture<T>> operation, Executor executor) throws Exception {
-        com.codahale.metrics.Timer.Context context = metricsTimer.time();
+        TimeContext context = start();
         try {
             CompletableFuture<T> promise = new CompletableFuture<>();
             CompletableFuture<T> future = operation.call();
@@ -71,7 +82,7 @@ public class MetricsTimer implements Timer {
 
     @Override
     public <T> CompletableFuture<T> timeAsync(Callable<CompletableFuture<T>> operation, Timer failureTimer, Executor executor) throws Exception {
-        com.codahale.metrics.Timer.Context successContext = metricsTimer.time();
+        TimeContext successContext = start();
         TimeContext failureContext = failureTimer.start();
         try {
             CompletableFuture<T> promise = new CompletableFuture<>();
@@ -95,26 +106,24 @@ public class MetricsTimer implements Timer {
 
     @Override
     public long count() {
-        return metricsTimer.getCount();
+        return timers.get(0).count();
     }
 
     @Override
     public String getName() {
-        return name;
+        return timers.get(0).getName();
     }
 
-    private static class Context implements TimeContext {
+    private static class MultiContext implements TimeContext {
+        private final List<TimeContext> contexts;
 
-        private final com.codahale.metrics.Timer.Context ctx;
-
-        public Context(com.codahale.metrics.Timer.Context ctx) {
-            this.ctx = ctx;
+        public MultiContext(List<TimeContext> contexts) {
+            this.contexts = contexts;
         }
 
         @Override
         public void stop() {
-            ctx.stop();
+            contexts.forEach(TimeContext::stop);
         }
     }
-
 }
