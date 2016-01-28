@@ -1,7 +1,5 @@
 package com.avast.metrics.api;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import java.time.Duration;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
@@ -17,7 +15,7 @@ public interface Timer extends Counting {
          * Stops the timer and returns elapsed time in nanoseconds.
          */
         default long stopAndGetTime() {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
 
         /**
