@@ -3,7 +3,6 @@ package com.avast.metrics.core.multi;
 import com.avast.metrics.api.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -13,23 +12,26 @@ import java.util.stream.Collectors;
  * and updated by a single call instead of two separate ones.
  * <p>
  * The first of the wrapped monitors is the main monitor instance, it should be the most concrete one. The second
- * is typically a summary per all instances. Only two wrapped monitors are expected but whatever number of monitors is
- * supported to make the code more generic.
- *
+ * is typically a summary per all instances. Only two wrapped monitors are expected at the moment but the internal
+ * implementation is generic.
+ * <p>
  * <h3>Limitations</h3>
  * <p>
  * The updates are applied to all wrapped monitors the same way, but queries for names and values will always operate only
  * on the first one which represents the monitored instance. Note it is impossible to return two ints at place of one int,
  * adding them together would typically produce a value that doesn't make any sense at all.
  * <p>
+ * {@link #named(String)} creates a new multi monitor with the name applied only to the instance monitor, the summary
+ *  one is untouched and only copied. This allows to dynamically create new sub-monitors while summary is preserved.
+ * <p>
  * {@link #remove(Metric)} removes the metric only from the first wrapped monitor. The summary monitor is shared by
  * multiple instances so the remove might cause some unexpected problems in such case.
  * <p>
  * {@link #newGauge(String, Supplier)} is also registered only to the first wrapped monitor. There would be JMX conflicts
  * with the summary monitor shared by multiple instances.
- *
+ * <p>
  * <h3>Typical usage</h3>
- *
+ * <p>
  * <pre><code>
  *     Monitor summaryMonitor = monitor.named("path");
  *     Monitor instanceMonitor = summaryMonitor.named("instance");
@@ -38,6 +40,15 @@ import java.util.stream.Collectors;
  *
  *     this.errors = monitor.newMeter("errors");
  *     this.requests = monitor.newMeter("requests");
+ * </code></pre>
+ * <p>
+ * <pre><code>
+ *     Monitor summaryMonitor = monitor.named("path");
+ *     Monitor monitor = MultiMonitor.of(summaryMonitor, summaryMonitor);
+ *     ConcurrentMap<String, Meter> requests = new ConcurrentHashMap<>()
+ *
+ *     // Dynamically create a new meter if not present in the cache and increment its value
+ *     requests.computeIfAbsent(topic, t -> monitor.named(t).newMeter("requests")).mark();
  * </code></pre>
  */
 public class MultiMonitor implements Monitor {
@@ -48,14 +59,12 @@ public class MultiMonitor implements Monitor {
      *
      * @param instanceMonitor non-shared main monitor for data from a single instance
      * @param summaryMonitor  shared summary monitor counting sums per all instances
-     * @param otherMonitors   optional other monitors
      * @return multi monitor containing all passed monitors
      */
-    public static Monitor of(Monitor instanceMonitor, Monitor summaryMonitor, Monitor... otherMonitors) {
-        List<Monitor> allMonitors = new ArrayList<>();
+    public static Monitor of(Monitor instanceMonitor, Monitor summaryMonitor) {
+        List<Monitor> allMonitors = new ArrayList<>(2);
         allMonitors.add(instanceMonitor);
         allMonitors.add(summaryMonitor);
-        allMonitors.addAll(Arrays.asList(otherMonitors));
 
         return new MultiMonitor(allMonitors);
     }
@@ -68,14 +77,28 @@ public class MultiMonitor implements Monitor {
         this.monitors = monitors;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param name name of the next sub-level
+     * @return new multi monitor with name applied only on the instance one, the summary one is left untouched
+     */
     @Override
     public Monitor named(String name) {
-        return monitors.get(0).named(name);
+        return MultiMonitor.of(monitors.get(0).named(name), monitors.get(1));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param name1       name of the next sub-level
+     * @param name2       name of the next sub-level
+     * @param restOfNames name of the next sub-level
+     * @return new multi monitor with names applied only on the instance one, the summary one is left untouched
+     */
     @Override
     public Monitor named(String name1, String name2, String... restOfNames) {
-        return monitors.get(0).named(name1, name2, restOfNames);
+        return MultiMonitor.of(monitors.get(0).named(name1, name2, restOfNames), monitors.get(1));
     }
 
     @Override
@@ -113,7 +136,8 @@ public class MultiMonitor implements Monitor {
     /**
      * {@inheritDoc}
      * <p>
-     * Register the gauge only to the first wrapped monitor. There would be JMX conflicts with the "summary" monitor.
+     * Register the gauge only to the instance monitor. There would be JMX conflicts with the summary monitor
+     * which is typically shared by multiple instances.
      *
      * @param name  gauge name
      * @param gauge method to compute the gauge value
@@ -137,7 +161,7 @@ public class MultiMonitor implements Monitor {
     /**
      * {@inheritDoc}
      * <p>
-     * Remove the metric only from the first wrapped monitor. There would be JMX conflicts with the "summary" monitor
+     * Remove the metric only from the instance monitor. There would be JMX conflicts with the summary monitor
      * which is typically shared by multiple instances.
      *
      * @param metric metric to unregister

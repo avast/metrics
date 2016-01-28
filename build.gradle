@@ -29,6 +29,10 @@ allprojects {
             groupId = 'com.avast.metrics'
         }
     }
+
+    tasks.withType(Javadoc) {
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
 }
 
 avast {
