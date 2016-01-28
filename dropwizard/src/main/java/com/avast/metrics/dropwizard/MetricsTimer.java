@@ -115,6 +115,12 @@ public class MetricsTimer implements Timer {
         public void stop() {
             ctx.stop();
         }
+
+        @Override
+        public long stopAndGetTime() {
+            return ctx.stop();
+        }
+
     }
 
 }

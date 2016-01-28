@@ -1,5 +1,7 @@
 package com.avast.metrics.api;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 import java.time.Duration;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
@@ -10,6 +12,13 @@ public interface Timer extends Counting {
     interface TimeContext extends AutoCloseable {
 
         void stop();
+
+        /**
+         * Stops the timer and returns elapsed time in nanoseconds.
+         */
+        default long stopAndGetTime() {
+            throw new NotImplementedException();
+        }
 
         /**
          * Close the resource, {@link #stop()} the time context by default.
