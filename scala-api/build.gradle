@@ -1,0 +1,11 @@
+apply plugin: 'scala';
+
+avast {
+    publish {
+        artifactId = 'metrics-scala-api'
+    }
+}
+
+dependencies {
+    compile project(':api')
+}
