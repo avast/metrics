@@ -14,7 +14,7 @@ class FutureTimer[A](val success: Timer, val failure: Timer, observer: FutureRes
 }
 
 class BlockTimer[A](val success: Timer, val failure: Timer, val observer: BlockResultObserver[A]) {
-  def block(block: => A) = {
+  def block(block: => A): A = {
     val succCtx = success.start()
     val failCtx = failure.start()
 
