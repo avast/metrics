@@ -27,13 +27,12 @@ class TimerPair(success: Timer, failure: Timer)(implicit ec: ExecutionContext) e
     val failCtx = failure.start()
     try {
       val a = future
-      a.onComplete {
+      a andThen {
         case Success(_) =>
           succCtx.stop()
         case Failure(thr) =>
           failCtx.stop()
       }
-      a
     } catch {
       case NonFatal(thr) =>
         failCtx.stop()
