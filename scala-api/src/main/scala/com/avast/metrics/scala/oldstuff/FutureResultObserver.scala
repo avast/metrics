@@ -1,4 +1,4 @@
-package com.avast.metrics.scalaapi
+package com.avast.metrics.scala.oldstuff
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
