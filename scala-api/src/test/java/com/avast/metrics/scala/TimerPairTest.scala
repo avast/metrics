@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 
-class TimerPaiwrTest extends FlatSpec with BeforeAndAfter with MockitoSugar {
+class TimerPairTest extends FlatSpec with BeforeAndAfter with MockitoSugar {
 
   var success: Timer = _
   var succCtx: TimeContext = _
