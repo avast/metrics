@@ -2,5 +2,3 @@ include 'api'
 include 'core'
 include 'dropwizard'
 include 'scala-api'
-
-
