@@ -1,9 +1,9 @@
 package com.avast.metrics.scalaapi
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class FutureResultObserver[A] {
+class FutureResultObserver[A](implicit ec: ExecutionContext) {
   def observe(future: => Future[A], onSuccess: A => Unit, onFailure: Throwable => Unit): Future[A] = {
     try {
       val fut = future

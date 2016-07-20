@@ -1,8 +1,12 @@
-apply plugin: 'scala';
+apply plugin: 'avast-scala';
 
 avast {
     publish {
         artifactId = 'metrics-scala-api'
+    }
+
+    scala {
+        version = "2.11"
     }
 }
 

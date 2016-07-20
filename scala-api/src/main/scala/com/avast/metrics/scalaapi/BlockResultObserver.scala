@@ -6,7 +6,7 @@ class BlockResultObserver[A] {
   def observe(block: => A, onSuccess: A => Unit, onFailure: Throwable => Unit) = {
     try {
       val res = block
-      onSuccess
+      onSuccess(res)
       res
     } catch {
       case NonFatal(ex) =>

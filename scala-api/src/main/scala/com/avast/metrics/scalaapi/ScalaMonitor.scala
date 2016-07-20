@@ -4,7 +4,9 @@ import java.util.function.Supplier
 
 import com.avast.metrics.api._
 
-class ScalaMonitor(monitor: Monitor) extends Monitor {
+import scala.concurrent.ExecutionContext
+
+class ScalaMonitor(monitor: Monitor)(implicit ec: ExecutionContext) extends Monitor {
   override def named(name: String): Monitor = monitor.named(name)
 
   override def named(name1: String, name2: String, restOfNames: String*): Monitor = monitor.named(name1, name2, restOfNames: _*)
@@ -25,13 +27,17 @@ class ScalaMonitor(monitor: Monitor) extends Monitor {
 
   override def close(): Unit = monitor.close()
 
-  def blockTimer[A](baseName: String): BlockTimer[A] = new BlockTimer[A](newTimer(succName(baseName)), newTimer(failName(baseName)), new BlockResultObserver[A])
+  def blockTimer[A](baseName: String): BlockTimer[A] =
+    new BlockTimer[A](newTimer(succName(baseName)), newTimer(failName(baseName)), new BlockResultObserver[A])
 
-  def futureTimer[A](baseName: String): FutureTimer[A] = new FutureTimer[A](newTimer(succName(baseName)), newTimer(failName(baseName)), new FutureResultObserver[A])
+  def futureTimer[A](baseName: String): FutureTimer[A] =
+    new FutureTimer[A](newTimer(succName(baseName)), newTimer(failName(baseName)), new FutureResultObserver[A])
 
-  def blockCounter[A](baseName: String): BlockCounters[A] = new BlockCounters[A](newCounter(succName(baseName)), newCounter(failName(baseName)), new BlockResultObserver[A])
+  def blockCounter[A](baseName: String): BlockCounters[A] =
+    new BlockCounters[A](newCounter(succName(baseName)), newCounter(failName(baseName)), new BlockResultObserver[A])
 
-  def futureCounter[A](baseName: String): FutureCounters[A] = new FutureCounters[A](newCounter(succName(baseName)), newCounter(failName(baseName)), new FutureResultObserver[A])
+  def futureCounter[A](baseName: String): FutureCounters[A] =
+    new FutureCounters[A](newCounter(succName(baseName)), newCounter(failName(baseName)), new FutureResultObserver[A])
 
   private def succName(base: String) = s"$base-success"
   private def failName(base: String) = s"$base-failure"
