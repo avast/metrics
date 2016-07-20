@@ -1,12 +1,11 @@
 buildscript {
     repositories {
-        maven { url 'http://integration.ff.int.avast.com:9999/artifactory/libs-release' }
+        maven { url 'https://artifactory.int.avast.com/artifactory/maven' }
     }
-
     dependencies {
-        classpath 'com.avast.gradle:gradle-publish:0.8.14'
-        classpath 'com.avast.gradle:gradle-release:0.8.14'
-        classpath 'com.avast.gradle:gradle-scala:0.8.14'
+        classpath 'com.avast.gradle:gradle-publish:0.8.19'
+        classpath 'com.avast.gradle:gradle-release:0.8.19'
+        classpath 'com.avast.gradle:gradle-scala:0.8.19'
     }
 }
 
