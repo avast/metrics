@@ -5,13 +5,13 @@ import api.{Timer => ITimer}
 import com.avast.metrics.api.{Timer => JTimer}
 import com.avast.metrics.api.Timer.TimeContext
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
 
 
-class Timer(inner: JTimer) extends ITimer{
+class Timer(inner: JTimer)(implicit val ec: ExecutionContext) extends ITimer{
   override def start(): TimeContext = inner.start()
 
   override def update(duration: Duration): Unit = {
@@ -19,13 +19,6 @@ class Timer(inner: JTimer) extends ITimer{
   }
 
   override def update(duration: java.time.Duration): Unit = inner.update(duration)
-
-  override def time[A](fn: () => A): A = {
-    val ctx = start()
-    val res = fn()
-    ctx.stop()
-    res
-  }
 
   override def time[A](block: => A): A = {
     val ctx = start()
@@ -37,22 +30,8 @@ class Timer(inner: JTimer) extends ITimer{
   override def time[A](future: => Future[A]): Future[A] = {
     val ctx = start()
     val a = future
-    a.onSuccess { case _: A => ctx.stop() }
+    a.onSuccess { case _ => ctx.stop() }
     a
-  }
-
-  override def time[A](fn: () => A, failure: ITimer): A = {
-    val succCtx = start()
-    val failCtx = failure.start()
-    try {
-      val a = fn()
-      succCtx.stop()
-      a
-    } catch {
-      case NonFatal(thr) =>
-        failCtx.stop()
-        throw thr
-    }
   }
 
   override def time[A](block: => A, failure: ITimer): A = {
@@ -76,7 +55,7 @@ class Timer(inner: JTimer) extends ITimer{
     try {
       val a = future
       a.onComplete {
-        case Success(a) =>
+        case Success(_) =>
           succCtx.stop()
         case Failure(thr) =>
           failCtx.stop()

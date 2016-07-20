@@ -13,13 +13,9 @@ trait Timer {
 
   def update(duration: java.time.Duration): Unit
 
-  def time[A](fn: () => A): A
-
   def time[A](block: => A): A
 
   def time[A](future: => Future[A]): Future[A]
-
-  def time[A](fn: () => A, failure: Timer): A
 
   def time[A](block: => A, failure: Timer): A
 
