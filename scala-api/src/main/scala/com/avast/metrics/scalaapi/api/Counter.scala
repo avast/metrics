@@ -1,4 +1,4 @@
-package com.avast.metrics.scala.api
+package com.avast.metrics.scalaapi.api
 
 trait Counter extends Metric with Counting {
   def inc(): Unit

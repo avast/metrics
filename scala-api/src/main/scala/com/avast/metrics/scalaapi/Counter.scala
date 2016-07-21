@@ -1,9 +1,8 @@
-package com.avast.metrics.scala
+package com.avast.metrics.scalaapi
 
 import com.avast.metrics.api.{Counter => JCounter}
-import com.avast.metrics.scala.api.{Counter => ICounter}
 
-class Counter(inner: JCounter) extends ICounter {
+class Counter(inner: JCounter) extends api.Counter {
   override def inc(): Unit = inner.inc()
 
   override def inc(n: Long): Unit = inner.inc(n)

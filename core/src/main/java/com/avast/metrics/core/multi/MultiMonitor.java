@@ -1,5 +1,6 @@
 package com.avast.metrics.core.multi;
 
+import com.avast.metrics.TimerPairImpl;
 import com.avast.metrics.api.*;
 
 import java.util.ArrayList;
@@ -53,6 +54,7 @@ import java.util.stream.Collectors;
  */
 public class MultiMonitor implements Monitor {
     private final List<Monitor> monitors;
+    private final Naming naming;
 
     /**
      * Factory method. Read {@link MultiMonitor} limitations!
@@ -66,15 +68,33 @@ public class MultiMonitor implements Monitor {
         allMonitors.add(instanceMonitor);
         allMonitors.add(summaryMonitor);
 
-        return new MultiMonitor(allMonitors);
+        return new MultiMonitor(allMonitors, Naming.defaultNaming());
     }
 
-    private MultiMonitor(List<Monitor> monitors) {
+    /**
+     * Factory method. Read {@link MultiMonitor} limitations!
+     *
+     * @param instanceMonitor non-shared main monitor for data from a single instance
+     * @param summaryMonitor  shared summary monitor counting sums per all instances
+     * @param naming naming conventions for TimerPair
+     * @return multi monitor containing all passed monitors
+     */
+
+    public static Monitor of(Monitor instanceMonitor, Monitor summaryMonitor, Naming naming) {
+        List<Monitor> allMonitors = new ArrayList<>(2);
+        allMonitors.add(instanceMonitor);
+        allMonitors.add(summaryMonitor);
+
+        return new MultiMonitor(allMonitors, naming);
+    }
+
+    private MultiMonitor(List<Monitor> monitors, Naming naming) {
         if (monitors.size() < 2) {
             throw new IllegalArgumentException("Multi monitor from less than 2 monitors makes no sense");
         }
 
         this.monitors = monitors;
+        this.naming = naming;
     }
 
     /**
@@ -126,11 +146,29 @@ public class MultiMonitor implements Monitor {
 
     @Override
     public Timer newTimer(String name) {
+        return newMultiTimer(name);
+    }
+
+    private MultiTimer newMultiTimer(String name) {
         List<Timer> timers = monitors.stream()
                 .map(m -> m.newTimer(name))
                 .collect(Collectors.toList());
 
         return new MultiTimer(timers);
+    }
+
+
+    /**
+     * TimerPair multi monitor. Uses instanceMonitor (first parameter of the factory method) to create failure timer.
+     * @param name
+     * @return
+     */
+    @Override
+    public TimerPair newTimerPair(String name) {
+        return new TimerPairImpl(
+                newMultiTimer(name),
+                monitors.get(0).newTimer(naming.successTimerName(name))
+        );
     }
 
     /**

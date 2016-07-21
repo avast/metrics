@@ -1,4 +1,4 @@
-package com.avast.metrics.scala.api
+package com.avast.metrics.scalaapi.api
 
 trait Monitor {
   def named(name: String): Monitor

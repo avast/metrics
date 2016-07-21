@@ -1,12 +1,6 @@
 package com.avast.metrics.test;
 
-import com.avast.metrics.api.Counter;
-import com.avast.metrics.api.Gauge;
-import com.avast.metrics.api.Histogram;
-import com.avast.metrics.api.Meter;
-import com.avast.metrics.api.Metric;
-import com.avast.metrics.api.Monitor;
-import com.avast.metrics.api.Timer;
+import com.avast.metrics.api.*;
 
 import java.time.Duration;
 import java.util.concurrent.Callable;
@@ -129,6 +123,21 @@ public class NoOpMonitor implements Monitor {
             @Override
             public String getName() {
                 return "";
+            }
+        };
+    }
+
+    @Override
+    public TimerPair newTimerPair(String name) {
+        return new TimerPair() {
+            @Override
+            public <T> T time(Callable<T> operation) throws Exception {
+                return operation.call();
+            }
+
+            @Override
+            public <T> CompletableFuture<T> timeAsync(Callable<CompletableFuture<T>> operation, Executor executor) throws Exception {
+                return operation.call();
             }
         };
     }

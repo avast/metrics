@@ -1,12 +1,10 @@
-package com.avast.metrics.scala
-
-import api.{TimerPair => ITimerPair}
+package com.avast.metrics.scalaapi
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
+import scala.util.{Failure, Success}
 
-class TimerPair(success: Timer, failure: Timer)(implicit ec: ExecutionContext) extends ITimerPair {
+class TimerPair(success: api.Timer, failure: api.Timer)(implicit ec: ExecutionContext) extends api.TimerPair {
   override def time[A](block: => A): A = {
     val succCtx = success.start()
     val failCtx = failure.start()

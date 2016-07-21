@@ -32,6 +32,8 @@ public interface Monitor extends AutoCloseable {
 
     Timer newTimer(String name);
 
+    TimerPair newTimerPair(String name);
+
     <T> Gauge<T> newGauge(String name, Supplier<T> gauge);
 
     Histogram newHistogram(String name);

@@ -1,9 +1,8 @@
-package com.avast.metrics.scala
+package com.avast.metrics.scalaapi
 
 import com.avast.metrics.api.{Meter => JMeter}
-import com.avast.metrics.scala.api.{Meter => IMeter}
 
-class Meter(meter: JMeter) extends IMeter {
+class Meter(meter: JMeter) extends api.Meter {
   override def mark(): Unit = meter.mark()
 
   override def mark(n: Long): Unit = meter.mark(n)

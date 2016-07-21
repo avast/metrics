@@ -1,4 +1,4 @@
-package com.avast.metrics.scala.api
+package com.avast.metrics.scalaapi.api
 
 import scala.concurrent.Future
 

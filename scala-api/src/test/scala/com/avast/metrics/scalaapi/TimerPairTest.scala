@@ -1,13 +1,13 @@
-package com.avast.metrics.scala
+package com.avast.metrics.scalaapi
 
 import com.avast.metrics.api.Timer.TimeContext
+import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfter, FlatSpec}
-import org.mockito.Mockito._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
 class TimerPairTest extends FlatSpec with BeforeAndAfter with MockitoSugar {
 

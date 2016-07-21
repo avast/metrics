@@ -1,5 +1,6 @@
 package com.avast.metrics.dropwizard;
 
+import com.avast.metrics.TimerPairImpl;
 import com.avast.metrics.api.*;
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
@@ -23,19 +24,22 @@ public class MetricsMonitor implements Monitor {
 
     protected final MetricRegistry registry;
     protected final List<String> names = new ArrayList<>();
+    protected final Naming naming;
 
     public MetricsMonitor() {
-        this.registry = new MetricRegistry();
+        this(new MetricRegistry(), Naming.defaultNaming());
     }
 
-    public MetricsMonitor(MetricRegistry registry) {
+    public MetricsMonitor(MetricRegistry registry, Naming naming) {
         this.registry = registry;
+        this.naming = naming;
     }
 
     protected MetricsMonitor(MetricsMonitor original, String... names) {
         this.registry = original.registry;
         this.names.addAll(original.names);
         this.names.addAll(Arrays.asList(names));
+        this.naming = original.naming;
     }
 
     @Override
@@ -66,6 +70,14 @@ public class MetricsMonitor implements Monitor {
     @Override
     public Timer newTimer(String name) {
         return withMetricName(name, n -> new MetricsTimer(n, registry.timer(n)));
+    }
+
+    @Override
+    public TimerPair newTimerPair(String name) {
+        return new TimerPairImpl(
+                newTimer(naming.successTimerName(name)),
+                newTimer(naming.failureTimerName(name))
+        );
     }
 
     @Override

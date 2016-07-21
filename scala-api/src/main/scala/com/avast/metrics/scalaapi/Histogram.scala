@@ -1,9 +1,8 @@
-package com.avast.metrics.scala
+package com.avast.metrics.scalaapi
 
 import com.avast.metrics.api.{Histogram => JHistogram}
-import com.avast.metrics.scala.api.{Histogram => IHistogram}
 
-class Histogram(histogram: JHistogram) extends IHistogram {
+class Histogram(histogram: JHistogram) extends api.Histogram {
   override def update(value: Long): Unit = histogram.update(value)
 
   override def name: String = histogram.getName
