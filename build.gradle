@@ -19,7 +19,7 @@ allprojects {
     targetCompatibility = '1.8'
 
     repositories {
-        maven { url 'http://integration.ff.int.avast.com:9999/artifactory/libs-release' }
+        maven { url 'https://artifactory.int.avast.com/artifactory/maven' }
     }
 
     avast {
