@@ -1,6 +1,7 @@
 package com.avast.metrics.dropwizard;
 
 import com.avast.metrics.api.Monitor;
+import com.avast.metrics.api.Naming;
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.ObjectNameFactory;
@@ -10,19 +11,19 @@ public class JmxMetricsMonitor extends MetricsMonitor {
     private final JmxReporter reporter;
 
     public JmxMetricsMonitor(String domain) {
-        this(domain, new MetricRegistry());
+        this(domain, new MetricRegistry(), Naming.defaultNaming());
     }
 
-    public JmxMetricsMonitor(String domain, MetricRegistry metricRegistry) {
-        this(TreeObjectNameFactory.getInstance(), domain, metricRegistry);
+    public JmxMetricsMonitor(String domain, MetricRegistry metricRegistry, Naming naming) {
+        this(TreeObjectNameFactory.getInstance(), domain, metricRegistry, naming);
     }
 
-    public JmxMetricsMonitor(ObjectNameFactory objectNameFactory, String domain) {
-        this(objectNameFactory, domain, new MetricRegistry());
+    public JmxMetricsMonitor(ObjectNameFactory objectNameFactory, String domain, Naming naming) {
+        this(objectNameFactory, domain, new MetricRegistry(), naming);
     }
 
-    public JmxMetricsMonitor(ObjectNameFactory objectNameFactory, String domain, MetricRegistry metricRegistry) {
-        super(metricRegistry);
+    public JmxMetricsMonitor(ObjectNameFactory objectNameFactory, String domain, MetricRegistry metricRegistry, Naming naming) {
+        super(metricRegistry, naming);
         this.reporter = JmxReporter
             .forRegistry(registry)
             .inDomain(domain)
