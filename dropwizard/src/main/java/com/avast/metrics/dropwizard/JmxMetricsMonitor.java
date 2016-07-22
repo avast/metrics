@@ -6,9 +6,6 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.ObjectNameFactory;
 
 
-/**
- *
- */
 public class JmxMetricsMonitor extends MetricsMonitor {
 
     private final JmxReporter reporter;
