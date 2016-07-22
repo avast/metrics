@@ -1,10 +1,10 @@
 package com.avast.metrics.dropwizard;
 
-import com.avast.metrics.api.Monitor;
 import com.avast.metrics.api.Naming;
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.ObjectNameFactory;
+
 
 public class JmxMetricsMonitor extends MetricsMonitor {
 
@@ -24,18 +24,26 @@ public class JmxMetricsMonitor extends MetricsMonitor {
 
     public JmxMetricsMonitor(ObjectNameFactory objectNameFactory, String domain, MetricRegistry metricRegistry, Naming naming) {
         super(metricRegistry, naming);
-        this.reporter = JmxReporter
-            .forRegistry(registry)
-            .inDomain(domain)
-            .createsObjectNamesWith(objectNameFactory)
-            .build();
-        this.reporter.start();
+        String propName = "avastMetricsDisableJmx";
+        String disableJmxProp = System.getProperty(propName);
+        if(disableJmxProp != null && !disableJmxProp.equals("true")) {
+            this.reporter = JmxReporter
+                    .forRegistry(registry)
+                    .inDomain(domain)
+                    .createsObjectNamesWith(objectNameFactory)
+                    .build();
+            this.reporter.start();
+        } else {
+            LOGGER.warn("jmx reporting disabled (system property `{}` = true)", propName);
+            this.reporter = null;
+        }
     }
 
     private JmxMetricsMonitor(JmxMetricsMonitor original, String... names) {
         super(original, names);
         this.reporter = original.reporter;
     }
+
 
     @Override
     public JmxMetricsMonitor named(String name) {
@@ -55,7 +63,9 @@ public class JmxMetricsMonitor extends MetricsMonitor {
     @Override
     public void close() {
         LOGGER.debug("Stopping JmxReporter");
-        reporter.stop();
+        if(reporter != null) {
+            reporter.stop();
+        }
         super.close();
     }
 

@@ -13,6 +13,7 @@ Library for application monitoring. It's abstraction of metrics is inspired by [
 The library is divided into submodules:
 * **metrics-api** - API layer that you can depend on if you are creating a library which should not force any metrics implementation,
 * **metrics-dropwizard** - for now the only implementation via Dropwizard Metrics.
+* **metrics-scala** - Scala wrapper around `metrics-api` implementation (such as `metrics-dropwizard`) which provides a nicer API 
 
 The entry-point into the library is the interface `Monitor`. Your classes need to get an instance of a monitor which they can use to construct different metrics, e.g. meters, timers or histograms.
 Instances of the individuals metrics can be used to monitor your application. The default implementation that will most probably be used is [JmxMetricsMonitor](dropwizard/src/main/java/com/avast/metrics/dropwizard/JmxMetricsMonitor.java)
@@ -49,3 +50,12 @@ Handler handler = new Handler(monitor.named("Handler1"));
 
 ## Unit Testing
 There is a singleton [NoOpMonitor.INSTANCE](api/src/main/java/com/avast/metrics/test/NoOpMonitor.java) in the `metrics-api` submodule that can be used in tests.
+
+## Disabling JMX
+Sometimes you want to globally disable JMX monitoring on the server (for example on our testing servers). You can do that by setting system property `avastMetricsDisableJmx=true`. To do that from bash, you can use:
+
+```sh
+ java -jar -DavastMetricsDisableJmx="true" program.jar
+```
+
+Any value that is not `true` will be ignored.
