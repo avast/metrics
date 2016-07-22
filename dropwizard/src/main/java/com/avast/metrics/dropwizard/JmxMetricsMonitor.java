@@ -24,9 +24,9 @@ public class JmxMetricsMonitor extends MetricsMonitor {
 
     public JmxMetricsMonitor(ObjectNameFactory objectNameFactory, String domain, MetricRegistry metricRegistry, Naming naming) {
         super(metricRegistry, naming);
-        String disableJmxProp = System.getProperty("avastMetricsDisableJmx");
+        String propName = "avastMetricsDisableJmx";
+        String disableJmxProp = System.getProperty(propName);
         if(disableJmxProp != null && !disableJmxProp.equals("true")) {
-            LOGGER.debug("jmx reporting enabled - systme property: " + disableJmxProp);
             this.reporter = JmxReporter
                     .forRegistry(registry)
                     .inDomain(domain)
@@ -34,7 +34,7 @@ public class JmxMetricsMonitor extends MetricsMonitor {
                     .build();
             this.reporter.start();
         } else {
-            LOGGER.warn("jmx reporting disabled (due to set system property override)");
+            LOGGER.warn("jmx reporting disabled (system property `{}` = true)", propName);
             this.reporter = null;
         }
     }
