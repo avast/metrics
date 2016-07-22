@@ -8,7 +8,7 @@ import scala.concurrent.ExecutionContext
 
 
 object Monitor {
-  def apply(monitor: JMonitor)(implicit ec: ExecutionContext): Monitor = new Monitor(monitor, Naming.defaultNaming())
+  def apply(monitor: JMonitor)(implicit ec: ExecutionContext): api.Monitor = new Monitor(monitor, Naming.defaultNaming())
 }
 class Monitor(monitor: JMonitor, naming: Naming)(implicit ec: ExecutionContext) extends api.Monitor {
   override def named(name: String): api.Monitor =
