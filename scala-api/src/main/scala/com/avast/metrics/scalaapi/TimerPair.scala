@@ -4,7 +4,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
 
-class TimerPair(success: api.Timer, failure: api.Timer)(implicit ec: ExecutionContext) extends api.TimerPair {
+class TimerPair(success: api.Timer, failure: api.Timer) extends api.TimerPair {
   override def time[A](block: => A): A = {
     val succCtx = success.start()
     val failCtx = failure.start()
@@ -20,7 +20,7 @@ class TimerPair(success: api.Timer, failure: api.Timer)(implicit ec: ExecutionCo
     }
   }
 
-  override def time[A](future: => Future[A]): Future[A] = {
+  override def time[A](future: => Future[A])(implicit ec: ExecutionContext): Future[A] = {
     val succCtx = success.start()
     val failCtx = failure.start()
     try {

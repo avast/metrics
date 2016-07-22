@@ -9,13 +9,13 @@ import scala.concurrent.ExecutionContext
 
 
 object Monitor {
-  def apply(monitor: JMonitor)(implicit ec: ExecutionContext): api.Monitor = new Monitor(monitor, Naming.defaultNaming())
-  def noOp(implicit ec: ExecutionContext): api.Monitor = {
+  def apply(monitor: JMonitor): api.Monitor = new Monitor(monitor, Naming.defaultNaming())
+  def noOp(): api.Monitor = {
     apply(NoOpMonitor.INSTANCE)
   }
 }
 
-class Monitor(monitor: JMonitor, naming: Naming)(implicit ec: ExecutionContext) extends api.Monitor {
+class Monitor(monitor: JMonitor, naming: Naming) extends api.Monitor {
   override def named(name: String): api.Monitor =
     new Monitor(monitor.named(name), naming)
 

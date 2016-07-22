@@ -8,7 +8,7 @@ import com.avast.metrics.api.{Timer => JTimer}
 import scala.concurrent.ExecutionContext
 
 
-class Timer(inner: JTimer)(implicit val ec: ExecutionContext) extends api.Timer {
+class Timer(inner: JTimer) extends api.Timer {
   override def start(): TimeContext = inner.start()
 
   override def update(duration: Duration): Unit = inner.update(duration)
