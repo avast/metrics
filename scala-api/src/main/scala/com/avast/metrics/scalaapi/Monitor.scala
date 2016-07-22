@@ -10,7 +10,7 @@ import scala.concurrent.ExecutionContext
 
 object Monitor {
   def apply(monitor: JMonitor)(implicit ec: ExecutionContext): api.Monitor = new Monitor(monitor, Naming.defaultNaming())
-  def noOp(): api.Monitor = {
+  def noOp(implicit ec: ExecutionContext): api.Monitor = {
     apply(NoOpMonitor.INSTANCE)
   }
 }
