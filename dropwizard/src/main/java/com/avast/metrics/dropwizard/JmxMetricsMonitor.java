@@ -34,7 +34,7 @@ public class JmxMetricsMonitor extends MetricsMonitor {
                     .build();
             this.reporter.start();
         } else {
-            LOGGER.warn("jmx reporting disabled (system property `{}` = true)", propName);
+            LOGGER.warn("jmx reporting disabled (system property `{}` = `{}`)", propName, disableJmxProp);
             this.reporter = null;
         }
     }
