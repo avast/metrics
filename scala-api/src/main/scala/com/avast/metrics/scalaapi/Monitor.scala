@@ -3,13 +3,18 @@ package com.avast.metrics.scalaapi
 import java.util.function.Supplier
 
 import com.avast.metrics.api.{Naming, Monitor => JMonitor}
+import com.avast.metrics.test.NoOpMonitor
 
 import scala.concurrent.ExecutionContext
 
 
 object Monitor {
   def apply(monitor: JMonitor)(implicit ec: ExecutionContext): api.Monitor = new Monitor(monitor, Naming.defaultNaming())
+  def noOp(): api.Monitor = {
+    apply(NoOpMonitor.INSTANCE)
+  }
 }
+
 class Monitor(monitor: JMonitor, naming: Naming)(implicit ec: ExecutionContext) extends api.Monitor {
   override def named(name: String): api.Monitor =
     new Monitor(monitor.named(name), naming)
