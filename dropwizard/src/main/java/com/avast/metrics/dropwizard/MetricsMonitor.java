@@ -82,8 +82,16 @@ public class MetricsMonitor implements Monitor {
 
     @Override
     public <T> Gauge<T> newGauge(String name, Supplier<T> gauge) {
+        return newGauge(name, false, gauge);
+    }
+
+    @Override
+    public <T> Gauge<T> newGauge(String name, boolean replaceExisting, Supplier<T> gauge) {
         return withMetricName(name, n -> {
             MetricsGauge.SupplierGauge<T> supplierGauge = new MetricsGauge.SupplierGauge<>(gauge);
+            if (replaceExisting) {
+                registry.remove(name);
+            }
             registry.register(n, supplierGauge);
             return new MetricsGauge<>(n, supplierGauge);
         });

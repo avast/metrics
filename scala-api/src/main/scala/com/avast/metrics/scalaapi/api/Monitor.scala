@@ -9,5 +9,6 @@ trait Monitor {
   def timer(name: String): Timer
   def timerPair(name: String): TimerPair
   def gauge[A](name: String)(gauge: () => A): Gauge[A]
+  def gauge[A](name: String, replaceExisting: Boolean)(gauge: () => A): Gauge[A]
   def histogram(name: String): Histogram
 }
