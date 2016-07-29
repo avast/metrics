@@ -36,6 +36,8 @@ public interface Monitor extends AutoCloseable {
 
     <T> Gauge<T> newGauge(String name, Supplier<T> gauge);
 
+    <T> Gauge<T> newGauge(String name, boolean replaceExisting, Supplier<T> gauge);
+
     Histogram newHistogram(String name);
 
     void remove(Metric metric);

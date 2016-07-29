@@ -143,7 +143,12 @@ public class NoOpMonitor implements Monitor {
     }
 
     @Override
-    public <T> Gauge<T> newGauge(String String, Supplier<T> gauge) {
+    public <T> Gauge<T> newGauge(String name, Supplier<T> gauge) {
+        return newGauge(name, false, gauge);
+    }
+
+    @Override
+    public <T> Gauge<T> newGauge(String name, boolean replaceExisting, Supplier<T> gauge) {
         return new Gauge<T>() {
             @Override
             public T getValue() {

@@ -184,7 +184,12 @@ public class MultiMonitor implements Monitor {
      */
     @Override
     public <T> Gauge<T> newGauge(String name, Supplier<T> gauge) {
-        return monitors.get(0).newGauge(name, gauge);
+        return newGauge(name, false, gauge);
+    }
+
+    @Override
+    public <T> Gauge<T> newGauge(String name, boolean replaceExisting, Supplier<T> gauge) {
+        return monitors.get(0).newGauge(name, replaceExisting, gauge);
     }
 
     @Override

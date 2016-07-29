@@ -5,8 +5,6 @@ import java.util.function.Supplier
 import com.avast.metrics.api.{Naming, Monitor => JMonitor}
 import com.avast.metrics.test.NoOpMonitor
 
-import scala.concurrent.ExecutionContext
-
 
 object Monitor {
   def apply(monitor: JMonitor): api.Monitor = new Monitor(monitor, Naming.defaultNaming())
@@ -40,7 +38,10 @@ class Monitor(monitor: JMonitor, naming: Naming) extends api.Monitor {
     )
 
   override def gauge[A](name: String)(value: () => A): api.Gauge[A] =
-    new Gauge[A](monitor.newGauge(name, new Supplier[A] {
+    gauge(name, false)(value)
+
+  override def gauge[A](name: String, replaceExisting: Boolean)(value: () => A): api.Gauge[A] =
+    new Gauge[A](monitor.newGauge(name, replaceExisting, new Supplier[A] {
       override def get(): A = value()
     }))
 
