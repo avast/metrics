@@ -90,7 +90,7 @@ public class MetricsMonitor implements Monitor {
         return withMetricName(name, n -> {
             MetricsGauge.SupplierGauge<T> supplierGauge = new MetricsGauge.SupplierGauge<>(gauge);
             if (replaceExisting) {
-                registry.remove(name);
+                registry.remove(n);
             }
             registry.register(n, supplierGauge);
             return new MetricsGauge<>(n, supplierGauge);
