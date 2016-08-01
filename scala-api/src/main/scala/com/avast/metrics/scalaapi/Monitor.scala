@@ -1,50 +1,28 @@
 package com.avast.metrics.scalaapi
 
-import java.util.function.Supplier
-
 import com.avast.metrics.api.{Naming, Monitor => JMonitor}
 import com.avast.metrics.test.NoOpMonitor
 
 
+trait Monitor {
+  def named(name: String): Monitor
+  def named(name: String, name2: String, names: String*): Monitor
+  def getName: String
+  def meter(name: String): Meter
+  def counter(name: String): Counter
+  def timer(name: String): Timer
+  def timerPair(name: String): TimerPair
+  def gauge[A](name: String)(gauge: () => A): Gauge[A]
+  def gauge[A](name: String, replaceExisting: Boolean)(gauge: () => A): Gauge[A]
+  def histogram(name: String): Histogram
+}
+
 object Monitor {
-  def apply(monitor: JMonitor): api.Monitor = new Monitor(monitor, Naming.defaultNaming())
-  def noOp(): api.Monitor = {
+  def apply(monitor: JMonitor): Monitor = new impl.MonitorImpl(monitor, Naming.defaultNaming())
+  def noOp(): Monitor = {
     apply(NoOpMonitor.INSTANCE)
   }
 }
 
-class Monitor(monitor: JMonitor, naming: Naming) extends api.Monitor {
-  override def named(name: String): api.Monitor =
-    new Monitor(monitor.named(name), naming)
 
-  override def named(name: String, name2: String, names: String*): api.Monitor =
-    new Monitor(monitor.named(name, name2, names: _*), naming)
 
-  override def getName: String = monitor.getName
-
-  override def meter(name: String): api.Meter =
-    new Meter(monitor.newMeter(name))
-
-  override def counter(name: String): api.Counter =
-    new Counter(monitor.newCounter(name))
-
-  override def timer(name: String): api.Timer =
-    new Timer(monitor.newTimer(name))
-
-  override def timerPair(name: String): api.TimerPair =
-    new TimerPair(
-      timer(naming.successTimerName(name)),
-      timer(naming.failureTimerName(name))
-    )
-
-  override def gauge[A](name: String)(value: () => A): api.Gauge[A] =
-    gauge(name, false)(value)
-
-  override def gauge[A](name: String, replaceExisting: Boolean)(value: () => A): api.Gauge[A] =
-    new Gauge[A](monitor.newGauge(name, replaceExisting, new Supplier[A] {
-      override def get(): A = value()
-    }))
-
-  override def histogram(name: String): api.Histogram =
-    new Histogram(monitor.newHistogram(name))
-}
