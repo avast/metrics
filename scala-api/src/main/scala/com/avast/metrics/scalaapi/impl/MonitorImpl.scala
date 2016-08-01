@@ -6,7 +6,7 @@ import com.avast.metrics.api.{Naming, Monitor => JMonitor}
 import com.avast.metrics.scalaapi._
 import com.avast.metrics.scalaapi.impl._
 
-class MonitorImpl(monitor: JMonitor, naming: Naming) extends Monitor {
+private[scalaapi] class MonitorImpl(monitor: JMonitor, naming: Naming) extends Monitor {
   override def named(name: String): Monitor =
     new MonitorImpl(monitor.named(name), naming)
 
