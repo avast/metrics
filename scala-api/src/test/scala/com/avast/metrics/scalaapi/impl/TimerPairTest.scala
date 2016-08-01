@@ -1,6 +1,7 @@
-package com.avast.metrics.scalaapi
+package com.avast.metrics.scalaapi.impl
 
 import com.avast.metrics.api.Timer.TimeContext
+import com.avast.metrics.scalaapi.{Timer, TimerPair}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfter, FlatSpec}
@@ -18,15 +19,15 @@ class TimerPairTest extends FlatSpec with BeforeAndAfter with MockitoSugar {
   var pair : TimerPair = _
 
   before {
-    success = mock[Timer]
+    success = mock[TimerImpl]
     succCtx = mock[TimeContext]
     when(success.start()).thenReturn(succCtx)
 
-    failure = mock[Timer]
+    failure = mock[TimerImpl]
     failCtx = mock[TimeContext]
     when(failure.start()).thenReturn(failCtx)
 
-    pair = new TimerPair(success, failure)
+    pair = new TimerPairImpl(success, failure)
   }
 
   "time block" should "hit success timer if no exception is thrown" in {
