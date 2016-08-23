@@ -3,7 +3,7 @@ package com.avast.metrics.scalaapi.impl
 import com.avast.metrics.api.Timer.TimeContext
 import com.avast.metrics.scalaapi.{Timer, TimerPair}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfter, FlatSpec}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -16,7 +16,7 @@ class TimerPairTest extends FlatSpec with BeforeAndAfter with MockitoSugar {
   var succCtx: TimeContext = _
   var failure: Timer = _
   var failCtx: TimeContext = _
-  var pair : TimerPair = _
+  var pair: TimerPair = _
 
   before {
     success = mock[TimerImpl]
@@ -42,7 +42,7 @@ class TimerPairTest extends FlatSpec with BeforeAndAfter with MockitoSugar {
   it should "hit failure timer if an exception is thrown and should rethrow the exception" in {
     val expected = new Exception
 
-    intercept[Exception]{ pair.time { throw expected } }
+    intercept[Exception] { pair.time { throw expected } }
 
     verify(succCtx, times(0)).stop()
     verify(failCtx, times(1)).stop()
@@ -61,7 +61,7 @@ class TimerPairTest extends FlatSpec with BeforeAndAfter with MockitoSugar {
     val expected = new Exception
     val fut = Future.failed(expected)
 
-    intercept[Exception]{ Await.result(pair.time(fut), 10.seconds) }
+    intercept[Exception] { Await.result(pair.time(fut), 10.seconds) }
     verify(succCtx, times(0)).stop()
     verify(failCtx, times(1)).stop()
   }

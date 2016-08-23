@@ -3,15 +3,15 @@ buildscript {
         maven { url 'https://artifactory.int.avast.com/artifactory/maven' }
     }
     dependencies {
-        classpath 'com.avast.gradle:gradle-publish:0.8.19'
-        classpath 'com.avast.gradle:gradle-release:0.8.19'
-        classpath 'com.avast.gradle:gradle-scala:0.8.19'
+        classpath 'com.avast.gradle:gradle-publish:0.9.0'
+        classpath 'com.avast.gradle:gradle-release:0.9.0'
+        classpath 'com.avast.gradle:gradle-scala:0.9.0'
     }
 }
 
 apply plugin: 'avast-release'
 
-allprojects {
+subprojects {
     apply plugin: 'java'
     apply plugin: 'avast-publish'
 
@@ -30,11 +30,5 @@ allprojects {
 
     tasks.withType(Javadoc) {
         options.addStringOption('Xdoclint:none', '-quiet')
-    }
-}
-
-avast {
-    publish {
-        artifactId = 'metrics-parent'
     }
 }
