@@ -3,8 +3,7 @@ package com.avast.metrics.scalaapi
 import com.avast.metrics.api.{Naming, Monitor => JMonitor}
 import com.avast.metrics.test.NoOpMonitor
 
-
-trait Monitor {
+trait Monitor extends AutoCloseable {
   def named(name: String): Monitor
   def named(name: String, name2: String, names: String*): Monitor
   def getName: String
@@ -18,10 +17,13 @@ trait Monitor {
 }
 
 object Monitor {
+
   def apply(monitor: JMonitor): Monitor = new impl.MonitorImpl(monitor, Naming.defaultNaming())
+
   def noOp(): Monitor = {
     apply(NoOpMonitor.INSTANCE)
   }
+
 }
 
 
