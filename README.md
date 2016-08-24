@@ -2,10 +2,10 @@
 
 * **Developer:** janecek@avast.com
 * **SCM:** https://git.int.avast.com/ff/metrics
-* **CI:** https://integration2.ff.int.avast.com/job/metrics
+* **CI:** https://teamcity.int.avast.com/project.html?projectId=CloudSystems_Metrics&tab=projectOverview
 * **SCM:** [ABE](https://butr.avast.com/browse/ABE/?selectedTab=com.atlassian.jira.jira-projects-plugin:components-panel)
 
-The **latest stable release** can be found on the [CI server](https://integration2.ff.int.avast.com/job/metrics-release/lastSuccessfulBuild) or in our [release blog](https://cml.avast.com/label/FF/metrics).
+The **latest stable release** can be found in our [release blog](https://cml.avast.com/label/FF/metrics).
 
 ## Introduction
 Library for application monitoring. It's abstraction of metrics is inspired by [Dropwizard Metrics](https://github.com/dropwizard/metrics).
