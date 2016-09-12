@@ -15,7 +15,7 @@ trait Monitor extends AutoCloseable {
   def gauge[A](name: String, replaceExisting: Boolean)(gauge: () => A): Gauge[A]
   def histogram(name: String): Histogram
 
-  def underlying: JMonitor
+  def asJava: JMonitor
 }
 
 object Monitor {
