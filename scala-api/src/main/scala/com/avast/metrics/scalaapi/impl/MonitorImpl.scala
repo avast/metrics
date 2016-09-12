@@ -35,4 +35,6 @@ private[scalaapi] class MonitorImpl(monitor: JMonitor, naming: Naming) extends M
 
   override def close(): Unit = monitor.close()
 
+  override def asJava: JMonitor = monitor
+
 }
