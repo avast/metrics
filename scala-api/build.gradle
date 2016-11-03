@@ -7,6 +7,8 @@ avast {
 
     scala {
         version = '2.11'
+        crossVersions = ["2.11", "2.12"]
+        versionCatalog = ["2.11": "2.11.8", "2.12": "2.12.0"]
     }
 }
 
@@ -14,5 +16,5 @@ dependencies {
     compile project(':api')
 
     testCompile "org.scalatest:scalatest_?:3.0.0"
-    testCompile "org.mockito:mockito-all:1.9.5"
+    testCompile "org.mockito:mockito-all:1.10.19"
 }
