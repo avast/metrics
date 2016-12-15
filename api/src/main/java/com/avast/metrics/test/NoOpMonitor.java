@@ -87,7 +87,15 @@ public class NoOpMonitor implements Monitor {
         return new Timer() {
             @Override
             public TimeContext start() {
-                return () -> {
+                return new TimeContext() {
+                    @Override
+                    public void stop() {
+                    }
+
+                    @Override
+                    public long stopAndGetTime() {
+                        return 0;
+                    }
                 };
             }
 
