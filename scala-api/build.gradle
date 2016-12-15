@@ -15,6 +15,6 @@ avast {
 dependencies {
     compile project(':api')
 
-    testCompile "org.scalatest:scalatest_?:3.0.0"
+    testCompile "org.scalatest:scalatest_?:3.0.1"
     testCompile "org.mockito:mockito-all:1.10.19"
 }

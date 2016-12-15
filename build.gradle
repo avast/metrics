@@ -3,9 +3,9 @@ buildscript {
         maven { url 'https://artifactory.int.avast.com/artifactory/maven' }
     }
     dependencies {
-        classpath 'com.avast.gradle:gradle-publish:0.9.3'
-        classpath 'com.avast.gradle:gradle-release:0.9.3'
-        classpath 'com.avast.gradle:gradle-scala:0.9.3'
+        classpath 'com.avast.gradle:gradle-publish:0.10.3'
+        classpath 'com.avast.gradle:gradle-release:0.10.3'
+        classpath 'com.avast.gradle:gradle-scala:0.10.3'
     }
 }
 
@@ -26,9 +26,5 @@ subprojects {
         publish {
             groupId = 'com.avast.metrics'
         }
-    }
-
-    tasks.withType(Javadoc) {
-        options.addStringOption('Xdoclint:none', '-quiet')
     }
 }
