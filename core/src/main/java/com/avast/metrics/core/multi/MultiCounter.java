@@ -47,4 +47,5 @@ class MultiCounter implements Counter {
     public String getName() {
         return counters.get(0).getName();
     }
+
 }

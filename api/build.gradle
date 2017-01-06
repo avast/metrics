@@ -1,5 +1,5 @@
 avast {
     publish {
-        artifactId = 'metrics-api'
+        artifactId = "metrics-api"
     }
 }

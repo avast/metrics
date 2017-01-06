@@ -1,4 +1,6 @@
-include 'api'
-include 'core'
-include 'dropwizard'
-include 'scala-api'
+rootProject.name = "metrics"
+
+include "api"
+include "core"
+include "dropwizard"
+include "scala-api"

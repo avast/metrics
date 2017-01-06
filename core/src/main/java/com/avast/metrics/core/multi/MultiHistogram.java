@@ -27,4 +27,5 @@ class MultiHistogram implements Histogram {
     public String getName() {
         return histograms.get(0).getName();
     }
+
 }

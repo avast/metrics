@@ -1,9 +1,9 @@
 avast {
     publish {
-        artifactId = 'metrics-core'
+        artifactId = "metrics-core"
     }
 }
 
 dependencies {
-    compile project(':api')
+    compile project(":api")
 }

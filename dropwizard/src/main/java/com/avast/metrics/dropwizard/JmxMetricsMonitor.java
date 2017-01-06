@@ -26,7 +26,7 @@ public class JmxMetricsMonitor extends MetricsMonitor {
         super(metricRegistry, naming);
         String propName = "avastMetricsDisableJmx";
         String disableJmxProp = System.getProperty(propName);
-        if(disableJmxProp == null || !disableJmxProp.equals("true")) {
+        if (disableJmxProp == null || !disableJmxProp.equals("true")) {
             this.reporter = JmxReporter
                     .forRegistry(registry)
                     .inDomain(domain)
@@ -63,7 +63,7 @@ public class JmxMetricsMonitor extends MetricsMonitor {
     @Override
     public void close() {
         LOGGER.debug("Stopping JmxReporter");
-        if(reporter != null) {
+        if (reporter != null) {
             reporter.stop();
         }
         super.close();

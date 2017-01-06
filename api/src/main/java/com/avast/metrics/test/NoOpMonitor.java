@@ -21,7 +21,9 @@ public class NoOpMonitor implements Monitor {
     }
 
     @Override
-    public Monitor named(String name1, String name2, String... restOfNames) { return this; }
+    public Monitor named(String name1, String name2, String... restOfNames) {
+        return this;
+    }
 
     @Override
     public String getName() {

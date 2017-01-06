@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  * adding them together would typically produce a value that doesn't make any sense at all.
  * <p>
  * {@link #named(String)} creates a new multi monitor with the name applied only to the instance monitor, the summary
- *  one is untouched and only copied. This allows to dynamically create new sub-monitors while summary is preserved.
+ * one is untouched and only copied. This allows to dynamically create new sub-monitors while summary is preserved.
  * <p>
  * {@link #remove(Metric)} removes the metric only from the first wrapped monitor. The summary monitor is shared by
  * multiple instances so the remove might cause some unexpected problems in such case.
@@ -53,6 +53,7 @@ import java.util.stream.Collectors;
  * </code></pre>
  */
 public class MultiMonitor implements Monitor {
+
     private final List<Monitor> monitors;
     private final Naming naming;
 
@@ -76,7 +77,7 @@ public class MultiMonitor implements Monitor {
      *
      * @param instanceMonitor non-shared main monitor for data from a single instance
      * @param summaryMonitor  shared summary monitor counting sums per all instances
-     * @param naming naming conventions for TimerPair
+     * @param naming          naming conventions for TimerPair
      * @return multi monitor containing all passed monitors
      */
 
@@ -160,6 +161,7 @@ public class MultiMonitor implements Monitor {
 
     /**
      * TimerPair multi monitor. Uses instanceMonitor (first parameter of the factory method) to create failure timer.
+     *
      * @param name
      * @return
      */
@@ -218,4 +220,5 @@ public class MultiMonitor implements Monitor {
     public void close() {
         monitors.forEach(Monitor::close);
     }
+
 }

@@ -26,8 +26,8 @@ private[scalaapi] class MonitorImpl(monitor: JMonitor, naming: Naming) extends M
 
   override def gauge[A](name: String)(value: () => A): Gauge[A] = gauge(name, replaceExisting = false)(value)
 
-  override def gauge[A](name: String, replaceExisting: Boolean)(value: () => A): Gauge[A] = new GaugeImpl[A](
-    monitor.newGauge(name, replaceExisting, new Supplier[A] {
+  override def gauge[A](name: String, replaceExisting: Boolean)(value: () => A): Gauge[A] =
+    new GaugeImpl[A](monitor.newGauge(name, replaceExisting, new Supplier[A] {
       override def get(): A = value()
     }))
 

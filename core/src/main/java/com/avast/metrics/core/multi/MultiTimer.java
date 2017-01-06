@@ -132,4 +132,5 @@ class MultiTimer implements Timer {
         }
 
     }
+
 }

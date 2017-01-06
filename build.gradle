@@ -1,30 +1,30 @@
 buildscript {
     repositories {
-        maven { url 'https://artifactory.int.avast.com/artifactory/maven' }
+        maven { url "https://artifactory.int.avast.com/artifactory/maven" }
     }
     dependencies {
-        classpath 'com.avast.gradle:gradle-publish:0.10.3'
-        classpath 'com.avast.gradle:gradle-release:0.10.3'
-        classpath 'com.avast.gradle:gradle-scala:0.10.3'
+        classpath "com.avast.gradle:gradle-publish:0.11.0"
+        classpath "com.avast.gradle:gradle-release:0.11.0"
+        classpath "com.avast.gradle:gradle-scala:0.11.0"
     }
 }
 
-apply plugin: 'avast-release'
+apply plugin: "avast-release"
 
 subprojects {
-    apply plugin: 'java'
-    apply plugin: 'avast-publish'
+    apply plugin: "java"
+    apply plugin: "avast-publish"
 
-    sourceCompatibility = '1.8'
-    targetCompatibility = '1.8'
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
 
     repositories {
-        maven { url 'https://artifactory.int.avast.com/artifactory/maven' }
+        maven { url "https://artifactory.int.avast.com/artifactory/maven" }
     }
 
     avast {
         publish {
-            groupId = 'com.avast.metrics'
+            groupId = "com.avast.metrics"
         }
     }
 }

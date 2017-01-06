@@ -37,4 +37,5 @@ class MultiMeter implements Meter {
     public String getName() {
         return meters.get(0).getName();
     }
+
 }
