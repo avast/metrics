@@ -1,0 +1,11 @@
+avast {
+    publish {
+        artifactId = "metrics-dropwizard-graphite"
+    }
+}
+
+dependencies {
+    compile project(":dropwizard")
+
+    compile "io.dropwizard.metrics:metrics-graphite:$dropwizardVersion"
+}
