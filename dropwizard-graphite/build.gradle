@@ -7,5 +7,5 @@ avast {
 dependencies {
     compile project(":dropwizard")
 
-    compile 'io.dropwizard.metrics:metrics-graphite:3.1.2'
+    compile "io.dropwizard.metrics:metrics-graphite:$dropwizardVersion"
 }

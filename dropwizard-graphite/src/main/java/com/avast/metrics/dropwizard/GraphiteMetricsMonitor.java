@@ -45,7 +45,6 @@ public class GraphiteMetricsMonitor extends MetricsMonitor {
                 .prefixedWith(domain)
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
-                .filter(MetricFilter.ALL)
                 .build(graphite);
 
         this.reporter.start(publishPeriod.toMillis(), TimeUnit.MILLISECONDS);
