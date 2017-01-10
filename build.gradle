@@ -3,9 +3,9 @@ buildscript {
         maven { url "https://artifactory.int.avast.com/artifactory/maven" }
     }
     dependencies {
-        classpath "com.avast.gradle:gradle-publish:0.11.0"
-        classpath "com.avast.gradle:gradle-release:0.11.0"
-        classpath "com.avast.gradle:gradle-scala:0.11.0"
+        classpath "com.avast.gradle:gradle-publish:0.11.1"
+        classpath "com.avast.gradle:gradle-release:0.11.1"
+        classpath "com.avast.gradle:gradle-scala:0.11.1"
     }
 }
 

@@ -1,4 +1,4 @@
-apply plugin: "avast-scala";
+apply plugin: "avast-scala"
 
 avast {
     publish {
