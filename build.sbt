@@ -40,7 +40,11 @@ lazy val commonSettings = Seq(
 )
 
 lazy val root = (project in file("."))
-  .aggregate(api, scalaApi, core, dropwizard, dropwizardGraphite)
+  .settings(
+    name := "metrics",
+    publish := {},
+    publishLocal := {}
+  ).aggregate(api, scalaApi, core, dropwizard, dropwizardGraphite)
 
 lazy val api = (project in file("api")).
   settings(
