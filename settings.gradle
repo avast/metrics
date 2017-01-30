@@ -1,7 +1,0 @@
-rootProject.name = "metrics"
-
-include "api"
-include "core"
-include "dropwizard"
-include "dropwizard-graphite"
-include "scala-api"
