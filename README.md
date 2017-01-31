@@ -1,23 +1,16 @@
 # Metrics
 
-* **Developer:** janecek@avast.com
-* **SCM:** https://git.int.avast.com/ff/metrics
-* **CI:** https://teamcity.int.avast.com/project.html?projectId=CloudSystems_Metrics&tab=projectOverview
-* **SCM:** [ABE](https://butr.avast.com/browse/ABE/?selectedTab=com.atlassian.jira.jira-projects-plugin:components-panel)
-
-The **latest stable release** can be found in our [release blog](https://cml.avast.com/label/FF/metrics).
-
 ## Introduction
-Library for application monitoring. It's abstraction of metrics is inspired by [Dropwizard Metrics](https://github.com/dropwizard/metrics).
-
-The library is divided into submodules:
-* **metrics-api** - API layer that you can depend on if you are creating a library which should not force any metrics implementation,
-* **metrics-dropwizard** - for now the only implementation via Dropwizard Metrics.
-* **metrics-scala** - Scala wrapper around `metrics-api` implementation (such as `metrics-dropwizard`) which provides a nicer API 
+Library for application monitoring. It's abstraction of metrics inspired by [Dropwizard Metrics](https://github.com/dropwizard/metrics).
 
 The entry-point into the library is the interface `Monitor`. Your classes need to get an instance of a monitor which they can use to construct different metrics, e.g. meters, timers or histograms.
-Instances of the individuals metrics can be used to monitor your application. The default implementation that will most probably be used is [JmxMetricsMonitor](dropwizard/src/main/java/com/avast/metrics/dropwizard/JmxMetricsMonitor.java)
-from `metrics-dropwizard` submodule which automatically publishes the metrics via **JMX**.
+Instances of the individuals metrics can be used to monitor your application.
+
+Currently there are two available implementations/exports:
+* JMX - use [JmxMetricsMonitor](dropwizard/src/main/java/com/avast/metrics/dropwizard/JmxMetricsMonitor.java) from `metrics-dropwizard`
+* JMX - use [GraphiteMetricsMonitor](dropwizard-graphite/src/main/java/com/avast/metrics/dropwizard/GraphiteMetricsMonitor.java) from `metrics-dropwizard-graphite`
+
+There is Scala API available in `metrics-scala`. See the example below.
 
 ### Naming of Monitors
 Each monitor can be named several times which creates a hierarchy of names for the final metric. However, the end result really depends on the implementation used. In case of `JmxMetricsMonitor`
@@ -48,8 +41,17 @@ JmxMetricsMonitor monitor = new JmxMetricsMonitor("com.avast.myapp");
 Handler handler = new Handler(monitor.named("Handler1"));
 ```
 
+```scala
+import com.avast.metrics.scalaapi.Monitor
+import com.avast.metrics.dropwizard.JmxMetricsMonitor
+
+val javaMonitor = new JmxMetricsMonitor("com.avast.myapp")
+val scalaMonitor = Monitor(javaMonitor)
+```
+
 ## Unit Testing
-There is a singleton [NoOpMonitor.INSTANCE](api/src/main/java/com/avast/metrics/test/NoOpMonitor.java) in the `metrics-api` submodule that can be used in tests.
+There is a singleton [NoOpMonitor.INSTANCE](api/src/main/java/com/avast/metrics/test/NoOpMonitor.java) in the `metrics-api` submodule that can be used in tests.  
+There is also available `Monitor.noOp` for Scala API.
 
 ## Disabling JMX
 Sometimes you want to globally disable JMX monitoring on the server (for example on our testing servers). You can do that by setting system property `avastMetricsDisableJmx=true`. To do that from bash, you can use:
