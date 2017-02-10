@@ -3,12 +3,17 @@
 ## Introduction
 Library for application monitoring. It's abstraction of metrics inspired by [Dropwizard Metrics](https://github.com/dropwizard/metrics).
 
+Main advantages of this library:
+1) Universal abstraction with (possibly) misc. implementations
+1) Support of multiple exports at once (`MultiMonitor`)
+1) Scala API
+
 The entry-point into the library is the interface `Monitor`. Your classes need to get an instance of a monitor which they can use to construct different metrics, e.g. meters, timers or histograms.
 Instances of the individuals metrics can be used to monitor your application.
 
 Currently there are two available implementations/exports:
-* JMX - use [JmxMetricsMonitor](dropwizard/src/main/java/com/avast/metrics/dropwizard/JmxMetricsMonitor.java) from `metrics-dropwizard`
-* JMX - use [GraphiteMetricsMonitor](dropwizard-graphite/src/main/java/com/avast/metrics/dropwizard/GraphiteMetricsMonitor.java) from `metrics-dropwizard-graphite`
+* [JMX](dropwizard) 
+* [Graphite](dropwizard-graphite)
 
 There is Scala API available in `metrics-scala`. See the example below.
 
@@ -37,7 +42,7 @@ public class Handler {
     }
 }
 
-JmxMetricsMonitor monitor = new JmxMetricsMonitor("com.avast.myapp");
+Monitor monitor = null; // TODO specific monitor
 Handler handler = new Handler(monitor.named("Handler1"));
 ```
 
@@ -45,7 +50,7 @@ Handler handler = new Handler(monitor.named("Handler1"));
 import com.avast.metrics.scalaapi.Monitor
 import com.avast.metrics.dropwizard.JmxMetricsMonitor
 
-val javaMonitor = new JmxMetricsMonitor("com.avast.myapp")
+val javaMonitor = getJavaMonitor()
 val scalaMonitor = Monitor(javaMonitor)
 ```
 
@@ -54,7 +59,7 @@ There is a singleton [NoOpMonitor.INSTANCE](api/src/main/java/com/avast/metrics/
 There is also available `Monitor.noOp` for Scala API.
 
 ## Disabling JMX
-Sometimes you want to globally disable JMX monitoring on the server (for example on our testing servers). You can do that by setting system property `avastMetricsDisableJmx=true`. To do that from bash, you can use:
+Sometimes you want to globally disable JMX monitoring on the server. You can do that by setting system property `avastMetricsDisableJmx=true`. To do that from bash, you can use:
 
 ```sh
  java -jar -DavastMetricsDisableJmx="true" program.jar
