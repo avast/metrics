@@ -5,11 +5,7 @@ import com.codahale.metrics.ObjectNameFactory;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-import java.util.Hashtable;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class TreeObjectNameFactory implements ObjectNameFactory {
@@ -18,7 +14,7 @@ public class TreeObjectNameFactory implements ObjectNameFactory {
 
     private static final ObjectNameFactory defaultFactory = new DefaultObjectNameFactory();
 
-    private static final String[] partNames = {"type", "scope", "name"};
+    private static final String[] partNames = {"type", "category", "scope"};
 
     private TreeObjectNameFactory() {
     }
@@ -35,11 +31,29 @@ public class TreeObjectNameFactory implements ObjectNameFactory {
 
     private Optional<ObjectName> parseName(String domain, String name) {
         try {
-            String[] parts = name.split(Pattern.quote(SEPARATOR), partNames.length);
+            final String[] parts = name.split(Pattern.quote(SEPARATOR));
 
-            Hashtable<String, String> properties = new OrderedProperties();
+            /*
+            Following block of code is a little hack.
+            The problem is the `ObjectName` requires `HashTable` as parameter but the `HashTable` is unsorted and
+            thus unusable for us. We hack it by raping the `HashTable` and in-fact using `LinkedHashMap` which is
+            much more suitable for our needs.
+             */
+
+            final LinkedHashMap<String, String> map = new LinkedHashMap<>();
+            final Hashtable<String, String> properties = new Hashtable<String, String>() {
+                @Override
+                public Set<Map.Entry<String, String>> entrySet() {
+                    return map.entrySet();
+                }
+            };
+
             for (int i = 0; i < parts.length; i++) {
-                properties.put(partNames[i], quote(parts[i]));
+                final String key = i < partNames.length ? partNames[i] : "level" + i;
+                final String value = parts[i];
+
+                map.put(key, quote(value));
+                properties.put(key, value);
             }
 
             return Optional.of(new ObjectName(domain, properties));
@@ -51,21 +65,7 @@ public class TreeObjectNameFactory implements ObjectNameFactory {
     private String quote(String objectName) {
         return objectName
                 .replaceAll(Pattern.quote(SEPARATOR), "/")
-                .replaceAll("[\\Q.?*\"\\E]", "_");
-    }
-
-    private static class OrderedProperties extends Hashtable<String, String> {
-
-        @Override
-        public Set<Map.Entry<String, String>> entrySet() {
-            LinkedHashMap<String, String> map = new LinkedHashMap<>();
-            for (String partName : partNames) {
-                if (get(partName) != null) {
-                    map.put(partName, get(partName));
-                }
-            }
-            return map.entrySet();
-        }
+                .replaceAll("[\\Q?*\"\\E]", "_");
     }
 
     private static class Holder {
