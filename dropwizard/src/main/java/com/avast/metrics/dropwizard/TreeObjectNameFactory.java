@@ -14,8 +14,6 @@ public class TreeObjectNameFactory implements ObjectNameFactory {
 
     private static final ObjectNameFactory defaultFactory = new DefaultObjectNameFactory();
 
-    private static final String[] partNames = {"type", "category", "scope"};
-
     private TreeObjectNameFactory() {
     }
 
@@ -49,7 +47,7 @@ public class TreeObjectNameFactory implements ObjectNameFactory {
             };
 
             for (int i = 0; i < parts.length; i++) {
-                final String key = i < partNames.length ? partNames[i] : "level" + i;
+                final String key = "level" + i;
                 final String value = parts[i];
 
                 map.put(key, quote(value));
