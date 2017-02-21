@@ -44,7 +44,7 @@ lazy val root = (project in file("."))
     name := "metrics",
     publish := {},
     publishLocal := {}
-  ).aggregate(api, scalaApi, core, dropwizard, dropwizardGraphite)
+  ).aggregate(api, scalaApi, core, jmx, graphite)
 
 lazy val api = (project in file("api")).
   settings(
@@ -72,11 +72,11 @@ lazy val core = (project in file("core")).
     name := "metrics-core"
   ).dependsOn(api)
 
-lazy val dropwizard = (project in file("dropwizard")).
+lazy val dropwizardCommon = (project in file("dropwizard-common")).
   settings(
     commonSettings,
     javaSettings,
-    name := "metrics-dropwizard",
+    name := "metrics-dropwizard-common",
     libraryDependencies ++= Seq(
       "io.dropwizard.metrics" % "metrics-core" % Versions.dropwizard,
       "org.slf4j" % "slf4j-api" % "1.7.22",
@@ -86,12 +86,23 @@ lazy val dropwizard = (project in file("dropwizard")).
     )
   ).dependsOn(core)
 
-lazy val dropwizardGraphite = (project in file("dropwizard-graphite")).
+lazy val jmx = (project in file("jmx")).
   settings(
     commonSettings,
     javaSettings,
-    name := "metrics-dropwizard-graphite",
+    name := "metrics-jmx",
+    libraryDependencies ++= Seq(
+      "junit" % "junit" % "4.12" % "test",
+      "ch.qos.logback" % "logback-classic" % "1.1.8" % "test"
+    )
+  ).dependsOn(dropwizardCommon)
+
+lazy val graphite = (project in file("graphite")).
+  settings(
+    commonSettings,
+    javaSettings,
+    name := "metrics-graphite",
     libraryDependencies ++= Seq(
       "io.dropwizard.metrics" % "metrics-graphite" % Versions.dropwizard
     )
-  ).dependsOn(dropwizard)
+  ).dependsOn(dropwizardCommon)

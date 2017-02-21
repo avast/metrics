@@ -1,6 +1,6 @@
 # Dropwizard Graphite export
 
-See [GraphiteMetricsMonitor](dropwizard-graphite/src/main/java/com/avast/metrics/dropwizard/GraphiteMetricsMonitor.java).
+See [GraphiteMetricsMonitor](graphite/src/main/java/com/avast/metrics/dropwizard/GraphiteMetricsMonitor.java).
 
 ```java
 import com.avast.metrics.api.*;

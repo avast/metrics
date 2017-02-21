@@ -12,14 +12,13 @@ The entry-point into the library is the interface `Monitor`. Your classes need t
 Instances of the individuals metrics can be used to monitor your application.
 
 Currently there are two available implementations/exports:
-* [JMX](dropwizard) 
+* [JMX](dropwizard-common) 
 * [Graphite](dropwizard-graphite)
 
 There is Scala API available in `metrics-scala`. See the example below.
 
 ### Naming of Monitors
-Each monitor can be named several times which creates a hierarchy of names for the final metric. However, the end result really depends on the implementation used. In case of `JmxMetricsMonitor`
-first three names are used for **type**, **scope** and **name** attributes of the metric, the rest is just concatenated using `/`.
+Each monitor can be named several times which creates a hierarchy of names for the final metric.
 
 > **Naming the monitors is very important!** Your metrics will be wrong if you give the same metric name to two unrelated metrics in different components. The `Monitor` behaves like a registry
 so it creates each metric just once and returns it if asked again for the same name. All your components should receive an instance of `Monitor` that was properly named for that particular component.

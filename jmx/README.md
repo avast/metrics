@@ -1,6 +1,6 @@
 # Dropwizard JMX export
 
-See [JmxMetricsMonitor](dropwizard/src/main/java/com/avast/metrics/dropwizard/JmxMetricsMonitor.java).
+See [JmxMetricsMonitor](jmx/src/main/java/com/avast/metrics/dropwizard/JmxMetricsMonitor.java).
 
 ```java
 import com.avast.metrics.api.*;
