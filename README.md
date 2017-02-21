@@ -12,8 +12,8 @@ The entry-point into the library is the interface `Monitor`. Your classes need t
 Instances of the individuals metrics can be used to monitor your application.
 
 Currently there are two available implementations/exports:
-* [JMX](dropwizard-common) 
-* [Graphite](dropwizard-graphite)
+* [JMX](jmx) 
+* [Graphite](graphite)
 
 There is Scala API available in `metrics-scala`. See the example below.
 
