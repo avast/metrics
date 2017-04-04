@@ -19,7 +19,7 @@ lazy val Versions = new {
 lazy val commonSettings = Seq(
   organization := "com.avast.metrics",
   version := sys.env.getOrElse("TRAVIS_TAG", "0.1-SNAPSHOT"),
-  description := "Library for conversion between GPB and Scala case classes",
+  description := "Library for application monitoring",
 
   licenses ++= Seq("MIT" -> url(s"https://github.com/avast/metrics/blob/${version.value}/LICENSE")),
   publishArtifact in Test := false,
