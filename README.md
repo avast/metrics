@@ -1,6 +1,7 @@
 # Metrics
 
 Java/Scala library defining API for metrics publishing. Implementation for Dropwizard Metrics is provided.  
+The library is incubating and there are some planned improvements. There can be some breaking changes in following major releases.
 
 ## Introduction
 Library for application monitoring. It's abstraction of metrics inspired by [Dropwizard Metrics](https://github.com/dropwizard/metrics).
