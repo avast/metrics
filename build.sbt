@@ -15,7 +15,7 @@ lazy val javaSettings = Seq(
 )
 
 lazy val Versions = new {
-  val dropwizard = "3.1.2"
+  val dropwizard = "3.2.2"
 }
 
 lazy val commonSettings = Seq(
