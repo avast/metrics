@@ -26,6 +26,7 @@ lazy val commonSettings = Seq(
   licenses ++= Seq("MIT" -> url(s"https://github.com/avast/metrics/blob/${version.value}/LICENSE")),
   publishArtifact in Test := false,
   bintrayOrganization := Some("avast"),
+  bintrayPackage := "metrics",
   pomExtra := (
     <scm>
       <url>git@github.com:avast/metrics.git</url>
