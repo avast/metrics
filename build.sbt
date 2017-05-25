@@ -1,3 +1,5 @@
+import sbt.Keys.libraryDependencies
+
 enablePlugins(CrossPerProjectPlugin)
 
 lazy val scalaSettings = Seq(
@@ -5,7 +7,10 @@ lazy val scalaSettings = Seq(
   scalacOptions += "-deprecation",
   scalacOptions += "-unchecked",
   scalacOptions += "-feature",
-  crossScalaVersions := Seq("2.11.8", "2.12.1")
+  crossScalaVersions := Seq("2.11.8", "2.12.1"),
+  libraryDependencies ++= Seq(
+    "org.scalatest" %% "scalatest" % "3.0.1" % "test"
+  )
 )
 
 lazy val javaSettings = Seq(
@@ -39,7 +44,12 @@ lazy val commonSettings = Seq(
           <url>https://www.avast.com</url>
         </developer>
       </developers>
-    )
+    ),
+  libraryDependencies ++= Seq(
+    "org.mockito" % "mockito-all" % "1.10.19" % "test",
+    "junit" % "junit" % "4.12" % "test",
+    "ch.qos.logback" % "logback-classic" % "1.1.8" % "test"
+  )
 )
 
 lazy val root = (project in file("."))
@@ -60,12 +70,7 @@ lazy val scalaApi = (project in file("scala-api")).
   settings(
     commonSettings,
     scalaSettings,
-
-    name := "metrics-scala",
-    libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest" % "3.0.1" % "test",
-      "org.mockito" % "mockito-all" % "1.10.19" % "test"
-    )
+    name := "metrics-scala"
   ).dependsOn(api, jmx % "test")
 
 lazy val core = (project in file("core")).
@@ -82,10 +87,7 @@ lazy val dropwizardCommon = (project in file("dropwizard-common")).
     name := "metrics-dropwizard-common",
     libraryDependencies ++= Seq(
       "io.dropwizard.metrics" % "metrics-core" % Versions.dropwizard,
-      "org.slf4j" % "slf4j-api" % "1.7.22",
-
-      "junit" % "junit" % "4.12" % "test",
-      "ch.qos.logback" % "logback-classic" % "1.1.8" % "test"
+      "org.slf4j" % "slf4j-api" % "1.7.22"
     )
   ).dependsOn(core)
 
@@ -93,11 +95,7 @@ lazy val jmx = (project in file("jmx")).
   settings(
     commonSettings,
     javaSettings,
-    name := "metrics-jmx",
-    libraryDependencies ++= Seq(
-      "junit" % "junit" % "4.12" % "test",
-      "ch.qos.logback" % "logback-classic" % "1.1.8" % "test"
-    )
+    name := "metrics-jmx"
   ).dependsOn(dropwizardCommon)
 
 lazy val graphite = (project in file("graphite")).
