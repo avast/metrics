@@ -46,10 +46,10 @@ import java.util.stream.Collectors;
  * <pre><code>
  *     Monitor summaryMonitor = monitor.named("path");
  *     Monitor monitor = MultiMonitor.of(summaryMonitor, summaryMonitor);
- *     ConcurrentMap<String, Meter> requests = new ConcurrentHashMap<>()
+ *     ConcurrentMap&lt;String, Meter&gt; requests = new ConcurrentHashMap&lt;&gt;()
  *
  *     // Dynamically create a new meter if not present in the cache and increment its value
- *     requests.computeIfAbsent(topic, t -> monitor.named(t).newMeter("requests")).mark();
+ *     requests.computeIfAbsent(topic, t -&gt; monitor.named(t).newMeter("requests")).mark();
  * </code></pre>
  */
 public class MultiMonitor implements Monitor {
@@ -162,8 +162,6 @@ public class MultiMonitor implements Monitor {
     /**
      * TimerPair multi monitor. Uses instanceMonitor (first parameter of the factory method) to create failure timer.
      *
-     * @param name
-     * @return
      */
     @Override
     public TimerPair newTimerPair(String name) {
