@@ -1,15 +1,17 @@
-crossScalaVersions := Seq("2.11.8", "2.12.1")
+enablePlugins(CrossPerProjectPlugin)
 
 lazy val scalaSettings = Seq(
   scalaVersion := "2.11.8",
   scalacOptions += "-deprecation",
   scalacOptions += "-unchecked",
-  scalacOptions += "-feature"
+  scalacOptions += "-feature",
+  crossScalaVersions := Seq("2.11.8", "2.12.1")
 )
 
 lazy val javaSettings = Seq(
   crossPaths := false,
-  autoScalaLibrary := false
+  autoScalaLibrary := false,
+  crossScalaVersions := Seq("2.11.8") // it's not really used; it's just about turning-off the crosscompilation
 )
 
 lazy val Versions = new {
