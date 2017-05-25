@@ -63,7 +63,7 @@ lazy val scalaApi = (project in file("scala-api")).
       "org.scalatest" %% "scalatest" % "3.0.1" % "test",
       "org.mockito" % "mockito-all" % "1.10.19" % "test"
     )
-  ).dependsOn(api)
+  ).dependsOn(api, jmx % "test")
 
 lazy val core = (project in file("core")).
   settings(

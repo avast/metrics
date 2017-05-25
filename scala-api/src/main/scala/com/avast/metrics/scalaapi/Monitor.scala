@@ -20,7 +20,8 @@ trait Monitor extends AutoCloseable {
 
 object Monitor {
 
-  def apply(monitor: JMonitor): Monitor = new impl.MonitorImpl(monitor, Naming.defaultNaming())
+  def apply(monitor: JMonitor): Monitor = apply(monitor, Naming.defaultNaming())
+  def apply(monitor: JMonitor, naming: Naming): Monitor = new impl.MonitorImpl(monitor, naming)
 
   def noOp(): Monitor = {
     apply(NoOpMonitor.INSTANCE)

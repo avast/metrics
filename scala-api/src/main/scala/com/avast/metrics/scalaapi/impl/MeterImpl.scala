@@ -9,4 +9,6 @@ private class MeterImpl(meter: JMeter) extends Meter {
   override def mark(n: Long): Unit = meter.mark(n)
 
   override def count: Long = meter.count()
+
+  override def name: String = meter.getName
 }

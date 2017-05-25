@@ -48,6 +48,10 @@ Monitor monitor = null; // TODO specific monitor
 Handler handler = new Handler(monitor.named("Handler1"));
 ```
 
+## Scala API
+
+An easy-to-use Scala API is available in `scala-api` module. Wrap the Java `Monitor` by `scalaapi.Monitor` to use the Scala version.
+
 ```scala
 import com.avast.metrics.scalaapi.Monitor
 import com.avast.metrics.dropwizard.JmxMetricsMonitor
@@ -55,6 +59,24 @@ import com.avast.metrics.dropwizard.JmxMetricsMonitor
 val javaMonitor = getJavaMonitor()
 val scalaMonitor = Monitor(javaMonitor)
 ```
+
+### Scala Per-key API
+Adds support for easier creating of counters and timers per some user given key.
+
+```scala
+val monitor = Monitor(new JmxMetricsMonitor("com.avast.some.app"))
+
+val perPartnerRequestCounter = monitor.perKey.counter("requestPerVendor")
+
+val x = perPartnerRequestCounter.forKey("a")
+val a = perPartnerRequestCounter.forKey("b")
+
+x.inc()
+a.inc()
+
+```
+
+See [example in tests](scala-api/src/test/scala/com/avast/metrics/examples/PerKeyExample.scala).
 
 ## Unit Testing
 There is a singleton [NoOpMonitor.INSTANCE](api/src/main/java/com/avast/metrics/test/NoOpMonitor.java) in the `metrics-api` submodule that can be used in tests.  
