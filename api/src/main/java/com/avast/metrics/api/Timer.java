@@ -5,7 +5,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-public interface Timer extends Counting {
+public interface Timer extends Metric {
 
     interface TimeContext extends AutoCloseable {
 
@@ -78,4 +78,8 @@ public interface Timer extends Counting {
      */
     <T> CompletableFuture<T> timeAsync(Callable<CompletableFuture<T>> operation, Timer failureTimer, Executor executor) throws Exception;
 
+    /**
+     * @return Total number of events in this timer.
+     */
+    long count();
 }
