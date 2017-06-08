@@ -4,12 +4,13 @@ import com.avast.metrics.api.Meter;
 import com.timgroup.statsd.StatsDClient;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class StatsDMeter implements Meter {
     private final StatsDClient client;
     private final String name;
 
-    private final AtomicInteger marks = new AtomicInteger(0);
+    private final AtomicLong marks = new AtomicLong(0);
 
     public StatsDMeter(final StatsDClient client, final String name) {
         this.client = client;

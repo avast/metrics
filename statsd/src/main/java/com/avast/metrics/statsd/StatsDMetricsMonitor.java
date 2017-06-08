@@ -51,13 +51,13 @@ public class StatsDMetricsMonitor implements Monitor {
     }
 
     @Override
-    public Meter newMeter(final String name) {
+    public StatsDMeter newMeter(final String name) {
         return new StatsDMeter(client, constructMetricName(name));
     }
 
     @Override
-    public Counter newCounter(final String name) {
-        return null;  //TODO: implement
+    public StatsDCounter newCounter(final String name) {
+        return new StatsDCounter(client, constructMetricName(name));
     }
 
     @Override
