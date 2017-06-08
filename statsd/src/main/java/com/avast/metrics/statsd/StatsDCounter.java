@@ -11,7 +11,7 @@ public class StatsDCounter implements Counter {
 
     private final AtomicLong count = new AtomicLong(0);
 
-    public StatsDCounter(final StatsDClient client, final String name) {
+    StatsDCounter(final StatsDClient client, final String name) {
         this.client = client;
         this.name = name;
     }

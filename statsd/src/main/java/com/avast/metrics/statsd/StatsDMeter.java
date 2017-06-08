@@ -12,7 +12,7 @@ public class StatsDMeter implements Meter {
 
     private final AtomicLong marks = new AtomicLong(0);
 
-    public StatsDMeter(final StatsDClient client, final String name) {
+    StatsDMeter(final StatsDClient client, final String name) {
         this.client = client;
         this.name = name;
     }
