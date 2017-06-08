@@ -13,22 +13,24 @@ public class StatsDCounterTest {
     public void testCounts() {
         final StatsDClient client = mock(StatsDClient.class);
 
-        final StatsDCounter meter = new StatsDCounter(client, "name");
+        final String name = TestUtils.randomString();
+
+        final StatsDCounter counter = new StatsDCounter(client, name);
 
         for (int i = 1; i <= 5; i++) {
-            meter.inc();
+            counter.inc();
         }
 
         for (int i = 1; i <= 3; i++) {
-            meter.dec();
+            counter.dec();
         }
 
-        meter.inc(4);
+        counter.inc(4);
 
-        meter.dec(8);
+        counter.dec(8);
 
-        verify(client, times(10)).count(Matchers.anyString(), Matchers.anyLong(), Matchers.<String>anyVararg());
+        verify(client, times(10)).count(Matchers.eq(name), Matchers.anyLong(), Matchers.<String>anyVararg());
 
-        assertEquals(-2, meter.count());
+        assertEquals(-2, counter.count());
     }
 }
