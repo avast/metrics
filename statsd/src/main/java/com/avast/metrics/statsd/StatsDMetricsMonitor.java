@@ -1,5 +1,6 @@
 package com.avast.metrics.statsd;
 
+import com.avast.metrics.TimerPairImpl;
 import com.avast.metrics.api.*;
 import com.timgroup.statsd.NonBlockingStatsDClient;
 import com.timgroup.statsd.StatsDClient;
@@ -62,12 +63,15 @@ public class StatsDMetricsMonitor implements Monitor {
 
     @Override
     public Timer newTimer(final String name) {
-        return null;  //TODO: implement
+        return new StatsDTimer(client, constructMetricName(name));
     }
 
     @Override
     public TimerPair newTimerPair(final String name) {
-        return null;  //TODO: implement
+        return new TimerPairImpl(
+                newTimer(naming.successTimerName(name)),
+                newTimer(naming.failureTimerName(name))
+        );
     }
 
     @Override
