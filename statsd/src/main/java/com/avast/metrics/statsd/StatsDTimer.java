@@ -3,15 +3,14 @@ package com.avast.metrics.statsd;
 import com.avast.metrics.api.Timer;
 import com.timgroup.statsd.StatsDClient;
 
-import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @SuppressWarnings("Duplicates")
 public class StatsDTimer implements Timer {
@@ -120,21 +119,21 @@ public class StatsDTimer implements Timer {
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     static class StatsDTimerContext implements TimeContext {
 
-        private final Clock clock;
-        private final Instant start;
+        private final Supplier<Long> clock;
+        private final long start;
         private Optional<Duration> length = Optional.empty();
         private final Consumer<Duration> update;
 
         private final Object lock = new Object();
 
-        StatsDTimerContext(final Clock clock, final Consumer<Duration> updateFunction) {
+        StatsDTimerContext(final Supplier<Long> clock, final Consumer<Duration> updateFunction) {
             this.clock = clock;
-            this.start = clock.instant();
+            this.start = clock.get();
             this.update = updateFunction;
         }
 
         StatsDTimerContext(final Consumer<Duration> updateFunction) {
-            this(Clock.systemDefaultZone(), updateFunction);
+            this(System::nanoTime, updateFunction);
         }
 
         @Override
@@ -146,7 +145,7 @@ public class StatsDTimer implements Timer {
         public long stopAndGetTime() {
             synchronized (lock) {
                 return length.orElseGet(() -> {
-                    final Duration d = Duration.between(start, clock.instant());
+                    final Duration d = Duration.ofNanos(clock.get() - start);
                     update.accept(d);
                     length = Optional.of(d);
                     return d;

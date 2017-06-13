@@ -77,12 +77,12 @@ public class StatsDTimerTest {
 
         final AtomicReference<Duration> r = new AtomicReference<>(null);
 
-        final StatsDTimer.StatsDTimerContext context = new StatsDTimer.StatsDTimerContext(clock, r::set);
+        // the ctor wants supplier for nanos, but it doesn't matter in test so we pass it as millis and then test is as millis
+        final StatsDTimer.StatsDTimerContext context = new StatsDTimer.StatsDTimerContext(() -> clock.instant().toEpochMilli(), r::set);
 
-        // * 1000000 = millis -> nanos
-        assertEquals(100 * 1000000, context.stopAndGetTime());
-        assertEquals(100 * 1000000, context.stopAndGetTime()); // repeated by purpose!
+        assertEquals(100 , context.stopAndGetTime());
+        assertEquals(100 , context.stopAndGetTime()); // repeated by purpose!
 
-        assertEquals(100, r.get().toMillis()); // repeated by purpose!
+        assertEquals(100, r.get().toNanos());
     }
 }
