@@ -16,7 +16,23 @@ import static org.mockito.Mockito.*;
 public class StatsDTimerTest {
 
     @Test
-    public void testCounts() throws Exception {
+    public void testUpdate() throws Exception {
+        final StatsDClient client = mock(StatsDClient.class);
+
+        final String name = TestUtils.randomString();
+
+        final StatsDTimer timer = new StatsDTimer(client, name);
+
+        timer.update(Duration.ZERO);
+
+        verify(client, times(1)).recordExecutionTime(Matchers.eq(name), Matchers.anyLong(), Matchers.anyVararg());
+
+        assertEquals(1, timer.count());
+    }
+
+
+    @Test
+    public void testTime() throws Exception {
         final StatsDClient client = mock(StatsDClient.class);
 
         final String name = TestUtils.randomString();
@@ -38,7 +54,22 @@ public class StatsDTimerTest {
             // ok
         }
 
-        timer.update(Duration.ZERO);
+        // verify results
+
+        verify(client, times(6)).recordExecutionTime(Matchers.eq(name), Matchers.anyLong(), Matchers.anyVararg());
+
+        assertEquals(5, timer.count());
+        assertEquals(1, failureTimer.count());
+    }
+
+    @Test
+    public void testTimeAsync() throws Exception {
+        final StatsDClient client = mock(StatsDClient.class);
+
+        final String name = TestUtils.randomString();
+
+        final StatsDTimer timer = new StatsDTimer(client, name);
+        final StatsDTimer failureTimer = new StatsDTimer(client, name);
 
         // it's important to wait for the future
         timer.timeAsync(() -> CompletableFuture.completedFuture(""), ForkJoinPool.commonPool()).get();
@@ -65,10 +96,10 @@ public class StatsDTimerTest {
 
         // verify results
 
-        verify(client, times(11)).recordExecutionTime(Matchers.eq(name), Matchers.anyLong(), Matchers.anyVararg());
+        verify(client, times(4)).recordExecutionTime(Matchers.eq(name), Matchers.anyLong(), Matchers.anyVararg());
 
-        assertEquals(9, timer.count());
-        assertEquals(2, failureTimer.count());
+        assertEquals(3, timer.count());
+        assertEquals(1, failureTimer.count());
     }
 
     @Test
