@@ -4,6 +4,7 @@ import com.timgroup.statsd.StatsDClient;
 import org.junit.Test;
 import org.mockito.Matchers;
 
+import java.time.Duration;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
@@ -35,7 +36,7 @@ public class StatsDMetricsMonitorTest {
             return mock(ScheduledFuture.class);
         }).when(scheduler).scheduleAtFixedRate(Matchers.any(), Matchers.anyLong(), Matchers.anyLong(), Matchers.any());
 
-        final StatsDMetricsMonitor monitor = new StatsDMetricsMonitor("", 1234, "com.avast.domain", scheduler) {
+        final StatsDMetricsMonitor monitor = new StatsDMetricsMonitor("", 1234, "com.avast.domain", Duration.ZERO, scheduler) {
             @Override
             protected StatsDClient createStatsDClient(final String host, final int port, final String domain) {
                 return statsDClient;
@@ -66,7 +67,7 @@ public class StatsDMetricsMonitorTest {
             return scheduledFuture;
         }).when(scheduler).scheduleAtFixedRate(Matchers.any(), Matchers.anyLong(), Matchers.anyLong(), Matchers.any());
 
-        final StatsDMetricsMonitor monitor = new StatsDMetricsMonitor("", 1234, "com.avast.domain", scheduler) {
+        final StatsDMetricsMonitor monitor = new StatsDMetricsMonitor("", 1234, "com.avast.domain", Duration.ZERO, scheduler) {
             @Override
             protected StatsDClient createStatsDClient(final String host, final int port, final String domain) {
                 return statsDClient;
