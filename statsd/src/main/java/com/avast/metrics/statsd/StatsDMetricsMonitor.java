@@ -1,11 +1,14 @@
 package com.avast.metrics.statsd;
 
 import com.avast.metrics.TimerPairImpl;
-import com.avast.metrics.api.*;
-import com.avast.metrics.api.Timer;
+import com.avast.metrics.api.Metric;
+import com.avast.metrics.api.Monitor;
+import com.avast.metrics.api.Naming;
+import com.avast.metrics.api.TimerPair;
 import com.timgroup.statsd.NonBlockingStatsDClient;
 import com.timgroup.statsd.StatsDClient;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -21,33 +24,36 @@ public class StatsDMetricsMonitor implements Monitor {
     protected final List<String> names = new ArrayList<>();
     protected final Naming naming;
     protected final ScheduledExecutorService scheduler;
+    protected final Duration gaugeSendPeriod;
 
     protected final Map<String, ScheduledFuture<?>> gauges = new HashMap<>();
 
-    public StatsDMetricsMonitor(String host, int port, String domain, final Naming naming, final ScheduledExecutorService scheduler) {
+    public StatsDMetricsMonitor(String host, int port, String domain, final Naming naming, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler) {
         this.domain = domain;
         this.naming = naming;
+        this.gaugeSendPeriod = gaugeSendPeriod;
         this.scheduler = scheduler;
-        client = createStatsDClient(host, port, domain); // TODO use prefix?
+        client = createStatsDClient(host, port, domain);
     }
 
     public StatsDMetricsMonitor(String host, int port, String domain, final Naming naming) {
-        this(host, port, domain, naming, createScheduler());
+        this(host, port, domain, naming, getDefaultGaugeSendPeriod(), createScheduler());
     }
 
-    public StatsDMetricsMonitor(String host, int port, String domain, final ScheduledExecutorService scheduler) {
-        this(host, port, domain, Naming.defaultNaming(), scheduler);
+    public StatsDMetricsMonitor(String host, int port, String domain, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler) {
+        this(host, port, domain, Naming.defaultNaming(), gaugeSendPeriod, scheduler);
     }
 
     public StatsDMetricsMonitor(String host, int port, String domain) {
-        this(host, port, domain, Naming.defaultNaming(), createScheduler());
+        this(host, port, domain, Naming.defaultNaming(), getDefaultGaugeSendPeriod(), createScheduler());
     }
 
-    protected StatsDMetricsMonitor(StatsDMetricsMonitor monitor, final ScheduledExecutorService scheduler, String... newNames) {
+    protected StatsDMetricsMonitor(StatsDMetricsMonitor monitor, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler, String... newNames) {
         this.domain = monitor.domain;
         this.client = monitor.client;
         this.naming = monitor.naming;
         this.scheduler = scheduler;
+        this.gaugeSendPeriod = gaugeSendPeriod;
 
         this.names.addAll(monitor.names);
         this.names.addAll(Arrays.asList(newNames));
@@ -57,18 +63,22 @@ public class StatsDMetricsMonitor implements Monitor {
         return new NonBlockingStatsDClient(domain, host, port);
     }
 
+    private static Duration getDefaultGaugeSendPeriod() {
+        return Duration.ofSeconds(1);
+    }
+
     private static ScheduledExecutorService createScheduler() {
         return Executors.newScheduledThreadPool(2);
     }
 
     @Override
     public StatsDMetricsMonitor named(final String name) {
-        return new StatsDMetricsMonitor(this, scheduler, name);
+        return new StatsDMetricsMonitor(this, gaugeSendPeriod, scheduler, name);
     }
 
     @Override
     public StatsDMetricsMonitor named(final String name1, final String name2, final String... restOfNames) {
-        return new StatsDMetricsMonitor(named(name1).named(name2), scheduler, restOfNames);
+        return new StatsDMetricsMonitor(named(name1).named(name2), gaugeSendPeriod, scheduler, restOfNames);
     }
 
     @Override
@@ -82,7 +92,7 @@ public class StatsDMetricsMonitor implements Monitor {
     }
 
     @Override
-    public Timer newTimer(final String name) {
+    public StatsDTimer newTimer(final String name) {
         return new StatsDTimer(client, constructMetricName(name));
     }
 
@@ -95,12 +105,12 @@ public class StatsDMetricsMonitor implements Monitor {
     }
 
     @Override
-    public <T> Gauge<T> newGauge(final String name, final Supplier<T> gauge) {
+    public <T> StatsDGauge<T> newGauge(final String name, final Supplier<T> gauge) {
         return newGauge(name, false, gauge);
     }
 
     @Override
-    public <T> Gauge<T> newGauge(final String name, final boolean replaceExisting, final Supplier<T> supplier) {
+    public <T> StatsDGauge<T> newGauge(final String name, final boolean replaceExisting, final Supplier<T> supplier) {
         final String finalName = constructMetricName(name);
 
         synchronized (gauges) {
@@ -114,8 +124,7 @@ public class StatsDMetricsMonitor implements Monitor {
 
             final StatsDGauge<T> gauge = new StatsDGauge<>(client, finalName, supplier);
 
-            // TODO configurable period?
-            final ScheduledFuture<?> scheduled = scheduler.scheduleAtFixedRate(gauge::send, 0, 1, TimeUnit.SECONDS);
+            final ScheduledFuture<?> scheduled = scheduler.scheduleAtFixedRate(gauge::send, 0, gaugeSendPeriod.toMillis(), TimeUnit.MILLISECONDS);
 
             gauges.put(name, scheduled);
 
@@ -124,8 +133,8 @@ public class StatsDMetricsMonitor implements Monitor {
     }
 
     @Override
-    public Histogram newHistogram(final String name) {
-        return null;  //TODO: implement
+    public StatsDHistogram newHistogram(final String name) {
+        return new StatsDHistogram(client, constructMetricName(name));
     }
 
     @Override
