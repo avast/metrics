@@ -5,7 +5,6 @@ import com.avast.metrics.core.TimerHelper;
 import com.timgroup.statsd.StatsDClient;
 
 import java.time.Duration;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -74,10 +73,7 @@ public class StatsDTimer implements Timer {
 
         private final Supplier<Long> clock;
         private final long start;
-        private Optional<Duration> length = Optional.empty();
         private final Consumer<Duration> update;
-
-        private final Object lock = new Object();
 
         StatsDTimerContext(final Supplier<Long> clock, final Consumer<Duration> updateFunction) {
             this.clock = clock;
@@ -96,19 +92,14 @@ public class StatsDTimer implements Timer {
 
         @Override
         public long stopAndGetTime() {
-            synchronized (lock) {
-                return length.orElseGet(() -> {
-                    final Duration d = Duration.ofNanos(clock.get() - start);
-                    update.accept(d);
-                    length = Optional.of(d);
-                    return d;
-                }).toNanos();
-            }
+            final Duration d = Duration.ofNanos(clock.get() - start);
+            update.accept(d);
+            return d.toNanos();
         }
 
         @Override
         public void close() {
-            // noop
+            stop();
         }
     }
 }
