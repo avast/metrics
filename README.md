@@ -17,6 +17,7 @@ Instances of the individuals metrics can be used to monitor your application.
 Currently there are two available implementations/exports:
 * [JMX](jmx) 
 * [Graphite](graphite)
+* [StatsD](statsd)
 
 There is Scala API available in `metrics-scala`. See the example below.
 
