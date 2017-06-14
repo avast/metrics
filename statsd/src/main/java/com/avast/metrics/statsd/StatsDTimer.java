@@ -1,6 +1,7 @@
 package com.avast.metrics.statsd;
 
 import com.avast.metrics.api.Timer;
+import com.avast.metrics.core.TimerHelper;
 import com.timgroup.statsd.StatsDClient;
 
 import java.time.Duration;
@@ -49,66 +50,18 @@ public class StatsDTimer implements Timer {
     }
 
     @Override
-    public <T> T time(final Callable<T> operation, final Timer failureTimer) throws Exception {
-        final TimeContext successContext = start();
-        final TimeContext failureContext = failureTimer.start();
-
-        try {
-            final T result = operation.call();
-            successContext.stop();
-            return result;
-        } catch (Exception e) {
-            failureContext.stop();
-            throw e;
-        }
+    public <T> T time(Callable<T> operation, Timer failureTimer) throws Exception {
+        return TimerHelper.time(operation, this, failureTimer);
     }
 
     @Override
-    public <T> CompletableFuture<T> timeAsync(final Callable<CompletableFuture<T>> operation, final Executor executor) throws Exception {
-        final TimeContext context = start();
-
-        try {
-            CompletableFuture<T> promise = new CompletableFuture<>();
-            CompletableFuture<T> future = operation.call();
-            future.handleAsync((success, failure) -> {
-                context.stop();
-                if (failure == null) {
-                    promise.complete(success);
-                } else {
-                    promise.completeExceptionally(failure);
-                }
-                return null;
-            }, executor);
-            return promise;
-        } catch (Exception ex) {
-            context.stop();
-            throw ex;
-        }
+    public <T> CompletableFuture<T> timeAsync(Callable<CompletableFuture<T>> operation, Executor executor) throws Exception {
+        return TimerHelper.timeAsync(operation, this, executor);
     }
 
     @Override
-    public <T> CompletableFuture<T> timeAsync(final Callable<CompletableFuture<T>> operation, final Timer failureTimer, final Executor executor) throws Exception {
-        final TimeContext successContext = start();
-        final TimeContext failureContext = failureTimer.start();
-
-        try {
-            CompletableFuture<T> promise = new CompletableFuture<>();
-            CompletableFuture<T> future = operation.call();
-            future.handleAsync((success, failure) -> {
-                if (failure == null) {
-                    successContext.stop();
-                    promise.complete(success);
-                } else {
-                    failureContext.stop();
-                    promise.completeExceptionally(failure);
-                }
-                return null;
-            }, executor);
-            return promise;
-        } catch (Exception ex) {
-            failureContext.stop();
-            throw ex;
-        }
+    public <T> CompletableFuture<T> timeAsync(Callable<CompletableFuture<T>> operation, Timer failureTimer, Executor executor) throws Exception {
+        return TimerHelper.timeAsync(operation, this, executor);
     }
 
     @Override
