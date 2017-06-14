@@ -41,7 +41,7 @@ public class StatsDCounter implements Counter {
 
     @Override
     public void dec(final int n) {
-        final int delta = -1 * n;
+        final int delta = -n;
 
         count.addAndGet(delta);
         client.count(name, delta);
