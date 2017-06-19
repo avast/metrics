@@ -8,7 +8,7 @@ See [StatsDMetricsMonitor](statsd/src/main/java/com/avast/metrics/statsd/StatsDM
 import com.avast.metrics.api.*;
 import com.avast.metrics.statsd.*;
 
-Monitor monitor = new StatsDMetricsMonitor(statsDHost, statsDPort, publishDomain);
+Monitor monitor = new StatsDMetricsMonitor(statsDHost, statsDPort, prefix);
 Handler handler = new Handler(monitor.named("Handler1"));
 ```
 
@@ -16,5 +16,5 @@ Handler handler = new Handler(monitor.named("Handler1"));
 import com.avast.metrics.scalaapi.Monitor
 import com.avast.metrics.dropwizard._
 
-val rootMonitor = Monitor(new StatsDMetricsMonitor(statsDHost, statsDPort, publishDomain))
+val rootMonitor = Monitor(new StatsDMetricsMonitor(statsDHost, statsDPort, prefix))
 ```

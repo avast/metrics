@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings({"WeakerAccess", "OptionalUsedAsFieldOrParameterType", "unused"})
 public class StatsDMetricsMonitor implements Monitor {
     protected final StatsDClient client;
-    protected final String domain;
+    protected final String prefix;
     protected final List<String> names = new ArrayList<>();
     protected final Naming naming;
     protected final ScheduledExecutorService scheduler;
@@ -28,28 +28,28 @@ public class StatsDMetricsMonitor implements Monitor {
 
     protected final Map<String, ScheduledFuture<?>> gauges = new HashMap<>();
 
-    public StatsDMetricsMonitor(String host, int port, String domain, final Naming naming, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler) {
-        this.domain = domain;
+    public StatsDMetricsMonitor(String host, int port, String prefix, final Naming naming, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler) {
+        this.prefix = prefix;
         this.naming = naming;
         this.gaugeSendPeriod = gaugeSendPeriod;
         this.scheduler = scheduler;
-        client = createStatsDClient(host, port, domain);
+        client = createStatsDClient(host, port, prefix);
     }
 
-    public StatsDMetricsMonitor(String host, int port, String domain, final Naming naming) {
-        this(host, port, domain, naming, getDefaultGaugeSendPeriod(), createScheduler());
+    public StatsDMetricsMonitor(String host, int port, String prefix, final Naming naming) {
+        this(host, port, prefix, naming, getDefaultGaugeSendPeriod(), createScheduler());
     }
 
-    public StatsDMetricsMonitor(String host, int port, String domain, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler) {
-        this(host, port, domain, Naming.defaultNaming(), gaugeSendPeriod, scheduler);
+    public StatsDMetricsMonitor(String host, int port, String prefix, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler) {
+        this(host, port, prefix, Naming.defaultNaming(), gaugeSendPeriod, scheduler);
     }
 
-    public StatsDMetricsMonitor(String host, int port, String domain) {
-        this(host, port, domain, Naming.defaultNaming(), getDefaultGaugeSendPeriod(), createScheduler());
+    public StatsDMetricsMonitor(String host, int port, String prefix) {
+        this(host, port, prefix, Naming.defaultNaming(), getDefaultGaugeSendPeriod(), createScheduler());
     }
 
     protected StatsDMetricsMonitor(StatsDMetricsMonitor monitor, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler, String... newNames) {
-        this.domain = monitor.domain;
+        this.prefix = monitor.prefix;
         this.client = monitor.client;
         this.naming = monitor.naming;
         this.scheduler = scheduler;
@@ -59,8 +59,8 @@ public class StatsDMetricsMonitor implements Monitor {
         this.names.addAll(Arrays.asList(newNames));
     }
 
-    protected StatsDClient createStatsDClient(final String host, final int port, final String domain) {
-        return new NonBlockingStatsDClient(domain, host, port);
+    protected StatsDClient createStatsDClient(final String host, final int port, final String prefix) {
+        return new NonBlockingStatsDClient(prefix, host, port);
     }
 
     private static Duration getDefaultGaugeSendPeriod() {
