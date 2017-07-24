@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/avast/metrics.svg?branch=master)](https://travis-ci.org/avast/metrics) [![Download](https://api.bintray.com/packages/avast/maven/metrics/images/download.svg) ](https://bintray.com/avast/maven/metrics/_latestVersion)
+
 # Metrics
 
 Java/Scala library defining API for metrics publishing. Implementation for Dropwizard Metrics is provided.  
@@ -20,6 +22,17 @@ Currently there are two available implementations/exports:
 * [StatsD](statsd)
 
 There is Scala API available in `metrics-scala`. See the example below.
+
+## Adding to project
+The library is published to [Bintray](https://bintray.com/avast/maven/metrics/) E.g. usage of the [StatsD](statsd) in Gradle project: 
+```gradle
+repositories {
+    jcenter()
+}
+dependencies {
+    compile "com.avast.metrics:metrics-statsd:$versionHere"
+}
+```
 
 ### Naming of Monitors
 Each monitor can be named several times which creates a hierarchy of names for the final metric.
