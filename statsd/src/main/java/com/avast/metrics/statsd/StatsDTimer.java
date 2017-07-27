@@ -42,10 +42,9 @@ public class StatsDTimer implements Timer {
 
     @Override
     public <T> T time(final Callable<T> operation) throws Exception {
-        final TimeContext context = start();
-        final T result = operation.call();
-        context.stop();
-        return result;
+        try (TimeContext ignored = start()) {
+            return operation.call();
+        }
     }
 
     @Override
