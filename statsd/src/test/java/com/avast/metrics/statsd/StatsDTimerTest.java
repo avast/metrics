@@ -104,7 +104,7 @@ public class StatsDTimerTest {
 
     @Test
     public void testTimerContext() {
-        final TestClock clock = new TestClock(0, 100);
+        final TestClock clock = new TestClock(0, 100, 200);
 
         final AtomicReference<Duration> r = new AtomicReference<>(null);
 
@@ -112,8 +112,8 @@ public class StatsDTimerTest {
         final StatsDTimer.StatsDTimerContext context = new StatsDTimer.StatsDTimerContext(() -> clock.instant().toEpochMilli(), r::set);
 
         assertEquals(100 , context.stopAndGetTime());
-        assertEquals(100 , context.stopAndGetTime()); // repeated by purpose!
+        assertEquals(200 , context.stopAndGetTime()); // repeated by purpose!
 
-        assertEquals(100, r.get().toNanos());
+        assertEquals(200, r.get().toNanos());
     }
 }

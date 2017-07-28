@@ -30,6 +30,10 @@ public class TestClock extends Clock {
 
     @Override
     public Instant instant() {
-        return instants.next();
+        if (instants.hasNext()) {
+            return instants.next();
+        } else {
+            throw new IllegalStateException("No more instants");
+        }
     }
 }
