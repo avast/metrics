@@ -60,7 +60,7 @@ public class StatsDTimer implements Timer {
 
     @Override
     public <T> CompletableFuture<T> timeAsync(Callable<CompletableFuture<T>> operation, Timer failureTimer, Executor executor) throws Exception {
-        return TimerHelper.timeAsync(operation, this, executor);
+        return TimerHelper.timeAsync(operation, this, failureTimer, executor);
     }
 
     @Override

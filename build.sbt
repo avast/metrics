@@ -48,8 +48,10 @@ lazy val commonSettings = Seq(
   libraryDependencies ++= Seq(
     "org.mockito" % "mockito-all" % "1.10.19" % "test",
     "junit" % "junit" % "4.12" % "test",
+    "com.novocode" % "junit-interface" % "0.10" % "test", // Required by sbt to execute JUnit tests
     "ch.qos.logback" % "logback-classic" % "1.1.8" % "test"
-  )
+  ),
+  testOptions += Tests.Argument(TestFrameworks.JUnit)
 )
 
 lazy val root = (project in file("."))
