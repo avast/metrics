@@ -57,7 +57,7 @@ lazy val root = (project in file("."))
     name := "metrics",
     publish := {},
     publishLocal := {}
-  ).aggregate(api, scalaApi, core, dropwizardCommon, jmx, graphite, statsd)
+  ).aggregate(api, scalaApi, core, dropwizardCommon, jmx, graphite, formatter, statsd)
 
 lazy val api = (project in file("api")).
   settings(
@@ -106,6 +106,13 @@ lazy val graphite = (project in file("graphite")).
     libraryDependencies ++= Seq(
       "io.dropwizard.metrics" % "metrics-graphite" % Versions.dropwizard
     )
+  ).dependsOn(dropwizardCommon)
+
+lazy val formatter = (project in file("formatter")).
+  settings(
+    commonSettings,
+    javaSettings,
+    name := "metrics-formatter"
   ).dependsOn(dropwizardCommon)
 
 lazy val statsd = (project in file("statsd")).
