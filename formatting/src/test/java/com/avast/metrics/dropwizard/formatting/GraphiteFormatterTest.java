@@ -1,4 +1,4 @@
-package com.avast.metrics.dropwizard.formatter;
+package com.avast.metrics.dropwizard.formatting;
 
 import org.junit.Test;
 

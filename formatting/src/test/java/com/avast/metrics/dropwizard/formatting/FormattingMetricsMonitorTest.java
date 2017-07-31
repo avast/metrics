@@ -1,4 +1,4 @@
-package com.avast.metrics.dropwizard.formatter;
+package com.avast.metrics.dropwizard.formatting;
 
 import com.avast.metrics.api.TimerPair;
 import org.junit.Test;

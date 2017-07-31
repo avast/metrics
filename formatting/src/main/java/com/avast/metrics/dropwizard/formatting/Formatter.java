@@ -1,4 +1,4 @@
-package com.avast.metrics.dropwizard.formatter;
+package com.avast.metrics.dropwizard.formatting;
 
 /**
  * Generic formatter of metric names and values.
