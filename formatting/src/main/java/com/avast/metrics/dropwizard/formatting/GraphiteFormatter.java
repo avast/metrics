@@ -1,12 +1,22 @@
 package com.avast.metrics.dropwizard.formatting;
 
+import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 /**
- * Graphite/StatsD formatter.
+ * Graphite/StatsD formatter. Timestamp is NOT appended.
+ * <p>
+ * http://graphite.readthedocs.io/en/latest/feeding-carbon.html#the-plaintext-protocol
+ * <metric path> <metric value> <metric timestamp>
  */
 public class GraphiteFormatter implements Formatter {
+    private static final String SEPARATOR_NAME_VALUE = " ";
+    private static final String SEPARATOR_METRICS = "\n";
+
     @Override
     public String nameSeparator() {
-        return ".";
+        return GraphiteNaming.SEPARATOR_NAME_PARTS;
     }
 
     @Override
@@ -40,5 +50,27 @@ public class GraphiteFormatter implements Formatter {
         }
 
         return result.toString();
+    }
+
+    @Override
+    public String formatNumber(long number) {
+        return Long.toString(number);
+    }
+
+    @Override
+    public String formatNumber(double number) {
+        return String.format(Locale.ENGLISH, "%s", number);
+    }
+
+    @Override
+    public <T> String formatObject(T object) {
+        return object.toString();
+    }
+
+    @Override
+    public String format(Stream<MetricValue> metrics) {
+        return metrics
+                .map(metric -> metric.getName() + SEPARATOR_NAME_VALUE + metric.getValue())
+                .collect(Collectors.joining(SEPARATOR_METRICS));
     }
 }

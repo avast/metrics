@@ -1,5 +1,6 @@
 package com.avast.metrics.dropwizard.formatting;
 
+import com.avast.metrics.api.Counter;
 import com.avast.metrics.api.TimerPair;
 import org.junit.Test;
 
@@ -89,6 +90,21 @@ public class FormattingMetricsMonitorTest {
     public void testHistogramName() throws Exception {
         try (FormattingMetricsMonitor monitor = new FormattingMetricsMonitor(new GraphiteFormatter())) {
             assertEquals("monitor.histogram-x", monitor.named("monitor").newHistogram("histogram.x").getName());
+        }
+    }
+
+    @Test
+    public void testFormatTwoCounters() throws Exception {
+        try (FormattingMetricsMonitor monitor = new FormattingMetricsMonitor(new GraphiteFormatter())) {
+            Counter counterB = monitor.named("b").newCounter("counter");
+            Counter counterA = monitor.named("a").newCounter("counter");
+            counterB.inc(42);
+            counterA.inc();
+
+            String expected = "a.counter.count 1\n" +
+                    "b.counter.count 42";
+
+            assertEquals(expected, monitor.format());
         }
     }
 }
