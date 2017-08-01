@@ -149,16 +149,6 @@ public class NoOpMonitor implements Monitor {
             public <T> CompletableFuture<T> timeAsync(Callable<CompletableFuture<T>> operation, Executor executor) throws Exception {
                 return operation.call();
             }
-
-            @Override
-            public Timer getSuccessTimer() {
-                return newTimer(name);
-            }
-
-            @Override
-            public Timer getFailureTimer() {
-                return newTimer(name);
-            }
         };
     }
 
