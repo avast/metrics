@@ -21,6 +21,7 @@ lazy val javaSettings = Seq(
 
 lazy val Versions = new {
   val dropwizard = "3.2.2"
+  val typesafeConfig = "1.3.1"
 }
 
 lazy val commonSettings = Seq(
@@ -57,7 +58,7 @@ lazy val root = (project in file("."))
     name := "metrics",
     publish := {},
     publishLocal := {}
-  ).aggregate(api, scalaApi, core, dropwizardCommon, jmx, graphite, formatting, statsd)
+  ).aggregate(api, scalaApi, core, dropwizardCommon, jmx, graphite, filter, formatting, statsd)
 
 lazy val api = (project in file("api")).
   settings(
@@ -105,6 +106,16 @@ lazy val graphite = (project in file("graphite")).
     name := "metrics-graphite",
     libraryDependencies ++= Seq(
       "io.dropwizard.metrics" % "metrics-graphite" % Versions.dropwizard
+    )
+  ).dependsOn(dropwizardCommon)
+
+lazy val filter = (project in file("filter")).
+  settings(
+    commonSettings,
+    javaSettings,
+    name := "metrics-filter",
+    libraryDependencies ++= Seq(
+      "com.typesafe" % "config" % Versions.typesafeConfig
     )
   ).dependsOn(dropwizardCommon)
 
