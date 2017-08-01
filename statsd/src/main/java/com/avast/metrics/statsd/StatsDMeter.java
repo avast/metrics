@@ -3,7 +3,6 @@ package com.avast.metrics.statsd;
 import com.avast.metrics.api.Meter;
 import com.timgroup.statsd.StatsDClient;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class StatsDMeter implements Meter {
@@ -30,7 +29,7 @@ public class StatsDMeter implements Meter {
 
     @Override
     public void mark(final long n) {
-        marks.incrementAndGet();
+        marks.addAndGet(n);
         client.count(name, n);
     }
 
