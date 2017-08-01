@@ -8,7 +8,6 @@ import com.codahale.metrics.Snapshot;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -103,39 +102,42 @@ public class FormattingMetricsMonitor extends MetricsMonitor {
     }
 
     public String format() {
-        Stream<MetricValue> metrics = Stream.of(
-                registry.getCounters()
-                        .entrySet()
-                        .stream()
-                        .map(entry -> mapCounter(entry.getKey(), entry.getValue())),
-                registry.getGauges()
-                        .entrySet()
-                        .stream()
-                        .map(entry -> mapGauge(entry.getKey(), entry.getValue())),
-                registry.getMeters()
-                        .entrySet()
-                        .stream()
-                        .flatMap(entry -> mapMeter(entry.getKey(), entry.getValue())),
-                registry.getHistograms()
-                        .entrySet()
-                        .stream()
-                        .flatMap(entry -> mapHistogram(entry.getKey(), entry.getValue())),
-                registry.getTimers()
-                        .entrySet()
-                        .stream()
-                        .flatMap(entry -> mapTimer(entry.getKey(), entry.getValue()))
-        ).flatMap(Function.identity())
+        Stream<MetricValue> metrics = registry.getMetrics()
+                .entrySet()
+                .stream()
+                .flatMap(entry -> toMetricValue(entry.getKey(), entry.getValue()))
                 .sorted(Comparator.comparing(MetricValue::getName));
 
         return formatter.format(metrics);
     }
 
-    private MetricValue mapCounter(String name, com.codahale.metrics.Counter counter) {
-        return new MetricValue(naming.countName(name), formatter.formatNumber(counter.getCount()));
+    private Stream<MetricValue> toMetricValue(String name, com.codahale.metrics.Metric metric) {
+        if (metric instanceof com.codahale.metrics.Counter) {
+            return mapCounter(name, (com.codahale.metrics.Counter) metric);
+        } else if (metric instanceof com.codahale.metrics.Gauge) {
+            return mapGauge(name, (com.codahale.metrics.Gauge) metric);
+        } else if (metric instanceof com.codahale.metrics.Meter) {
+            return mapMeter(name, (com.codahale.metrics.Meter) metric);
+        } else if (metric instanceof com.codahale.metrics.Histogram) {
+            return mapHistogram(name, (com.codahale.metrics.Histogram) metric);
+        } else if (metric instanceof com.codahale.metrics.Timer) {
+            return mapTimer(name, (com.codahale.metrics.Timer) metric);
+        } else {
+            LOGGER.error("Unexpected metric class: {}", metric.getClass());
+            return Stream.empty();
+        }
     }
 
-    private MetricValue mapGauge(String name, com.codahale.metrics.Gauge gauge) {
-        return new MetricValue(name, formatter.formatObject(gauge.getValue()));
+    private Stream<MetricValue> mapCounter(String name, com.codahale.metrics.Counter counter) {
+        return Stream.of(
+                new MetricValue(naming.countName(name), formatter.formatNumber(counter.getCount()))
+        );
+    }
+
+    private Stream<MetricValue> mapGauge(String name, com.codahale.metrics.Gauge gauge) {
+        return Stream.of(
+                new MetricValue(name, formatter.formatObject(gauge.getValue()))
+        );
     }
 
     private Stream<MetricValue> mapMeter(String name, com.codahale.metrics.Meter meter) {
