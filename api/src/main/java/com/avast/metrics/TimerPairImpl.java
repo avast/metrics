@@ -9,8 +9,8 @@ import java.util.concurrent.Executor;
 
 public class TimerPairImpl implements TimerPair {
 
-    private final Timer successTimer;
-    private final Timer failureTimer;
+    private Timer successTimer;
+    private Timer failureTimer;
 
     public TimerPairImpl(Timer successTimer, Timer failureTimer) {
         this.successTimer = successTimer;
@@ -53,15 +53,5 @@ public class TimerPairImpl implements TimerPair {
             failureContext.stop();
             throw ex;
         }
-    }
-
-    @Override
-    public Timer getSuccessTimer() {
-        return successTimer;
-    }
-
-    @Override
-    public Timer getFailureTimer() {
-        return failureTimer;
     }
 }
