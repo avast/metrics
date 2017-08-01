@@ -24,6 +24,9 @@ public class GraphiteFormatterTest {
         assertEquals("3.141592653589793", formatter.formatNumber(Math.PI));
         assertEquals("1.7976931348623157E308", formatter.formatNumber(Double.MAX_VALUE));
         assertEquals("4.9E-324", formatter.formatNumber(Double.MIN_VALUE));
+        assertEquals("NaN", formatter.formatNumber(Double.NaN));
+        assertEquals("Infinity", formatter.formatNumber(Double.POSITIVE_INFINITY));
+        assertEquals("-Infinity", formatter.formatNumber(Double.NEGATIVE_INFINITY));
     }
 
     @Test
