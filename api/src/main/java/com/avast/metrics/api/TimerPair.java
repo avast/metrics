@@ -9,4 +9,6 @@ public interface TimerPair {
     <T> T time(Callable<T> operation) throws Exception;
     <T> CompletableFuture<T> timeAsync(Callable<CompletableFuture<T>> operation, Executor executor) throws Exception;
 
+    Timer getSuccessTimer();
+    Timer getFailureTimer();
 }
