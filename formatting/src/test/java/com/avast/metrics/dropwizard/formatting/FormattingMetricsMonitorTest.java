@@ -69,9 +69,30 @@ public class FormattingMetricsMonitorTest {
     @Test
     public void testTimerPairName() throws Exception {
         try (FormattingMetricsMonitor monitor = new FormattingMetricsMonitor(new GraphiteFormatter())) {
-            TimerPair timerPair = monitor.named("monitor").newTimerPair("timer.pair.x");
-            assertEquals("monitor.timer-pair-xSuccesses", timerPair.getSuccessTimer().getName());
-            assertEquals("monitor.timer-pair-xFailures", timerPair.getFailureTimer().getName());
+            monitor.named("monitor").newTimerPair("timer.pair.x");
+
+            String expected = "monitor.timer-pair-xFailures.15mRate 0.0\n" +
+                    "monitor.timer-pair-xFailures.1mRate 0.0\n" +
+                    "monitor.timer-pair-xFailures.50Perc 0.0\n" +
+                    "monitor.timer-pair-xFailures.5mRate 0.0\n" +
+                    "monitor.timer-pair-xFailures.count 0\n" +
+                    "monitor.timer-pair-xFailures.max 0\n" +
+                    "monitor.timer-pair-xFailures.mean 0.0\n" +
+                    "monitor.timer-pair-xFailures.mean 0.0\n" +
+                    "monitor.timer-pair-xFailures.min 0\n" +
+                    "monitor.timer-pair-xFailures.stdDev 0.0\n" +
+                    "monitor.timer-pair-xSuccesses.15mRate 0.0\n" +
+                    "monitor.timer-pair-xSuccesses.1mRate 0.0\n" +
+                    "monitor.timer-pair-xSuccesses.50Perc 0.0\n" +
+                    "monitor.timer-pair-xSuccesses.5mRate 0.0\n" +
+                    "monitor.timer-pair-xSuccesses.count 0\n" +
+                    "monitor.timer-pair-xSuccesses.max 0\n" +
+                    "monitor.timer-pair-xSuccesses.mean 0.0\n" +
+                    "monitor.timer-pair-xSuccesses.mean 0.0\n" +
+                    "monitor.timer-pair-xSuccesses.min 0\n" +
+                    "monitor.timer-pair-xSuccesses.stdDev 0.0";
+
+            assertEquals(expected, monitor.format());
         }
     }
 
