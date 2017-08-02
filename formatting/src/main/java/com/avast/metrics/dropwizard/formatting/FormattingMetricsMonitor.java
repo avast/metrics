@@ -99,6 +99,8 @@ public class FormattingMetricsMonitor extends MetricsMonitor {
     /**
      * Implementation in parent class can be considered broken from contract point of view. It uses hardcoded "/" as a
      * separator. The unexpected behavior is needed by JmxMetricsMonitor that internally uses group of unusual characters.
+     *
+     * TODO: Define expected behavior by writing contract of MetricsMonitor.getName(), optionally refactor all related code.
      */
     @Override
     public String getName() {
