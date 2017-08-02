@@ -1,5 +1,7 @@
 package com.avast.metrics.dropwizard.formatting;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -64,7 +66,29 @@ public class GraphiteFormatter implements Formatter {
 
     @Override
     public <T> String formatObject(T object) {
-        return object.toString();
+        if (object == null) {
+            return "null";
+        } else if (object instanceof Float) {
+            return formatNumber(((Float) object).doubleValue());
+        } else if (object instanceof Double) {
+            return formatNumber((Double) object);
+        } else if (object instanceof Byte) {
+            return formatNumber(((Byte) object).longValue());
+        } else if (object instanceof Short) {
+            return formatNumber(((Short) object).longValue());
+        } else if (object instanceof Integer) {
+            return formatNumber(((Integer) object).longValue());
+        } else if (object instanceof Long) {
+            return formatNumber((Long) object);
+        } else if (object instanceof BigInteger) {
+            return formatNumber(((BigInteger) object).doubleValue());
+        } else if (object instanceof BigDecimal) {
+            return formatNumber(((BigDecimal) object).doubleValue());
+        } else if (object instanceof Boolean) {
+            return formatNumber(((Boolean) object) ? 1 : 0);
+        } else {
+            return object.toString();
+        }
     }
 
     @Override
