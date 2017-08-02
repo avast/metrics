@@ -123,7 +123,10 @@ lazy val formatting = (project in file("formatting")).
   settings(
     commonSettings,
     javaSettings,
-    name := "metrics-formatting"
+    name := "metrics-formatting",
+    libraryDependencies ++= Seq(
+      "com.typesafe" % "config" % Versions.typesafeConfig
+    )
   ).dependsOn(dropwizardCommon)
 
 lazy val statsd = (project in file("statsd")).
