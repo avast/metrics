@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 public class ReferenceConfTest {
     @Test
     public void testDefaultsLoadable() throws Exception {
-        Config config = ConfigFactory.load().getConfig("metricFiltersDefaults");
+        Config config = ConfigFactory.load().getConfig("metricsFiltersDefaults");
         assertTrue(config.hasPath("root"));
         assertEquals("enable", config.getString("root.level"));
 
