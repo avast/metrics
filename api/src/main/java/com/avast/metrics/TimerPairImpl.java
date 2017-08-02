@@ -54,14 +54,4 @@ public class TimerPairImpl implements TimerPair {
             throw ex;
         }
     }
-
-    @Override
-    public Timer getSuccessTimer() {
-        return successTimer;
-    }
-
-    @Override
-    public Timer getFailureTimer() {
-        return failureTimer;
-    }
 }
