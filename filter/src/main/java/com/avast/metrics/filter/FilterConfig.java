@@ -5,18 +5,18 @@ package com.avast.metrics.filter;
  */
 public class FilterConfig {
     private final String metricName;
-    private final FilterLevel level;
+    private final boolean enabled;
 
-    public FilterConfig(String metricName, FilterLevel level) {
+    public FilterConfig(String metricName, boolean enabled) {
         this.metricName = metricName;
-        this.level = level;
+        this.enabled = enabled;
     }
 
     public FilterConfig withMetricName(String newName) {
         if (metricName.equals(newName)) {
             return this;
         } else {
-            return new FilterConfig(newName, level);
+            return new FilterConfig(newName, enabled);
         }
     }
 
@@ -24,7 +24,12 @@ public class FilterConfig {
         return metricName;
     }
 
-    public FilterLevel getLevel() {
-        return level;
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    @Override
+    public String toString() {
+        return metricName + " " + (enabled ? "enabled" : "disabled");
     }
 }
