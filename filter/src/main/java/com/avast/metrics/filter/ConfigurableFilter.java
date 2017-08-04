@@ -8,16 +8,17 @@ import java.util.stream.Collectors;
  * Configurable metrics filter.
  */
 class ConfigurableFilter implements MetricsFilter {
-    private static final String SEPARATOR_NAMES = ".";
-
     /**
      * Name of root filter (prefix of all possible names).
      */
-    private static final String ROOT_FILTER_NAME = "";
+    private static final String INTERNAL_ROOT_FILTER_NAME = "";
 
     /**
      * List of configurations sorted from the most concrete ones to the less concrete ones. The first prefix that
-     * matches beginning of the metric name will win.
+     * matches beginning of the metric name will win. The last record is root filter that matches everything.
+     *
+     * Only very small number of records is expected, so O(n) complexity should be acceptable. Alternative and faster
+     * implementation would be a tree data structure with O(log(n)) complexity.
      */
     private final List<FilterConfig> configuration;
 
@@ -30,7 +31,7 @@ class ConfigurableFilter implements MetricsFilter {
                 .collect(Collectors.toList());
 
         boolean rootFilterPresent = this.configuration.stream()
-                .anyMatch(cfg -> ROOT_FILTER_NAME.equals(cfg.getMetricName()));
+                .anyMatch(cfg -> INTERNAL_ROOT_FILTER_NAME.equals(cfg.getMetricName()));
         if (!rootFilterPresent) {
             throw new IllegalArgumentException("Root filter is missing");
         }
@@ -49,8 +50,8 @@ class ConfigurableFilter implements MetricsFilter {
     }
 
     private FilterConfig mapRootName(FilterConfig config) {
-        return config.getMetricName().equals(appendNameSeparator("root"))
-                ? config.withMetricName(ROOT_FILTER_NAME)
+        return config.getMetricName().equals(appendNameSeparator(ROOT_FILTER_NAME))
+                ? config.withMetricName(INTERNAL_ROOT_FILTER_NAME)
                 : config;
     }
 
@@ -64,6 +65,6 @@ class ConfigurableFilter implements MetricsFilter {
      * - Correct: "hello.wor." doesn't match "hello.world."
      */
     private String appendNameSeparator(String metricName) {
-        return (metricName.endsWith(SEPARATOR_NAMES)) ? metricName : metricName + SEPARATOR_NAMES;
+        return (metricName.endsWith(NAME_SEPARATOR)) ? metricName : metricName + NAME_SEPARATOR;
     }
 }

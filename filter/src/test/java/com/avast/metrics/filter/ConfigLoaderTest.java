@@ -17,9 +17,8 @@ public class ConfigLoaderTest {
         List<FilterConfig> filterConfigs = new ConfigLoader().load(config);
 
         assertEquals(1, filterConfigs.size());
-        FilterConfig filterConfig = filterConfigs.get(0);
-        assertEquals("root", filterConfig.getMetricName());
-        assertTrue(filterConfig.isEnabled());
+        assertEquals(MetricsFilter.ROOT_FILTER_NAME, filterConfigs.get(0).getMetricName());
+        assertTrue(filterConfigs.get(0).isEnabled());
     }
 
     @Test
@@ -28,9 +27,8 @@ public class ConfigLoaderTest {
         List<FilterConfig> filterConfigs = new ConfigLoader().load(config);
 
         assertEquals(1, filterConfigs.size());
-        FilterConfig filterConfig = filterConfigs.get(0);
-        assertEquals("root", filterConfig.getMetricName());
-        assertTrue(filterConfig.isEnabled());
+        assertEquals(MetricsFilter.ROOT_FILTER_NAME, filterConfigs.get(0).getMetricName());
+        assertTrue(filterConfigs.get(0).isEnabled());
     }
 
     @Test
@@ -39,9 +37,8 @@ public class ConfigLoaderTest {
         List<FilterConfig> filterConfigs = new ConfigLoader().load(config);
 
         assertEquals(1, filterConfigs.size());
-        FilterConfig filterConfig = filterConfigs.get(0);
-        assertEquals("root", filterConfig.getMetricName());
-        assertFalse(filterConfig.isEnabled());
+        assertEquals(MetricsFilter.ROOT_FILTER_NAME, filterConfigs.get(0).getMetricName());
+        assertFalse(filterConfigs.get(0).isEnabled());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -60,12 +57,36 @@ public class ConfigLoaderTest {
 
         assertEquals(2, filterConfigs.size());
 
-        FilterConfig sectionConfig = filterConfigs.get(0);
-        assertEquals("name1.name2.nameN", sectionConfig.getMetricName());
-        assertFalse(sectionConfig.isEnabled());
+        assertEquals("name1.name2.nameN", filterConfigs.get(0).getMetricName());
+        assertFalse(filterConfigs.get(0).isEnabled());
 
-        FilterConfig rootFilterConfig = filterConfigs.get(1);
-        assertEquals("root", rootFilterConfig.getMetricName());
-        assertTrue(rootFilterConfig.isEnabled());
+        assertEquals(MetricsFilter.ROOT_FILTER_NAME, filterConfigs.get(1).getMetricName());
+        assertTrue(filterConfigs.get(1).isEnabled());
+    }
+
+    @Test
+    public void testComplexEnableDisable() throws Exception {
+        Config config = ConfigFactory.load().getConfig("testComplexEnableDisable");
+        List<FilterConfig> filterConfigs = new ConfigLoader().load(config)
+                .stream()
+                .sorted(Comparator.comparing(FilterConfig::getMetricName))
+                .collect(Collectors.toList());
+
+        assertEquals(5, filterConfigs.size());
+
+        assertEquals("name1", filterConfigs.get(0).getMetricName());
+        assertFalse(filterConfigs.get(0).isEnabled());
+
+        assertEquals("name1.name2", filterConfigs.get(1).getMetricName());
+        assertTrue(filterConfigs.get(1).isEnabled());
+
+        assertEquals("name1.name2.nameN", filterConfigs.get(2).getMetricName());
+        assertFalse(filterConfigs.get(2).isEnabled());
+
+        assertEquals("name1.name2.nameN.myCounter", filterConfigs.get(3).getMetricName());
+        assertTrue(filterConfigs.get(3).isEnabled());
+
+        assertEquals(MetricsFilter.ROOT_FILTER_NAME, filterConfigs.get(4).getMetricName());
+        assertTrue(filterConfigs.get(4).isEnabled());
     }
 }

@@ -10,7 +10,7 @@ public class ReferenceConfTest {
     @Test
     public void testDefaultsLoadable() throws Exception {
         Config config = ConfigFactory.load().getConfig(ConfigLoader.SECTION_DEFAULTS);
-        assertEquals("enabled", config.getString("root"));
+        assertEquals("enabled", config.getString(MetricsFilter.ROOT_FILTER_NAME));
 
         assertEquals(1, config.entrySet().size());
     }
