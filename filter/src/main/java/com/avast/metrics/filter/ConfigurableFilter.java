@@ -7,13 +7,13 @@ import java.util.stream.Collectors;
 /**
  * Configurable metrics filter.
  */
-public class ConfigurableFilter implements MetricsFilter {
-    private static final String SEPARATOR_NAMES = "/";
+class ConfigurableFilter implements MetricsFilter {
+    private static final String SEPARATOR_NAMES = ".";
 
     /**
      * Name of root filter (prefix of all possible names).
      */
-    private static final String ROOT_FILTER_NAME = SEPARATOR_NAMES;
+    private static final String ROOT_FILTER_NAME = "";
 
     /**
      * List of configurations sorted from the most concrete ones to the less concrete ones. The first prefix that
@@ -21,14 +21,15 @@ public class ConfigurableFilter implements MetricsFilter {
      */
     private final List<FilterConfig> configuration;
 
-    public ConfigurableFilter(List<FilterConfig> configuration) {
+    ConfigurableFilter(List<FilterConfig> configuration) {
         this.configuration = configuration
                 .stream()
-                .map(cfg -> cfg.withMetricName(appendNameSeparator(cfg.getMetricName())))
+                .map(this::appendNameSeparator)
+                .map(this::mapRootName)
                 .sorted(Comparator.comparing(FilterConfig::getMetricName).reversed())
                 .collect(Collectors.toList());
 
-        boolean rootFilterPresent = configuration.stream()
+        boolean rootFilterPresent = this.configuration.stream()
                 .anyMatch(cfg -> ROOT_FILTER_NAME.equals(cfg.getMetricName()));
         if (!rootFilterPresent) {
             throw new IllegalArgumentException("Root filter is missing");
@@ -36,20 +37,31 @@ public class ConfigurableFilter implements MetricsFilter {
     }
 
     @Override
-    public FilterConfig getConfig(String metricName) {
+    public boolean isEnabled(String metricName) {
         String nameWithSeparator = appendNameSeparator(metricName);
 
         return configuration
                 .stream()
                 .filter(cfg -> nameWithSeparator.startsWith(cfg.getMetricName()))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Root filter should be always defined"));
+                .orElseThrow(() -> new IllegalStateException("Root filter should be defined, this should never happen"))
+                .isEnabled();
+    }
+
+    private FilterConfig mapRootName(FilterConfig config) {
+        return config.getMetricName().equals(appendNameSeparator("root"))
+                ? config.withMetricName(ROOT_FILTER_NAME)
+                : config;
+    }
+
+    private FilterConfig appendNameSeparator(FilterConfig config) {
+        return config.withMetricName(appendNameSeparator(config.getMetricName()));
     }
 
     /**
      * Append name separator at the end of name to prevent bad prefix matches.
-     * - Incorrect: "hello/wor" matches "hello/world"
-     * - Correct: "hello/wor/" doesn't match "hello/world/"
+     * - Incorrect: "hello.wor" matches "hello.world"
+     * - Correct: "hello.wor." doesn't match "hello.world."
      */
     private String appendNameSeparator(String metricName) {
         return (metricName.endsWith(SEPARATOR_NAMES)) ? metricName : metricName + SEPARATOR_NAMES;

@@ -3,7 +3,7 @@ package com.avast.metrics.filter;
 /**
  * Configuration for a single filter.
  */
-public class FilterConfig {
+class FilterConfig {
     private final String metricName;
     private final boolean enabled;
 
@@ -30,6 +30,6 @@ public class FilterConfig {
 
     @Override
     public String toString() {
-        return metricName + " " + (enabled ? "enabled" : "disabled");
+        return metricName + " - " + (enabled ? "enabled" : "disabled");
     }
 }
