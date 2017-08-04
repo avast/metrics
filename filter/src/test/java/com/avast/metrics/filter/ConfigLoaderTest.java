@@ -11,10 +11,14 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.*;
 
 public class ConfigLoaderTest {
+    private List<FilterConfig> loadConfig(String name) {
+        Config config = ConfigFactory.load().getConfig(name);
+        return new ConfigLoader(".").load(config);
+    }
+
     @Test
     public void testEmpty() throws Exception {
-        Config config = ConfigFactory.load().getConfig("testEmpty");
-        List<FilterConfig> filterConfigs = new ConfigLoader().load(config);
+        List<FilterConfig> filterConfigs = loadConfig("testEmpty");
 
         assertEquals(1, filterConfigs.size());
         assertEquals(MetricsFilter.ROOT_FILTER_NAME, filterConfigs.get(0).getMetricName());
@@ -23,8 +27,7 @@ public class ConfigLoaderTest {
 
     @Test
     public void testAllEnabled() throws Exception {
-        Config config = ConfigFactory.load().getConfig("testAllEnabled");
-        List<FilterConfig> filterConfigs = new ConfigLoader().load(config);
+        List<FilterConfig> filterConfigs = loadConfig("testAllEnabled");
 
         assertEquals(1, filterConfigs.size());
         assertEquals(MetricsFilter.ROOT_FILTER_NAME, filterConfigs.get(0).getMetricName());
@@ -33,8 +36,7 @@ public class ConfigLoaderTest {
 
     @Test
     public void testAllDisabled() throws Exception {
-        Config config = ConfigFactory.load().getConfig("testAllDisabled");
-        List<FilterConfig> filterConfigs = new ConfigLoader().load(config);
+        List<FilterConfig> filterConfigs = loadConfig("testAllDisabled");
 
         assertEquals(1, filterConfigs.size());
         assertEquals(MetricsFilter.ROOT_FILTER_NAME, filterConfigs.get(0).getMetricName());
@@ -43,14 +45,12 @@ public class ConfigLoaderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testBroken() throws Exception {
-        Config config = ConfigFactory.load().getConfig("testBroken");
-        new ConfigLoader().load(config);
+        loadConfig("testBroken"); // Exception
     }
 
     @Test
     public void testStructuredName() throws Exception {
-        Config config = ConfigFactory.load().getConfig("testStructuredName");
-        List<FilterConfig> filterConfigs = new ConfigLoader().load(config)
+        List<FilterConfig> filterConfigs = loadConfig("testStructuredName")
                 .stream()
                 .sorted(Comparator.comparing(FilterConfig::getMetricName))
                 .collect(Collectors.toList());
@@ -66,8 +66,7 @@ public class ConfigLoaderTest {
 
     @Test
     public void testComplexEnableDisable() throws Exception {
-        Config config = ConfigFactory.load().getConfig("testComplexEnableDisable");
-        List<FilterConfig> filterConfigs = new ConfigLoader().load(config)
+        List<FilterConfig> filterConfigs = loadConfig("testComplexEnableDisable")
                 .stream()
                 .sorted(Comparator.comparing(FilterConfig::getMetricName))
                 .collect(Collectors.toList());

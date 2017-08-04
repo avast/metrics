@@ -21,8 +21,10 @@ class ConfigurableFilter implements MetricsFilter {
      * implementation would be a tree data structure with O(log(n)) complexity.
      */
     private final List<FilterConfig> configuration;
+    private final String nameSeparator;
 
-    ConfigurableFilter(List<FilterConfig> configuration) {
+    ConfigurableFilter(List<FilterConfig> configuration, String nameSeparator) {
+        this.nameSeparator = nameSeparator;
         this.configuration = configuration
                 .stream()
                 .map(this::appendNameSeparator)
@@ -65,6 +67,6 @@ class ConfigurableFilter implements MetricsFilter {
      * - Correct: "hello.wor." doesn't match "hello.world."
      */
     private String appendNameSeparator(String metricName) {
-        return (metricName.endsWith(NAME_SEPARATOR)) ? metricName : metricName + NAME_SEPARATOR;
+        return (metricName.endsWith(nameSeparator)) ? metricName : metricName + nameSeparator;
     }
 }

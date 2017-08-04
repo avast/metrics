@@ -8,7 +8,13 @@ import java.util.stream.Collectors;
 
 class ConfigLoader {
     static final String SECTION_DEFAULTS = "metricsFiltersDefaults";
-    private static final char CONFIG_SEPARATOR_CHAR = '/';
+    private static final String CONFIG_NAME_SEPARATOR = "/";
+
+    private final String nameSeparator;
+
+    ConfigLoader(String nameSeparator) {
+        this.nameSeparator = nameSeparator;
+    }
 
     List<FilterConfig> load(Config config) {
         Config referenceConfig = ConfigFactory.defaultReference().getConfig(SECTION_DEFAULTS);
@@ -35,7 +41,7 @@ class ConfigLoader {
      * name1.name2.nameN.myCounter = enabled
      */
     private String parseName(String metricName) {
-        String name = metricName.replace(CONFIG_SEPARATOR_CHAR, MetricsFilter.NAME_SEPARATOR_CHAR);
+        String name = metricName.replace(CONFIG_NAME_SEPARATOR, nameSeparator);
         int len = name.length();
 
         if (len >= 2 && name.charAt(0) == '"' && name.charAt(len - 1) == '"') {

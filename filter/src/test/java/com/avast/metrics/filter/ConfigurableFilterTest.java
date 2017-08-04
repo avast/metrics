@@ -1,16 +1,20 @@
 package com.avast.metrics.filter;
 
 import com.typesafe.config.ConfigFactory;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class ConfigurableFilterTest {
+    private MetricsFilter loadFilter(String name) {
+        return MetricsFilter.fromConfig(ConfigFactory.load().getConfig(name), ".");
+    }
+
     @Test
     public void testEmpty() throws Exception {
-        MetricsFilter filter = MetricsFilter.fromConfig(ConfigFactory.load().getConfig("testEmpty"));
+        MetricsFilter filter = loadFilter("testEmpty");
+
         assertTrue(filter.isEnabled(""));
         assertTrue(filter.isEnabled(MetricsFilter.ROOT_FILTER_NAME));
 
@@ -20,7 +24,8 @@ public class ConfigurableFilterTest {
 
     @Test
     public void testAllEnabled() throws Exception {
-        MetricsFilter filter = MetricsFilter.fromConfig(ConfigFactory.load().getConfig("testAllEnabled"));
+        MetricsFilter filter = loadFilter("testAllEnabled");
+
         assertTrue(filter.isEnabled(""));
         assertTrue(filter.isEnabled(MetricsFilter.ROOT_FILTER_NAME));
 
@@ -30,7 +35,8 @@ public class ConfigurableFilterTest {
 
     @Test
     public void testAllDisabled() throws Exception {
-        MetricsFilter filter = MetricsFilter.fromConfig(ConfigFactory.load().getConfig("testAllDisabled"));
+        MetricsFilter filter = loadFilter("testAllDisabled");
+
         assertFalse(filter.isEnabled(""));
         assertFalse(filter.isEnabled(MetricsFilter.ROOT_FILTER_NAME));
 
@@ -40,7 +46,8 @@ public class ConfigurableFilterTest {
 
     @Test
     public void testStructuredName() throws Exception {
-        MetricsFilter filter = MetricsFilter.fromConfig(ConfigFactory.load().getConfig("testStructuredName"));
+        MetricsFilter filter = loadFilter("testStructuredName");
+
         assertTrue(filter.isEnabled(""));
         assertTrue(filter.isEnabled(MetricsFilter.ROOT_FILTER_NAME));
         assertTrue(filter.isEnabled("name1"));
@@ -53,7 +60,8 @@ public class ConfigurableFilterTest {
 
     @Test
     public void testComplexEnableDisable() throws Exception {
-        MetricsFilter filter = MetricsFilter.fromConfig(ConfigFactory.load().getConfig("testComplexEnableDisable"));
+        MetricsFilter filter = loadFilter("testComplexEnableDisable");
+
         assertTrue(filter.isEnabled(""));
         assertTrue(filter.isEnabled(MetricsFilter.ROOT_FILTER_NAME));
         assertTrue(filter.isEnabled("myCounter"));
