@@ -1,6 +1,7 @@
 package com.avast.metrics.filter;
 
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigException;
 import com.typesafe.config.ConfigFactory;
 import org.junit.Test;
 
@@ -43,9 +44,19 @@ public class ConfigLoaderTest {
         assertFalse(filterConfigs.get(0).isEnabled());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ConfigException.WrongType.class)
     public void testBroken() throws Exception {
         loadConfig("testBroken"); // Exception
+    }
+
+    @Test(expected = ConfigException.WrongType.class)
+    public void testEnabledBroken() throws Exception {
+        loadConfig("testBrokenEnabled"); // Exception
+    }
+
+    @Test(expected = ConfigException.BadPath.class)
+    public void testBrokenDisabled() throws Exception {
+        loadConfig("testBrokenDisabled"); // Exception
     }
 
     @Test
