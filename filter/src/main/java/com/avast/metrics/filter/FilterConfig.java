@@ -3,7 +3,7 @@ package com.avast.metrics.filter;
 /**
  * Configuration for a single filter.
  */
-class FilterConfig {
+public class FilterConfig {
     private final String metricName;
     private final boolean enabled;
 
