@@ -127,7 +127,7 @@ lazy val formatting = (project in file("formatting")).
     libraryDependencies ++= Seq(
       "com.typesafe" % "config" % Versions.typesafeConfig
     )
-  ).dependsOn(dropwizardCommon)
+  ).dependsOn(dropwizardCommon, filter)
 
 lazy val statsd = (project in file("statsd")).
   settings(

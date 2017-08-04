@@ -2,6 +2,7 @@ package com.avast.metrics.dropwizard.formatting;
 
 import com.avast.metrics.api.*;
 import com.avast.metrics.dropwizard.MetricsMonitor;
+import com.avast.metrics.filter.MetricsFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Snapshot;
 
@@ -101,10 +102,11 @@ public class FormattingMetricsMonitor extends MetricsMonitor {
         return constructMetricName(Optional.empty(), separator());
     }
 
-    public String format() {
+    public String format(MetricsFilter filter) {
         Stream<MetricValue> metrics = registry.getMetrics()
                 .entrySet()
                 .stream()
+                .filter(entry -> filter.isEnabled(entry.getKey()))
                 .flatMap(entry -> toMetricValue(entry.getKey(), entry.getValue()))
                 .sorted(Comparator.comparing(MetricValue::getName));
 

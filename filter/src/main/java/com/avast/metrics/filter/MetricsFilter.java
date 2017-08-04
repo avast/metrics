@@ -7,8 +7,12 @@ import java.util.List;
 /**
  * Abstract metrics filter.
  */
+@FunctionalInterface
 public interface MetricsFilter {
     String ROOT_FILTER_NAME = "root";
+
+    MetricsFilter ALL_ENABLED = metricName -> true;
+    MetricsFilter ALL_DISABLED = metricName -> false;
 
     /**
      * Get effective configuration for a metric according its name.
