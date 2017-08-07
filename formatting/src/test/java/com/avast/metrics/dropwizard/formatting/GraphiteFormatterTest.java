@@ -57,4 +57,20 @@ public class GraphiteFormatterTest {
         testFormatLongWithChangedDefaultLocale(Locale.CHINESE);
         testFormatLongWithChangedDefaultLocale(defaultLocale);
     }
+
+    @Test
+    public void testFormatObject() throws Exception {
+        assertEquals("null", formatter.formatObject(null));
+        assertEquals("4", formatter.formatObject(4));
+        assertEquals("4.2", formatter.formatObject(4.2));
+        assertEquals("a", formatter.formatObject('a'));
+        assertEquals("1", formatter.formatObject(true));
+    }
+
+    @Test
+    public void testFormatObjectUnsupported() throws Exception {
+        assertEquals("unsupported", formatter.formatObject("a\nb\nc"));
+        assertEquals("unsupported", formatter.formatObject("vrku vrku"));
+        assertEquals("unsupported", formatter.formatObject("buuuu"));
+    }
 }

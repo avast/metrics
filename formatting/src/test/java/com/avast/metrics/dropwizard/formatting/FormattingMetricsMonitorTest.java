@@ -150,7 +150,7 @@ public class FormattingMetricsMonitorTest {
 
             String expected = "gauge.BigDecimal.value 7.2\n" +
                     "gauge.BigInteger.value 6.0\n" +
-                    "gauge.String.value haf\n" +
+                    "gauge.String.value unsupported\n" +
                     "gauge.boolean.value 1\n" +
                     "gauge.byte.value 2\n" +
                     "gauge.double.value 7.1\n" +
