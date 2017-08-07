@@ -4,6 +4,9 @@ import com.avast.metrics.api.Counter;
 import com.avast.metrics.api.TimerPair;
 import org.junit.Test;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import static org.junit.Assert.assertEquals;
 
 public class FormattingMetricsMonitorTest {
@@ -103,6 +106,37 @@ public class FormattingMetricsMonitorTest {
 
             String expected = "a.counter.count 1\n" +
                     "b.counter.count 42";
+
+            assertEquals(expected, monitor.format());
+        }
+    }
+
+    @Test
+    public void testFormatGauge() throws Exception {
+        try (FormattingMetricsMonitor monitor = new FormattingMetricsMonitor(new GraphiteFormatter())) {
+            monitor.named("gauge").newGauge("null", () -> null);
+            monitor.named("gauge").newGauge("boolean", () -> true);
+            monitor.named("gauge").newGauge("byte", () -> (byte) 2);
+            monitor.named("gauge").newGauge("short", () -> (short) 3);
+            monitor.named("gauge").newGauge("int", () -> (int) 4);
+            monitor.named("gauge").newGauge("long", () -> (long) 5);
+            monitor.named("gauge").newGauge("BigInteger", () -> new BigInteger("6"));
+            monitor.named("gauge").newGauge("float", () -> (float) 7.0);
+            monitor.named("gauge").newGauge("double", () -> (double) 7.1);
+            monitor.named("gauge").newGauge("BigDecimal", () -> new BigDecimal(7.2));
+            monitor.named("gauge").newGauge("String", () -> "haf");
+
+            String expected = "gauge.BigDecimal 7.2\n" +
+                    "gauge.BigInteger 6.0\n" +
+                    "gauge.String haf\n" +
+                    "gauge.boolean 1\n" +
+                    "gauge.byte 2\n" +
+                    "gauge.double 7.1\n" +
+                    "gauge.float 7.0\n" +
+                    "gauge.int 4\n" +
+                    "gauge.long 5\n" +
+                    "gauge.null null\n" +
+                    "gauge.short 3";
 
             assertEquals(expected, monitor.format());
         }
