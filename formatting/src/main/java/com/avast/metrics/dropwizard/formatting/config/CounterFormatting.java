@@ -1,7 +1,7 @@
 package com.avast.metrics.dropwizard.formatting.config;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class CounterConfig {
+public class CounterFormatting {
     private boolean count;
 
     public boolean isCount() {

@@ -3,7 +3,7 @@ package com.avast.metrics.dropwizard.formatting.config;
 import java.util.List;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class HistogramConfig {
+public class HistogramFormatting {
     private List<Double> percentiles;
     private boolean count;
     private boolean min;

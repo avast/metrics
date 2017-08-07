@@ -2,7 +2,9 @@ package com.avast.metrics.dropwizard.formatting;
 
 import com.avast.metrics.api.Counter;
 import com.avast.metrics.api.TimerPair;
+import com.avast.metrics.dropwizard.formatting.config.FieldsFormatting;
 import com.avast.metrics.filter.MetricsFilter;
+import com.typesafe.config.ConfigFactory;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -11,6 +13,8 @@ import java.math.BigInteger;
 import static org.junit.Assert.assertEquals;
 
 public class FormattingMetricsMonitorTest {
+    private static final FieldsFormatting FIELDS_ALL_ENABLED = FieldsFormatting.fromConfig(ConfigFactory.load().getConfig("metricsFieldsFormattingAllEnabled"));
+
     private FormattingMetricsMonitor newMonitor() {
         return new FormattingMetricsMonitor(new GraphiteFormatter());
     }
@@ -112,7 +116,7 @@ public class FormattingMetricsMonitorTest {
             String expected = "a.counter.count 1\n" +
                     "b.counter.count 42";
 
-            assertEquals(expected, monitor.format(MetricsFilter.ALL_ENABLED));
+            assertEquals(expected, monitor.format(MetricsFilter.ALL_ENABLED, FIELDS_ALL_ENABLED));
         }
     }
 
@@ -124,10 +128,11 @@ public class FormattingMetricsMonitorTest {
             counterB.inc(42);
             counterA.inc();
 
-            assertEquals("", monitor.format(MetricsFilter.ALL_DISABLED));
+            assertEquals("", monitor.format(MetricsFilter.ALL_DISABLED, FIELDS_ALL_ENABLED));
         }
     }
 
+    @SuppressWarnings("RedundantCast")
     @Test
     public void testFormatGauge() throws Exception {
         try (FormattingMetricsMonitor monitor = newMonitor()) {
@@ -143,19 +148,19 @@ public class FormattingMetricsMonitorTest {
             monitor.named("gauge").newGauge("BigDecimal", () -> new BigDecimal(7.2));
             monitor.named("gauge").newGauge("String", () -> "haf");
 
-            String expected = "gauge.BigDecimal 7.2\n" +
-                    "gauge.BigInteger 6.0\n" +
-                    "gauge.String haf\n" +
-                    "gauge.boolean 1\n" +
-                    "gauge.byte 2\n" +
-                    "gauge.double 7.1\n" +
-                    "gauge.float 7.0\n" +
-                    "gauge.int 4\n" +
-                    "gauge.long 5\n" +
-                    "gauge.null null\n" +
-                    "gauge.short 3";
+            String expected = "gauge.BigDecimal.value 7.2\n" +
+                    "gauge.BigInteger.value 6.0\n" +
+                    "gauge.String.value haf\n" +
+                    "gauge.boolean.value 1\n" +
+                    "gauge.byte.value 2\n" +
+                    "gauge.double.value 7.1\n" +
+                    "gauge.float.value 7.0\n" +
+                    "gauge.int.value 4\n" +
+                    "gauge.long.value 5\n" +
+                    "gauge.null.value null\n" +
+                    "gauge.short.value 3";
 
-            assertEquals(expected, monitor.format(MetricsFilter.ALL_ENABLED));
+            assertEquals(expected, monitor.format(MetricsFilter.ALL_ENABLED, FIELDS_ALL_ENABLED));
         }
     }
 }

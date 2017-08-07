@@ -1,7 +1,7 @@
 package com.avast.metrics.dropwizard.formatting.config;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class MeterConfig {
+public class MeterFormatting {
     private boolean count;
     private boolean mean;
     private boolean oneMinuteRate;

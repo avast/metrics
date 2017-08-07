@@ -2,7 +2,9 @@ package com.avast.metrics.dropwizard.formatting;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Comparator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -13,12 +15,13 @@ import java.util.stream.Stream;
  * <metric path> <metric value> <metric timestamp>
  */
 public class GraphiteFormatter implements Formatter {
+    private static final String SEPARATOR_NAME_PARTS = ".";
     private static final String SEPARATOR_NAME_VALUE = " ";
     private static final String SEPARATOR_METRICS = "\n";
 
     @Override
     public String nameSeparator() {
-        return GraphiteNaming.SEPARATOR_NAME_PARTS;
+        return SEPARATOR_NAME_PARTS;
     }
 
     @Override
@@ -87,14 +90,24 @@ public class GraphiteFormatter implements Formatter {
         } else if (object instanceof Boolean) {
             return formatNumber(((Boolean) object) ? 1 : 0);
         } else {
-            return object.toString();
+            return object.toString(); // TODO: This may break the format
         }
     }
 
     @Override
-    public String format(Stream<MetricValue> metrics) {
+    public String format(Stream<MetricValues> metrics) {
         return metrics
-                .map(metric -> metric.getName() + SEPARATOR_NAME_VALUE + metric.getValue())
+                .flatMap(this::formatValues)
                 .collect(Collectors.joining(SEPARATOR_METRICS));
+    }
+
+    private Stream<String> formatValues(MetricValues values) {
+        return values
+                .getFieldsValues()
+                .entrySet()
+                .stream()
+                .sorted(Comparator.comparing(Map.Entry::getKey))
+                .map(fieldValue -> values.getName() + SEPARATOR_NAME_PARTS + fieldValue.getKey()
+                        + SEPARATOR_NAME_VALUE + fieldValue.getValue());
     }
 }

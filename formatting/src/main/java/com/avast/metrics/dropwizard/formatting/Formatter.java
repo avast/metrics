@@ -34,5 +34,5 @@ public interface Formatter {
     /**
      * Format metrics and their values.
      */
-    String format(Stream<MetricValue> metrics);
+    String format(Stream<MetricValues> metrics);
 }

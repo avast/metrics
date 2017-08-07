@@ -1,7 +1,7 @@
 package com.avast.metrics.dropwizard.formatting.config;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class GaugeConfig {
+public class GaugeFormatting {
     private boolean value;
 
     public boolean isValue() {
