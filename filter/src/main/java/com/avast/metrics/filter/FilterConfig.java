@@ -29,6 +29,22 @@ public class FilterConfig {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FilterConfig that = (FilterConfig) o;
+        return enabled == that.enabled && metricName.equals(that.metricName);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = metricName.hashCode();
+        result = 31 * result + (enabled ? 1 : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return metricName + " - " + (enabled ? "enabled" : "disabled");
     }

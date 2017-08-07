@@ -5,11 +5,13 @@ import com.typesafe.config.ConfigException;
 import com.typesafe.config.ConfigFactory;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class ConfigLoaderTest {
     private List<FilterConfig> loadConfig(String name) {
@@ -21,27 +23,30 @@ public class ConfigLoaderTest {
     public void testEmpty() throws Exception {
         List<FilterConfig> filterConfigs = loadConfig("testEmpty");
 
-        assertEquals(1, filterConfigs.size());
-        assertEquals(MetricsFilter.ROOT_FILTER_NAME, filterConfigs.get(0).getMetricName());
-        assertTrue(filterConfigs.get(0).isEnabled());
+        List<FilterConfig> expected = Collections.singletonList(
+                new FilterConfig(MetricsFilter.ROOT_FILTER_NAME, true));
+
+        assertEquals(expected, filterConfigs);
     }
 
     @Test
     public void testAllEnabled() throws Exception {
         List<FilterConfig> filterConfigs = loadConfig("testAllEnabled");
 
-        assertEquals(1, filterConfigs.size());
-        assertEquals(MetricsFilter.ROOT_FILTER_NAME, filterConfigs.get(0).getMetricName());
-        assertTrue(filterConfigs.get(0).isEnabled());
+        List<FilterConfig> expected = Collections.singletonList(
+                new FilterConfig(MetricsFilter.ROOT_FILTER_NAME, true));
+
+        assertEquals(expected, filterConfigs);
     }
 
     @Test
     public void testAllDisabled() throws Exception {
         List<FilterConfig> filterConfigs = loadConfig("testAllDisabled");
 
-        assertEquals(1, filterConfigs.size());
-        assertEquals(MetricsFilter.ROOT_FILTER_NAME, filterConfigs.get(0).getMetricName());
-        assertFalse(filterConfigs.get(0).isEnabled());
+        List<FilterConfig> expected = Collections.singletonList(
+                new FilterConfig(MetricsFilter.ROOT_FILTER_NAME, false));
+
+        assertEquals(expected, filterConfigs);
     }
 
     @Test(expected = ConfigException.WrongType.class)
@@ -66,13 +71,11 @@ public class ConfigLoaderTest {
                 .sorted(Comparator.comparing(FilterConfig::getMetricName))
                 .collect(Collectors.toList());
 
-        assertEquals(2, filterConfigs.size());
+        List<FilterConfig> expected = Arrays.asList(
+                new FilterConfig("name1.name2.nameN", false),
+                new FilterConfig(MetricsFilter.ROOT_FILTER_NAME, true));
 
-        assertEquals("name1.name2.nameN", filterConfigs.get(0).getMetricName());
-        assertFalse(filterConfigs.get(0).isEnabled());
-
-        assertEquals(MetricsFilter.ROOT_FILTER_NAME, filterConfigs.get(1).getMetricName());
-        assertTrue(filterConfigs.get(1).isEnabled());
+        assertEquals(expected, filterConfigs);
     }
 
     @Test
@@ -82,21 +85,13 @@ public class ConfigLoaderTest {
                 .sorted(Comparator.comparing(FilterConfig::getMetricName))
                 .collect(Collectors.toList());
 
-        assertEquals(5, filterConfigs.size());
+        List<FilterConfig> expected = Arrays.asList(
+                new FilterConfig("name1", false),
+                new FilterConfig("name1.name2", true),
+                new FilterConfig("name1.name2.nameN", false),
+                new FilterConfig("name1.name2.nameN.myCounter", true),
+                new FilterConfig(MetricsFilter.ROOT_FILTER_NAME, true));
 
-        assertEquals("name1", filterConfigs.get(0).getMetricName());
-        assertFalse(filterConfigs.get(0).isEnabled());
-
-        assertEquals("name1.name2", filterConfigs.get(1).getMetricName());
-        assertTrue(filterConfigs.get(1).isEnabled());
-
-        assertEquals("name1.name2.nameN", filterConfigs.get(2).getMetricName());
-        assertFalse(filterConfigs.get(2).isEnabled());
-
-        assertEquals("name1.name2.nameN.myCounter", filterConfigs.get(3).getMetricName());
-        assertTrue(filterConfigs.get(3).isEnabled());
-
-        assertEquals(MetricsFilter.ROOT_FILTER_NAME, filterConfigs.get(4).getMetricName());
-        assertTrue(filterConfigs.get(4).isEnabled());
+        assertEquals(expected, filterConfigs);
     }
 }
