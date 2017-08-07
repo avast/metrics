@@ -1,7 +1,6 @@
 package com.avast.metrics.dropwizard.formatting;
 
 import com.avast.metrics.api.Counter;
-import com.avast.metrics.api.TimerPair;
 import com.avast.metrics.dropwizard.formatting.config.FieldsFormatting;
 import com.avast.metrics.filter.MetricsFilter;
 import com.typesafe.config.ConfigFactory;
@@ -80,28 +79,28 @@ public class FormattingMetricsMonitorTest {
         try (FormattingMetricsMonitor monitor = new FormattingMetricsMonitor(new GraphiteFormatter())) {
             monitor.named("monitor").newTimerPair("timer.pair.x");
 
-            String expected = "monitor.timer-pair-xFailures.15mRate 0.0\n" +
-                    "monitor.timer-pair-xFailures.1mRate 0.0\n" +
-                    "monitor.timer-pair-xFailures.50Perc 0.0\n" +
-                    "monitor.timer-pair-xFailures.5mRate 0.0\n" +
-                    "monitor.timer-pair-xFailures.count 0\n" +
+            String expected = "monitor.timer-pair-xFailures.count 0\n" +
+                    "monitor.timer-pair-xFailures.m1 0.0\n" +
+                    "monitor.timer-pair-xFailures.m15 0.0\n" +
+                    "monitor.timer-pair-xFailures.m5 0.0\n" +
                     "monitor.timer-pair-xFailures.max 0\n" +
                     "monitor.timer-pair-xFailures.mean 0.0\n" +
-                    "monitor.timer-pair-xFailures.mean 0.0\n" +
                     "monitor.timer-pair-xFailures.min 0\n" +
-                    "monitor.timer-pair-xFailures.stdDev 0.0\n" +
-                    "monitor.timer-pair-xSuccesses.15mRate 0.0\n" +
-                    "monitor.timer-pair-xSuccesses.1mRate 0.0\n" +
-                    "monitor.timer-pair-xSuccesses.50Perc 0.0\n" +
-                    "monitor.timer-pair-xSuccesses.5mRate 0.0\n" +
+                    "monitor.timer-pair-xFailures.p50-0 0.0\n" +
+                    "monitor.timer-pair-xFailures.p99-0 0.0\n" +
+                    "monitor.timer-pair-xFailures.stddev 0.0\n" +
                     "monitor.timer-pair-xSuccesses.count 0\n" +
+                    "monitor.timer-pair-xSuccesses.m1 0.0\n" +
+                    "monitor.timer-pair-xSuccesses.m15 0.0\n" +
+                    "monitor.timer-pair-xSuccesses.m5 0.0\n" +
                     "monitor.timer-pair-xSuccesses.max 0\n" +
                     "monitor.timer-pair-xSuccesses.mean 0.0\n" +
-                    "monitor.timer-pair-xSuccesses.mean 0.0\n" +
                     "monitor.timer-pair-xSuccesses.min 0\n" +
-                    "monitor.timer-pair-xSuccesses.stdDev 0.0";
+                    "monitor.timer-pair-xSuccesses.p50-0 0.0\n" +
+                    "monitor.timer-pair-xSuccesses.p99-0 0.0\n" +
+                    "monitor.timer-pair-xSuccesses.stddev 0.0";
 
-            assertEquals(expected, monitor.format());
+            assertEquals(expected, monitor.format(MetricsFilter.ALL_ENABLED, FIELDS_ALL_ENABLED));
         }
     }
 
