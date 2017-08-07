@@ -16,6 +16,12 @@ public class HistogramFormatting {
     }
 
     public void setPercentiles(List<Double> percentiles) {
+        percentiles.forEach(percentile -> {
+            if (percentile < 0.0 || percentile > 1.0) {
+                throw new IllegalArgumentException("Range for percentiles is 0 - 1 inclusively: " + percentile);
+            }
+        });
+
         this.percentiles = percentiles;
     }
 

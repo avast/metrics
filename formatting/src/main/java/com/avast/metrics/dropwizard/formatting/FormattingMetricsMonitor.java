@@ -185,7 +185,7 @@ public class FormattingMetricsMonitor extends MetricsMonitor {
             fieldsValues.put("stddev", formatter.formatNumber(snapshot.getStdDev()));
 
         histogramFormatting
-                .getPercentiles() // TODO: Limits
+                .getPercentiles()
                 .forEach(percentile -> fieldsValues.put(percentileName(percentile), formatter.formatNumber(snapshot.getValue(percentile))));
 
         return new MetricValues(name, fieldsValues);
@@ -216,7 +216,7 @@ public class FormattingMetricsMonitor extends MetricsMonitor {
             fieldsValues.put("stddev", formatter.formatNumber(snapshot.getStdDev()));
 
         timerFormatting
-                .getPercentiles() // TODO: Limits
+                .getPercentiles()
                 .forEach(percentile -> fieldsValues.put(percentileName(percentile), formatter.formatNumber(snapshot.getValue(percentile))));
 
         return new MetricValues(name, fieldsValues);
