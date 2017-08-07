@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 public class ReferenceConfTest {
     @Test
     public void testDefaultsLoadable() throws Exception {
-        Config config = ConfigFactory.load().getConfig(FormatterConfig.SECTION_DEFAULTS);
+        Config config = ConfigFactory.load().getConfig(MetricsFormattingConfig.SECTION_DEFAULTS);
 
         assertTrue(config.getBoolean("counter.count"));
 

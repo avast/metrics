@@ -8,13 +8,13 @@ import com.typesafe.config.ConfigFactory;
  * Configuration for fields formatting.
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class FormatterConfig {
+public class MetricsFormattingConfig {
     static final String SECTION_DEFAULTS = "metricsFormattingDefaults";
 
-    public static FormatterConfig fromConfig(Config config) {
+    public static MetricsFormattingConfig fromConfig(Config config) {
         Config referenceConfig = ConfigFactory.defaultReference().getConfig(SECTION_DEFAULTS);
         Config mergedConfig = config.withFallback(referenceConfig);
-        return ConfigBeanFactory.create(mergedConfig, FormatterConfig.class);
+        return ConfigBeanFactory.create(mergedConfig, MetricsFormattingConfig.class);
     }
 
     private CounterConfig counter;
