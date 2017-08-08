@@ -2,7 +2,9 @@ package com.avast.metrics.dropwizard.formatting;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Comparator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -13,12 +15,13 @@ import java.util.stream.Stream;
  * <metric path> <metric value> <metric timestamp>
  */
 public class GraphiteFormatter implements Formatter {
+    private static final String SEPARATOR_NAME_PARTS = ".";
     private static final String SEPARATOR_NAME_VALUE = " ";
     private static final String SEPARATOR_METRICS = "\n";
 
     @Override
     public String nameSeparator() {
-        return GraphiteNaming.SEPARATOR_NAME_PARTS;
+        return SEPARATOR_NAME_PARTS;
     }
 
     @Override
@@ -65,36 +68,19 @@ public class GraphiteFormatter implements Formatter {
     }
 
     @Override
-    public <T> String formatObject(T object) {
-        if (object == null) {
-            return "null";
-        } else if (object instanceof Float) {
-            return formatNumber(((Float) object).doubleValue());
-        } else if (object instanceof Double) {
-            return formatNumber((Double) object);
-        } else if (object instanceof Byte) {
-            return formatNumber(((Byte) object).longValue());
-        } else if (object instanceof Short) {
-            return formatNumber(((Short) object).longValue());
-        } else if (object instanceof Integer) {
-            return formatNumber(((Integer) object).longValue());
-        } else if (object instanceof Long) {
-            return formatNumber((Long) object);
-        } else if (object instanceof BigInteger) {
-            return formatNumber(((BigInteger) object).doubleValue());
-        } else if (object instanceof BigDecimal) {
-            return formatNumber(((BigDecimal) object).doubleValue());
-        } else if (object instanceof Boolean) {
-            return formatNumber(((Boolean) object) ? 1 : 0);
-        } else {
-            return object.toString();
-        }
+    public String format(Stream<MetricValues> metrics) {
+        return metrics
+                .flatMap(this::formatValues)
+                .collect(Collectors.joining(SEPARATOR_METRICS));
     }
 
-    @Override
-    public String format(Stream<MetricValue> metrics) {
-        return metrics
-                .map(metric -> metric.getName() + SEPARATOR_NAME_VALUE + metric.getValue())
-                .collect(Collectors.joining(SEPARATOR_METRICS));
+    private Stream<String> formatValues(MetricValues values) {
+        return values
+                .getFieldsValues()
+                .entrySet()
+                .stream()
+                .sorted(Comparator.comparing(Map.Entry::getKey))
+                .map(fieldValue -> values.getName() + SEPARATOR_NAME_PARTS + fieldValue.getKey()
+                        + SEPARATOR_NAME_VALUE + fieldValue.getValue());
     }
 }
