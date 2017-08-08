@@ -16,10 +16,11 @@ Main advantages of this library:
 The entry-point into the library is the interface `Monitor`. Your classes need to get an instance of a monitor which they can use to construct different metrics, e.g. meters, timers or histograms.
 Instances of the individuals metrics can be used to monitor your application.
 
-Currently there are two available implementations/exports:
+Currently there are multiple implementations/exports:
 * [JMX](jmx) 
 * [Graphite](graphite)
 * [StatsD](statsd)
+* [Formatting](formatting) to string in configurable formats, e.g. for serving via HTTP server
 
 There is Scala API available in `metrics-scala`. See the example below.
 
