@@ -2,6 +2,7 @@ package com.avast.metrics.dropwizard.formatting;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Locale;
 import java.util.stream.Stream;
 
 /**
@@ -21,12 +22,16 @@ public interface Formatter {
     /**
      * Format long number to string.
      */
-    String formatNumber(long number);
+    default String formatNumber(long number) {
+        return Long.toString(number);
+    }
 
     /**
      * Format double number to string.
      */
-    String formatNumber(double number);
+    default String formatNumber(double number) {
+        return String.format(Locale.ENGLISH, "%s", number);
+    }
 
     /**
      * Format an object of unknown type to string.
@@ -64,5 +69,5 @@ public interface Formatter {
     /**
      * Format metrics and their values.
      */
-    String format(Stream<MetricValues> metrics);
+    String format(Stream<MetricValue> metrics);
 }
