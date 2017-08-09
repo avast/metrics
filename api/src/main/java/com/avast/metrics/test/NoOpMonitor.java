@@ -31,7 +31,7 @@ public class NoOpMonitor implements Monitor {
     }
 
     @Override
-    public Meter newMeter(String String) {
+    public Meter newMeter(String name) {
         return new Meter() {
             @Override
             public void mark() {
@@ -48,13 +48,13 @@ public class NoOpMonitor implements Monitor {
 
             @Override
             public String getName() {
-                return "";
+                return name;
             }
         };
     }
 
     @Override
-    public Counter newCounter(String String) {
+    public Counter newCounter(String name) {
         return new Counter() {
             @Override
             public void inc() {
@@ -79,13 +79,13 @@ public class NoOpMonitor implements Monitor {
 
             @Override
             public String getName() {
-                return "";
+                return name;
             }
         };
     }
 
     @Override
-    public Timer newTimer(String String) {
+    public Timer newTimer(String name) {
         return new Timer() {
             @Override
             public TimeContext start() {
@@ -132,7 +132,7 @@ public class NoOpMonitor implements Monitor {
 
             @Override
             public String getName() {
-                return "";
+                return name;
             }
         };
     }
@@ -167,13 +167,13 @@ public class NoOpMonitor implements Monitor {
 
             @Override
             public String getName() {
-                return "";
+                return name;
             }
         };
     }
 
     @Override
-    public Histogram newHistogram(String String) {
+    public Histogram newHistogram(String name) {
         return new Histogram() {
             @Override
             public void update(long value) {
@@ -181,7 +181,7 @@ public class NoOpMonitor implements Monitor {
 
             @Override
             public String getName() {
-                return "";
+                return name;
             }
         };
     }
