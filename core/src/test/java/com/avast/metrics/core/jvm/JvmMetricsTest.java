@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 public class JvmMetricsTest {
     private static final int OFFSET_CPU = 0;
     private static final int OFFSET_FDS = OFFSET_CPU + 2;
-    private static final int OFFSET_HEAP = OFFSET_FDS + 2;
+    private static final int OFFSET_HEAP = OFFSET_FDS + 1;
     private static final int OFFSET_NON_HEAP = OFFSET_HEAP + 3;
     private static final int OFFSET_UPTIME = OFFSET_NON_HEAP + 2;
     private static final int OFFSET_THREADS = OFFSET_UPTIME + 1;
@@ -28,7 +28,7 @@ public class JvmMetricsTest {
             JvmMetrics.registerAll(monitor);
             List<Gauge<?>> gauges = monitor.getGauges();
 
-            assertEquals(22, gauges.size());
+            assertEquals(21, gauges.size());
         }
     }
 
@@ -57,10 +57,6 @@ public class JvmMetricsTest {
             long fdsOpened = (Long) gauges.get(OFFSET_FDS).getValue();
             assertEquals("jvm.fds.opened", gauges.get(OFFSET_FDS).getName());
             assertThat(fdsOpened).as("opened FDs").isBetween(0L, 1000L);
-
-            long fdsMax = (Long) gauges.get(OFFSET_FDS + 1).getValue();
-            assertEquals("jvm.fds.max", gauges.get(OFFSET_FDS + 1).getName());
-            assertThat(fdsMax).as("max FDs").isBetween(0L, 100000L);
         }
     }
 

@@ -75,7 +75,6 @@ public class JvmMetrics {
 
         if (bean instanceof UnixOperatingSystemMXBean) {
             monitor.newGauge("opened", ((UnixOperatingSystemMXBean) bean)::getOpenFileDescriptorCount);
-            monitor.newGauge("max", ((UnixOperatingSystemMXBean) bean)::getMaxFileDescriptorCount);
         } else {
             LOGGER.warn("Registration of file descriptors count failed, there may be changes in JVM internals: {}", bean.getClass());
         }
