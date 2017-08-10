@@ -38,7 +38,7 @@ public class JvmMetrics {
         Monitor jvmMonitor = monitor.named("jvm");
 
         registerCpu(jvmMonitor.named("cpu"));
-        registerFDsCount(jvmMonitor.named("fds"));
+        registerFDs(jvmMonitor.named("fds"));
         registerHeapMemory(jvmMonitor.named("heap"));
         registerNonHeapMemory(jvmMonitor.named("nonheap"));
         registerProcessUptime(jvmMonitor);
@@ -68,15 +68,16 @@ public class JvmMetrics {
     }
 
     /**
-     * Number of open file descriptors.
+     * Number of file descriptors.
      */
-    private static void registerFDsCount(Monitor monitor) {
+    private static void registerFDs(Monitor monitor) {
         OperatingSystemMXBean bean = ManagementFactory.getOperatingSystemMXBean();
 
         if (bean instanceof UnixOperatingSystemMXBean) {
             monitor.newGauge("opened", ((UnixOperatingSystemMXBean) bean)::getOpenFileDescriptorCount);
+            monitor.newGauge("max", ((UnixOperatingSystemMXBean) bean)::getMaxFileDescriptorCount);
         } else {
-            LOGGER.warn("Registration of open FDs count failed, there may be changes in JVM internals: {}", bean.getClass());
+            LOGGER.warn("Registration of file descriptors count failed, there may be changes in JVM internals: {}", bean.getClass());
         }
     }
 
