@@ -5,6 +5,8 @@ import org.junit.Test;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -95,7 +97,39 @@ public class JvmMetricsTest {
             assertTrue("Mapped buffers bytes should be positive: " + mappedBufferBytes, mappedBufferBytes >= 0);
             assertTrue("Mapped buffers bytes should be quite small: " + mappedBufferBytes, mappedBufferBytes < 20 * 1024 * 1024);
 
-            assertEquals(17, gauges.size());
+            Set<String> gcCollectionNames = JvmMetrics.GC_NAMES_MAPPING
+                    .values()
+                    .stream()
+                    .map(name -> "jvm.gc." + name + ".collections")
+                    .collect(Collectors.toSet());
+
+            Set<String> gcTimeNames = JvmMetrics.GC_NAMES_MAPPING
+                    .values()
+                    .stream()
+                    .map(name -> "jvm.gc." + name + ".time")
+                    .collect(Collectors.toSet());
+
+            long gcACollections = (Long) gauges.get(17).getValue();
+            assertTrue(gcCollectionNames.contains(gauges.get(17).getName()));
+            assertTrue("GC A collections should be positive: " + gcACollections, gcACollections >= 0);
+            assertTrue("GC A collections should be quite small: " + gcACollections, gcACollections < 1000);
+
+            long gcATime = (Long) gauges.get(18).getValue();
+            assertTrue(gcTimeNames.contains(gauges.get(18).getName()));
+            assertTrue("GC A collections should be positive: " + gcATime, gcATime >= 0);
+            assertTrue("GC A collections should be quite small: " + gcATime, gcATime < Duration.ofSeconds(10).toMillis());
+
+            long gcBCollections = (Long) gauges.get(19).getValue();
+            assertTrue(gcCollectionNames.contains(gauges.get(19).getName()));
+            assertTrue("GC B collections should be positive: " + gcBCollections, gcBCollections >= 0);
+            assertTrue("GC B collections should be quite small: " + gcBCollections, gcBCollections < 1000);
+
+            long gcBTime = (Long) gauges.get(20).getValue();
+            assertTrue(gcTimeNames.contains(gauges.get(20).getName()));
+            assertTrue("GC B collections should be positive: " + gcBTime, gcBTime >= 0);
+            assertTrue("GC B collections should be quite small: " + gcBTime, gcBTime < Duration.ofSeconds(10).toMillis());
+
+            assertEquals(21, gauges.size());
         }
     }
 }

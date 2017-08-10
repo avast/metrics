@@ -7,14 +7,32 @@ import org.slf4j.LoggerFactory;
 import sun.management.ManagementFactoryHelper;
 
 import java.lang.management.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Reporter of common JVM-layer metrics.
  */
 @SuppressWarnings("WeakerAccess")
 public class JvmMetrics {
-    protected static final Logger LOGGER = LoggerFactory.getLogger(JvmMetrics.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JvmMetrics.class);
+
+    static final Map<String, String> GC_NAMES_MAPPING = new HashMap<>();
+
+    static {
+        // young
+        GC_NAMES_MAPPING.put("Copy", "copy"); // -XX:+UseSerialGC
+        GC_NAMES_MAPPING.put("PS Scavenge", "psscav"); // -XX:+UseParallelGC
+        GC_NAMES_MAPPING.put("ParNew", "parnew"); // -XX:+UseParNewGC
+        GC_NAMES_MAPPING.put("G1 Young Generation", "g1y"); // -XX:+UseG1GC
+
+        // old
+        GC_NAMES_MAPPING.put("MarkSweepCompact", "msc"); // -XX:+UseSerialGC
+        GC_NAMES_MAPPING.put("PS MarkSweep", "psms"); // -XX:+UseParallelOldGC
+        GC_NAMES_MAPPING.put("ConcurrentMarkSweep", "conms"); // -XX:+UseConcMarkSweepGC
+        GC_NAMES_MAPPING.put("G1 Old Generation", "g1o"); // -XX:+UseG1GC
+    }
 
     public static void registerAll(Monitor monitor) {
         Monitor jvmMonitor = monitor.named("jvm");
@@ -27,6 +45,7 @@ public class JvmMetrics {
         registerThreads(jvmMonitor.named("threads"));
         registerClasses(jvmMonitor.named("classes"));
         registerBufferPools(jvmMonitor.named("buffers"));
+        registerGc(jvmMonitor.named("gc"));
     }
 
     /**
@@ -117,5 +136,22 @@ public class JvmMetrics {
             subMonitor.newGauge("instances", bean::getCount);
             subMonitor.newGauge("bytes", bean::getMemoryUsed);
         });
+    }
+
+    /**
+     * Garbage collectors.
+     */
+    private static void registerGc(Monitor monitor) {
+        List<GarbageCollectorMXBean> beans = ManagementFactory.getGarbageCollectorMXBeans();
+
+        beans.forEach(bean -> {
+            Monitor subMonitor = monitor.named(mapGcName(bean.getName()));
+            subMonitor.newGauge("collections", bean::getCollectionCount);
+            subMonitor.newGauge("time", bean::getCollectionTime);
+        });
+    }
+
+    private static String mapGcName(String name) {
+        return GC_NAMES_MAPPING.getOrDefault(name, name.replace(" ", ""));
     }
 }

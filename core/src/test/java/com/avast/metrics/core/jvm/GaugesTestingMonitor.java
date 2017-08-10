@@ -84,6 +84,11 @@ class GaugesTestingMonitor implements Monitor {
             public String getName() {
                 return monitorName + "." + name;
             }
+
+            @Override
+            public String toString() {
+                return getName() + " = " + getValue();
+            }
         };
 
         gauges.add(g);
