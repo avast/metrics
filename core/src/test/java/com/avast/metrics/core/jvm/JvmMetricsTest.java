@@ -41,13 +41,21 @@ public class JvmMetricsTest {
             assertEquals("jvm.heap.max", gauges.get(5).getName());
             assertTrue("Max heap memory should be positive: " + heapMax, heapMax > 0);
 
-            long uptime = (Long) gauges.get(6).getValue();
-            assertEquals("jvm.uptime", gauges.get(6).getName());
+            long nonHeapUsed = (Long) gauges.get(6).getValue();
+            assertEquals("jvm.nonheap.used", gauges.get(6).getName());
+            assertTrue("Used non-heap memory should be positive: " + nonHeapUsed, nonHeapUsed > 0);
+
+            long nonHeapCommitted = (Long) gauges.get(7).getValue();
+            assertEquals("jvm.nonheap.committed", gauges.get(7).getName());
+            assertTrue("Committed non-heap memory should be positive: " + nonHeapCommitted, nonHeapCommitted > 0);
+
+            long uptime = (Long) gauges.get(8).getValue();
+            assertEquals("jvm.uptime", gauges.get(8).getName());
             assertTrue("Uptime should be positive: " + uptime + " ms", uptime > 0);
             assertTrue("Uptime should be shorter than 1 hour: " + uptime + " ms",
                     uptime <= Duration.ofHours(1).toMillis()); // Executed as part of unit tests which should be fast
 
-            assertEquals(7, gauges.size());
+            assertEquals(9, gauges.size());
         }
     }
 }

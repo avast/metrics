@@ -23,6 +23,7 @@ public class JvmMetrics {
         registerCpu(jvmMonitor.named("cpu"));
         registerFDsCount(jvmMonitor);
         registerHeapMemory(jvmMonitor.named("heap"));
+        registerNonHeapMemory(jvmMonitor.named("nonheap"));
         registerProcessUptime(jvmMonitor);
     }
 
@@ -66,6 +67,15 @@ public class JvmMetrics {
         monitor.newGauge("used", () -> bean.getHeapMemoryUsage().getUsed());
         monitor.newGauge("committed", () -> bean.getHeapMemoryUsage().getCommitted());
         monitor.newGauge("max", () -> bean.getHeapMemoryUsage().getMax());
+    }
+
+    /**
+     * Non heap memory in bytes.
+     */
+    private static void registerNonHeapMemory(Monitor monitor) {
+        MemoryMXBean bean = ManagementFactory.getMemoryMXBean();
+        monitor.newGauge("used", () -> bean.getNonHeapMemoryUsage().getUsed());
+        monitor.newGauge("committed", () -> bean.getNonHeapMemoryUsage().getCommitted());
     }
 
     /**
