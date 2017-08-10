@@ -55,7 +55,22 @@ public class JvmMetricsTest {
             assertTrue("Uptime should be shorter than 1 hour: " + uptime + " ms",
                     uptime <= Duration.ofHours(1).toMillis()); // Executed as part of unit tests which should be fast
 
-            assertEquals(9, gauges.size());
+            int totalThreads = (Integer) gauges.get(9).getValue();
+            assertEquals("jvm.threads.total", gauges.get(9).getName());
+            assertTrue("Total threads count should be positive: " + totalThreads, totalThreads > 0);
+            assertTrue("Total threads count should be quite small: " + totalThreads, totalThreads < 100);
+
+            int daemonThreads = (Integer) gauges.get(10).getValue();
+            assertEquals("jvm.threads.daemon", gauges.get(10).getName());
+            assertTrue("Daemon threads count should be positive: " + daemonThreads, daemonThreads > 0);
+            assertTrue("Daemon threads count should be quite small: " + daemonThreads, daemonThreads < 100);
+
+            long startedThreads = (Long) gauges.get(11).getValue();
+            assertEquals("jvm.threads.started", gauges.get(11).getName());
+            assertTrue("Started threads count should be positive: " + startedThreads, startedThreads > 0);
+            assertTrue("Started threads count should be quite small: " + startedThreads, startedThreads < 500);
+
+            assertEquals(12, gauges.size());
         }
     }
 }

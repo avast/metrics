@@ -5,10 +5,7 @@ import com.sun.management.UnixOperatingSystemMXBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryMXBean;
-import java.lang.management.OperatingSystemMXBean;
-import java.lang.management.RuntimeMXBean;
+import java.lang.management.*;
 
 /**
  * Reporter of common JVM-layer metrics.
@@ -25,6 +22,7 @@ public class JvmMetrics {
         registerHeapMemory(jvmMonitor.named("heap"));
         registerNonHeapMemory(jvmMonitor.named("nonheap"));
         registerProcessUptime(jvmMonitor);
+        registerThreads(jvmMonitor.named("threads"));
     }
 
     /**
@@ -84,5 +82,15 @@ public class JvmMetrics {
     private static void registerProcessUptime(Monitor monitor) {
         RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
         monitor.newGauge("uptime", bean::getUptime);
+    }
+
+    /**
+     * Number of threads.
+     */
+    private static void registerThreads(Monitor monitor) {
+        ThreadMXBean bean = ManagementFactory.getThreadMXBean();
+        monitor.newGauge("total", bean::getThreadCount); // Both daemon and non-daemon
+        monitor.newGauge("daemon", bean::getDaemonThreadCount);
+        monitor.newGauge("started", bean::getTotalStartedThreadCount); // Since JVM started
     }
 }
