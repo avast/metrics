@@ -18,11 +18,12 @@ public class JvmMetrics {
         Monitor jvmMonitor = monitor.named("jvm");
 
         registerCpu(jvmMonitor.named("cpu"));
-        registerFDsCount(jvmMonitor);
+        registerFDsCount(jvmMonitor.named("fds"));
         registerHeapMemory(jvmMonitor.named("heap"));
         registerNonHeapMemory(jvmMonitor.named("nonheap"));
         registerProcessUptime(jvmMonitor);
         registerThreads(jvmMonitor.named("threads"));
+        registerClasses(jvmMonitor.named("classes"));
     }
 
     /**
@@ -51,7 +52,7 @@ public class JvmMetrics {
         OperatingSystemMXBean bean = ManagementFactory.getOperatingSystemMXBean();
 
         if (bean instanceof UnixOperatingSystemMXBean) {
-            monitor.newGauge("fds", ((UnixOperatingSystemMXBean) bean)::getOpenFileDescriptorCount);
+            monitor.newGauge("opened", ((UnixOperatingSystemMXBean) bean)::getOpenFileDescriptorCount);
         } else {
             LOGGER.warn("Registration of open FDs count failed, there may be changes in JVM internals: {}", bean.getClass());
         }
@@ -92,5 +93,13 @@ public class JvmMetrics {
         monitor.newGauge("total", bean::getThreadCount); // Both daemon and non-daemon
         monitor.newGauge("daemon", bean::getDaemonThreadCount);
         monitor.newGauge("started", bean::getTotalStartedThreadCount); // Since JVM started
+    }
+
+    /**
+     * Number of classes.
+     */
+    private static void registerClasses(Monitor monitor) {
+        ClassLoadingMXBean bean = ManagementFactory.getClassLoadingMXBean();
+        monitor.newGauge("loaded", bean::getLoadedClassCount); // Currently loaded
     }
 }

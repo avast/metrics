@@ -25,7 +25,7 @@ public class JvmMetricsTest {
             assertTrue("Process CPU load should be positive: " + cpuLoad, cpuLoad > 0.0);
 
             long fds = (Long) gauges.get(2).getValue();
-            assertEquals("jvm.fds", gauges.get(2).getName());
+            assertEquals("jvm.fds.opened", gauges.get(2).getName());
             assertTrue("Number of open file descriptors should be positive: " + fds, fds > 0);
             assertTrue("Number of open file descriptors should be low: " + fds, fds < 1000); // 25 now
 
@@ -70,7 +70,12 @@ public class JvmMetricsTest {
             assertTrue("Started threads count should be positive: " + startedThreads, startedThreads > 0);
             assertTrue("Started threads count should be quite small: " + startedThreads, startedThreads < 500);
 
-            assertEquals(12, gauges.size());
+            int loadedClasses = (Integer) gauges.get(12).getValue();
+            assertEquals("jvm.classes.loaded", gauges.get(12).getName());
+            assertTrue("Loaded classes count should be positive: " + loadedClasses, loadedClasses > 0);
+            assertTrue("Loaded classes count should be quite small: " + loadedClasses, loadedClasses < 50000);
+
+            assertEquals(13, gauges.size());
         }
     }
 }
