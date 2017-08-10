@@ -1,13 +1,12 @@
 package com.avast.metrics.core.jvm;
 
-import com.avast.metrics.api.Gauge;
 import com.avast.metrics.api.Monitor;
-import com.avast.metrics.test.NoOpMonitor;
 import com.sun.management.UnixOperatingSystemMXBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
 
@@ -20,61 +19,60 @@ public class JvmMetrics {
 
     public static void registerAll(Monitor monitor) {
         Monitor jvmMonitor = monitor.named("jvm");
-        registerProcessCpuTime(jvmMonitor);
-        registerProcessCpuLoad(jvmMonitor);
-        registerOpenFDsCount(jvmMonitor);
+
+        registerCpu(jvmMonitor.named("cpu"));
+        registerFDsCount(jvmMonitor);
+        registerHeapMemory(jvmMonitor.named("heap"));
         registerProcessUptime(jvmMonitor);
     }
 
     /**
-     * Returns the CPU time used by the process on which the Java virtual machine is running in nanoseconds.
+     * CPU time (nanoseconds) and load.
      */
-    public static Gauge<Long> registerProcessCpuTime(Monitor monitor) {
+    private static void registerCpu(Monitor monitor) {
         OperatingSystemMXBean bean = ManagementFactory.getOperatingSystemMXBean();
 
         if (bean instanceof com.sun.management.OperatingSystemMXBean) {
-            return monitor.newGauge("cputime", ((com.sun.management.OperatingSystemMXBean) bean)::getProcessCpuTime);
-        } else {
-            LOGGER.warn("Reading of process CPU time failed, there may be changes in JVM internals: {}", bean.getClass());
-            return NoOpMonitor.INSTANCE.newGauge("cputime", () -> -1L);
-        }
-    }
+            monitor.newGauge("time", ((com.sun.management.OperatingSystemMXBean) bean)::getProcessCpuTime);
 
-    /**
-     * Returns the "recent cpu usage" for the Java Virtual Machine process.
-     */
-    public static Gauge<Double> registerProcessCpuLoad(Monitor monitor) {
-        OperatingSystemMXBean bean = ManagementFactory.getOperatingSystemMXBean();
-
-        if (bean instanceof com.sun.management.OperatingSystemMXBean) {
             // There are multiple possibilities with very different results
             // getProcessCpuLoad()    7.307818620526464E-6
             // getSystemCpuLoad()     0.07893744901883035
             // getSystemLoadAverage() 0.45 (same value as from unix uptime command)
-            return monitor.newGauge("cpuload", ((com.sun.management.OperatingSystemMXBean) bean)::getProcessCpuLoad);
+            monitor.newGauge("load", ((com.sun.management.OperatingSystemMXBean) bean)::getProcessCpuLoad);
         } else {
-            LOGGER.warn("Reading of process CPU time failed, there may be changes in JVM internals: {}", bean.getClass());
-            return NoOpMonitor.INSTANCE.newGauge("cpuload", () -> -1.0);
-        }
-    }
-
-    public static Gauge<Long> registerOpenFDsCount(Monitor monitor) {
-        OperatingSystemMXBean bean = ManagementFactory.getOperatingSystemMXBean();
-
-        if (bean instanceof UnixOperatingSystemMXBean) {
-            System.err.println(((UnixOperatingSystemMXBean) bean).getOpenFileDescriptorCount());
-            return monitor.newGauge("openfds", ((UnixOperatingSystemMXBean) bean)::getOpenFileDescriptorCount);
-        } else {
-            LOGGER.warn("Reading of open FDs failed, there may be changes in JVM internals: {}", bean.getClass());
-            return NoOpMonitor.INSTANCE.newGauge("openfds", () -> -1L);
+            LOGGER.warn("Registration of process CPU metrics failed, there may be changes in JVM internals: {}", bean.getClass());
         }
     }
 
     /**
-     * JVM uptime in milliseconds.
+     * Number of open file descriptors.
      */
-    public static Gauge<Long> registerProcessUptime(Monitor monitor) {
+    private static void registerFDsCount(Monitor monitor) {
+        OperatingSystemMXBean bean = ManagementFactory.getOperatingSystemMXBean();
+
+        if (bean instanceof UnixOperatingSystemMXBean) {
+            monitor.newGauge("fds", ((UnixOperatingSystemMXBean) bean)::getOpenFileDescriptorCount);
+        } else {
+            LOGGER.warn("Registration of open FDs count failed, there may be changes in JVM internals: {}", bean.getClass());
+        }
+    }
+
+    /**
+     * Heap memory in bytes.
+     */
+    private static void registerHeapMemory(Monitor monitor) {
+        MemoryMXBean bean = ManagementFactory.getMemoryMXBean();
+        monitor.newGauge("used", () -> bean.getHeapMemoryUsage().getUsed());
+        monitor.newGauge("committed", () -> bean.getHeapMemoryUsage().getCommitted());
+        monitor.newGauge("max", () -> bean.getHeapMemoryUsage().getMax());
+    }
+
+    /**
+     * Uptime in milliseconds.
+     */
+    private static void registerProcessUptime(Monitor monitor) {
         RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
-        return monitor.newGauge("uptime", bean::getUptime);
+        monitor.newGauge("uptime", bean::getUptime);
     }
 }
