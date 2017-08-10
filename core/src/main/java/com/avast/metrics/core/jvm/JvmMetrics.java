@@ -4,8 +4,10 @@ import com.avast.metrics.api.Monitor;
 import com.sun.management.UnixOperatingSystemMXBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.management.ManagementFactoryHelper;
 
 import java.lang.management.*;
+import java.util.List;
 
 /**
  * Reporter of common JVM-layer metrics.
@@ -24,6 +26,7 @@ public class JvmMetrics {
         registerProcessUptime(jvmMonitor);
         registerThreads(jvmMonitor.named("threads"));
         registerClasses(jvmMonitor.named("classes"));
+        registerBufferPools(jvmMonitor.named("buffers"));
     }
 
     /**
@@ -101,5 +104,18 @@ public class JvmMetrics {
     private static void registerClasses(Monitor monitor) {
         ClassLoadingMXBean bean = ManagementFactory.getClassLoadingMXBean();
         monitor.newGauge("loaded", bean::getLoadedClassCount); // Currently loaded
+    }
+
+    /**
+     * Number of buffer pools.
+     */
+    private static void registerBufferPools(Monitor monitor) {
+        List<BufferPoolMXBean> beans = ManagementFactoryHelper.getBufferPoolMXBeans();
+
+        beans.forEach(bean -> {
+            Monitor subMonitor = monitor.named(bean.getName()); // "direct" and "mapped"
+            subMonitor.newGauge("instances", bean::getCount);
+            subMonitor.newGauge("bytes", bean::getMemoryUsed);
+        });
     }
 }

@@ -75,7 +75,27 @@ public class JvmMetricsTest {
             assertTrue("Loaded classes count should be positive: " + loadedClasses, loadedClasses > 0);
             assertTrue("Loaded classes count should be quite small: " + loadedClasses, loadedClasses < 50000);
 
-            assertEquals(13, gauges.size());
+            long directBufferInstances = (Long) gauges.get(13).getValue();
+            assertEquals("jvm.buffers.direct.instances", gauges.get(13).getName());
+            assertTrue("Direct buffers count should be positive: " + directBufferInstances, directBufferInstances >= 0);
+            assertTrue("Direct buffers count should be quite small: " + directBufferInstances, directBufferInstances < 100);
+
+            long directBufferBytes = (Long) gauges.get(14).getValue();
+            assertEquals("jvm.buffers.direct.bytes", gauges.get(14).getName());
+            assertTrue("Direct buffers bytes should be positive: " + directBufferBytes, directBufferBytes >= 0);
+            assertTrue("Direct buffers bytes should be quite small: " + directBufferBytes, directBufferBytes < 20 * 1024 * 1024);
+
+            long mappedBufferInstances = (Long) gauges.get(15).getValue();
+            assertEquals("jvm.buffers.mapped.instances", gauges.get(15).getName());
+            assertTrue("Mapped buffers count should be positive: " + mappedBufferInstances, mappedBufferInstances >= 0);
+            assertTrue("Mapped buffers count should be quite small: " + mappedBufferInstances, mappedBufferInstances < 100);
+
+            long mappedBufferBytes = (Long) gauges.get(16).getValue();
+            assertEquals("jvm.buffers.mapped.bytes", gauges.get(16).getName());
+            assertTrue("Mapped buffers bytes should be positive: " + mappedBufferBytes, mappedBufferBytes >= 0);
+            assertTrue("Mapped buffers bytes should be quite small: " + mappedBufferBytes, mappedBufferBytes < 20 * 1024 * 1024);
+
+            assertEquals(17, gauges.size());
         }
     }
 }
