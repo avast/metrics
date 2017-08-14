@@ -25,13 +25,13 @@ public class JvmMetrics {
         GC_NAMES_MAPPING.put("Copy", "copy"); // -XX:+UseSerialGC
         GC_NAMES_MAPPING.put("PS Scavenge", "psscav"); // -XX:+UseParallelGC
         GC_NAMES_MAPPING.put("ParNew", "parnew"); // -XX:+UseParNewGC
-        GC_NAMES_MAPPING.put("G1 Young Generation", "g1y"); // -XX:+UseG1GC
+        GC_NAMES_MAPPING.put("G1 Young Generation", "g1young"); // -XX:+UseG1GC
 
         // old
         GC_NAMES_MAPPING.put("MarkSweepCompact", "msc"); // -XX:+UseSerialGC
         GC_NAMES_MAPPING.put("PS MarkSweep", "psms"); // -XX:+UseParallelOldGC
         GC_NAMES_MAPPING.put("ConcurrentMarkSweep", "conms"); // -XX:+UseConcMarkSweepGC
-        GC_NAMES_MAPPING.put("G1 Old Generation", "g1o"); // -XX:+UseG1GC
+        GC_NAMES_MAPPING.put("G1 Old Generation", "g1old"); // -XX:+UseG1GC
     }
 
     public static void registerAll(Monitor monitor) {
