@@ -11,13 +11,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class JvmMetricsTest {
+    private boolean isWindows() {
+        return System.getProperty("os.name").toLowerCase().contains("win");
+    }
+
     @Test
     public void testRegisterAll() throws Exception {
         try (GaugesTestingMonitor monitor = new GaugesTestingMonitor()) {
             JvmMetrics.registerAll(monitor);
             List<Gauge<?>> gauges = monitor.getGauges();
 
-            assertEquals(21, gauges.size());
+            if (isWindows()) {
+                // ManagementFactory.getOperatingSystemMXBean() is not UnixOperatingSystemMXBean
+                // Number of open FDs is not supported
+                assertEquals(20, gauges.size());
+            } else {
+                assertEquals(21, gauges.size());
+            }
         }
     }
 
@@ -38,6 +48,12 @@ public class JvmMetricsTest {
 
     @Test
     public void testRegisterFDs() throws Exception {
+        if (isWindows()) {
+            // ManagementFactory.getOperatingSystemMXBean() is not UnixOperatingSystemMXBean
+            // Skip the test, not supported
+            return;
+        }
+
         try (GaugesTestingMonitor monitor = new GaugesTestingMonitor()) {
             JvmMetrics.registerAll(monitor);
 
