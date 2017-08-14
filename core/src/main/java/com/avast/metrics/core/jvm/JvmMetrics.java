@@ -18,7 +18,7 @@ import java.util.Map;
 public class JvmMetrics {
     private static final Logger LOGGER = LoggerFactory.getLogger(JvmMetrics.class);
 
-    static final Map<String, String> GC_NAMES_MAPPING = new HashMap<>();
+    private static final Map<String, String> GC_NAMES_MAPPING = new HashMap<>();
 
     static {
         // young

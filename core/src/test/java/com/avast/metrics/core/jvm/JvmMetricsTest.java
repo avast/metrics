@@ -5,23 +5,12 @@ import org.junit.Test;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class JvmMetricsTest {
-    private static final int OFFSET_CPU = 0;
-    private static final int OFFSET_FDS = OFFSET_CPU + 2;
-    private static final int OFFSET_HEAP = OFFSET_FDS + 1;
-    private static final int OFFSET_NON_HEAP = OFFSET_HEAP + 3;
-    private static final int OFFSET_UPTIME = OFFSET_NON_HEAP + 2;
-    private static final int OFFSET_THREADS = OFFSET_UPTIME + 1;
-    private static final int OFFSET_CLASSES = OFFSET_THREADS + 3;
-    private static final int OFFSET_BUFFER_POOLS = OFFSET_CLASSES + 1;
-    private static final int OFFSET_GC = OFFSET_BUFFER_POOLS + 4;
-
     @Test
     public void testRegisterAll() throws Exception {
         try (GaugesTestingMonitor monitor = new GaugesTestingMonitor()) {
@@ -36,15 +25,14 @@ public class JvmMetricsTest {
     public void testRegisterCpu() throws Exception {
         try (GaugesTestingMonitor monitor = new GaugesTestingMonitor()) {
             JvmMetrics.registerAll(monitor);
-            List<Gauge<?>> gauges = monitor.getGauges();
 
-            long cpuTime = (Long) gauges.get(OFFSET_CPU).getValue();
-            assertEquals("jvm.cpu.time", gauges.get(OFFSET_CPU).getName());
-            assertThat(cpuTime).as("CPU time").isPositive();
+            assertThat((Long) monitor.findGauge("jvm.cpu.time").getValue())
+                    .as("jvm.cpu.time")
+                    .isPositive();
 
-            double cpuLoad = (Double) gauges.get(OFFSET_CPU + 1).getValue();
-            assertEquals("jvm.cpu.load", gauges.get(OFFSET_CPU + 1).getName());
-            assertThat(cpuLoad).as("CPU load").isPositive();
+            assertThat((Double) monitor.findGauge("jvm.cpu.load").getValue())
+                    .as("jvm.cpu.load")
+                    .isPositive();
         }
     }
 
@@ -52,11 +40,10 @@ public class JvmMetricsTest {
     public void testRegisterFDs() throws Exception {
         try (GaugesTestingMonitor monitor = new GaugesTestingMonitor()) {
             JvmMetrics.registerAll(monitor);
-            List<Gauge<?>> gauges = monitor.getGauges();
 
-            long fdsOpened = (Long) gauges.get(OFFSET_FDS).getValue();
-            assertEquals("jvm.fds.opened", gauges.get(OFFSET_FDS).getName());
-            assertThat(fdsOpened).as("opened FDs").isBetween(0L, 1000L);
+            assertThat((Long) monitor.findGauge("jvm.fds.opened").getValue())
+                    .as("jvm.fds.opened")
+                    .isBetween(0L, 1000L);
         }
     }
 
@@ -64,19 +51,18 @@ public class JvmMetricsTest {
     public void testRegisterHeap() throws Exception {
         try (GaugesTestingMonitor monitor = new GaugesTestingMonitor()) {
             JvmMetrics.registerAll(monitor);
-            List<Gauge<?>> gauges = monitor.getGauges();
 
-            long heapUsed = (Long) gauges.get(OFFSET_HEAP).getValue();
-            assertEquals("jvm.heap.used", gauges.get(OFFSET_HEAP).getName());
-            assertThat(heapUsed).as("used heap memory").isPositive();
+            assertThat((Long) monitor.findGauge("jvm.heap.used").getValue())
+                    .as("jvm.heap.used")
+                    .isPositive();
 
-            long heapCommitted = (Long) gauges.get(OFFSET_HEAP + 1).getValue();
-            assertEquals("jvm.heap.committed", gauges.get(OFFSET_HEAP + 1).getName());
-            assertThat(heapCommitted).as("committed heap memory").isPositive();
+            assertThat((Long) monitor.findGauge("jvm.heap.committed").getValue())
+                    .as("jvm.heap.committed")
+                    .isPositive();
 
-            long heapMax = (Long) gauges.get(OFFSET_HEAP + 2).getValue();
-            assertEquals("jvm.heap.max", gauges.get(OFFSET_HEAP + 2).getName());
-            assertThat(heapMax).as("max heap memory").isPositive();
+            assertThat((Long) monitor.findGauge("jvm.heap.max").getValue())
+                    .as("jvm.heap.max")
+                    .isPositive();
         }
     }
 
@@ -84,15 +70,14 @@ public class JvmMetricsTest {
     public void testRegisterNonHeap() throws Exception {
         try (GaugesTestingMonitor monitor = new GaugesTestingMonitor()) {
             JvmMetrics.registerAll(monitor);
-            List<Gauge<?>> gauges = monitor.getGauges();
 
-            long nonHeapUsed = (Long) gauges.get(OFFSET_NON_HEAP).getValue();
-            assertEquals("jvm.nonheap.used", gauges.get(OFFSET_NON_HEAP).getName());
-            assertThat(nonHeapUsed).as("used non heap memory").isPositive();
+            assertThat((Long) monitor.findGauge("jvm.nonheap.used").getValue())
+                    .as("jvm.nonheap.used")
+                    .isPositive();
 
-            long nonHeapCommitted = (Long) gauges.get(OFFSET_NON_HEAP + 1).getValue();
-            assertEquals("jvm.nonheap.committed", gauges.get(OFFSET_NON_HEAP + 1).getName());
-            assertThat(nonHeapCommitted).as("committed non heap memory").isPositive();
+            assertThat((Long) monitor.findGauge("jvm.nonheap.committed").getValue())
+                    .as("jvm.nonheap.committed")
+                    .isPositive();
         }
     }
 
@@ -100,11 +85,10 @@ public class JvmMetricsTest {
     public void testRegisterUptime() throws Exception {
         try (GaugesTestingMonitor monitor = new GaugesTestingMonitor()) {
             JvmMetrics.registerAll(monitor);
-            List<Gauge<?>> gauges = monitor.getGauges();
 
-            long uptime = (Long) gauges.get(OFFSET_UPTIME).getValue();
-            assertEquals("jvm.uptime", gauges.get(OFFSET_UPTIME).getName());
-            assertThat(uptime).as("uptime").isBetween(0L, Duration.ofHours(1).toMillis());
+            assertThat((Long) monitor.findGauge("jvm.uptime").getValue())
+                    .as("jvm.uptime")
+                    .isBetween(0L, Duration.ofHours(1).toMillis());
         }
     }
 
@@ -112,19 +96,18 @@ public class JvmMetricsTest {
     public void testRegisterThreads() throws Exception {
         try (GaugesTestingMonitor monitor = new GaugesTestingMonitor()) {
             JvmMetrics.registerAll(monitor);
-            List<Gauge<?>> gauges = monitor.getGauges();
 
-            int totalThreads = (Integer) gauges.get(OFFSET_THREADS).getValue();
-            assertEquals("jvm.threads.total", gauges.get(OFFSET_THREADS).getName());
-            assertThat(totalThreads).as("total threads").isBetween(0, 100);
+            assertThat((Integer) monitor.findGauge("jvm.threads.total").getValue())
+                    .as("jvm.threads.total")
+                    .isBetween(0, 100);
 
-            int daemonThreads = (Integer) gauges.get(OFFSET_THREADS + 1).getValue();
-            assertEquals("jvm.threads.daemon", gauges.get(OFFSET_THREADS + 1).getName());
-            assertThat(daemonThreads).as("daemon threads").isBetween(0, 100);
+            assertThat((Integer) monitor.findGauge("jvm.threads.daemon").getValue())
+                    .as("jvm.threads.daemon")
+                    .isBetween(0, 100);
 
-            long startedThreads = (Long) gauges.get(OFFSET_THREADS + 2).getValue();
-            assertEquals("jvm.threads.started", gauges.get(OFFSET_THREADS + 2).getName());
-            assertThat(startedThreads).as("started threads").isBetween(0L, 500L);
+            assertThat((Long) monitor.findGauge("jvm.threads.started").getValue())
+                    .as("jvm.threads.started")
+                    .isBetween(0L, 500L);
         }
     }
 
@@ -132,11 +115,10 @@ public class JvmMetricsTest {
     public void testRegisterClasses() throws Exception {
         try (GaugesTestingMonitor monitor = new GaugesTestingMonitor()) {
             JvmMetrics.registerAll(monitor);
-            List<Gauge<?>> gauges = monitor.getGauges();
 
-            int loadedClasses = (Integer) gauges.get(OFFSET_CLASSES).getValue();
-            assertEquals("jvm.classes.loaded", gauges.get(OFFSET_CLASSES).getName());
-            assertThat(loadedClasses).as("loaded classes").isBetween(0, 50000);
+            assertThat((Integer) monitor.findGauge("jvm.classes.loaded").getValue())
+                    .as("jvm.classes.loaded")
+                    .isBetween(0, 50000);
         }
     }
 
@@ -144,23 +126,22 @@ public class JvmMetricsTest {
     public void testRegisterBufferPools() throws Exception {
         try (GaugesTestingMonitor monitor = new GaugesTestingMonitor()) {
             JvmMetrics.registerAll(monitor);
-            List<Gauge<?>> gauges = monitor.getGauges();
 
-            long directBufferInstances = (Long) gauges.get(OFFSET_BUFFER_POOLS).getValue();
-            assertEquals("jvm.buffers.direct.instances", gauges.get(OFFSET_BUFFER_POOLS).getName());
-            assertThat(directBufferInstances).as("direct buffer instances").isBetween(0L, 100L);
+            assertThat((Long) monitor.findGauge("jvm.buffers.direct.instances").getValue())
+                    .as("jvm.buffers.direct.instances")
+                    .isBetween(0L, 100L);
 
-            long directBufferBytes = (Long) gauges.get(OFFSET_BUFFER_POOLS + 1).getValue();
-            assertEquals("jvm.buffers.direct.bytes", gauges.get(OFFSET_BUFFER_POOLS + 1).getName());
-            assertThat(directBufferBytes).as("direct buffer bytes").isBetween(0L, 20L * 1024L * 1024L);
+            assertThat((Long) monitor.findGauge("jvm.buffers.direct.bytes").getValue())
+                    .as("jvm.buffers.direct.bytes")
+                    .isBetween(0L, 20L * 1024L * 1024L);
 
-            long mappedBufferInstances = (Long) gauges.get(OFFSET_BUFFER_POOLS + 2).getValue();
-            assertEquals("jvm.buffers.mapped.instances", gauges.get(OFFSET_BUFFER_POOLS + 2).getName());
-            assertThat(mappedBufferInstances).as("mapped buffer instances").isBetween(0L, 100L);
+            assertThat((Long) monitor.findGauge("jvm.buffers.mapped.instances").getValue())
+                    .as("jvm.buffers.mapped.instances")
+                    .isBetween(0L, 100L);
 
-            long mappedBufferBytes = (Long) gauges.get(OFFSET_BUFFER_POOLS + 3).getValue();
-            assertEquals("jvm.buffers.mapped.bytes", gauges.get(OFFSET_BUFFER_POOLS + 3).getName());
-            assertThat(mappedBufferBytes).as("mapped buffer bytes").isBetween(0L, 20L * 1024L * 1024L);
+            assertThat((Long) monitor.findGauge("jvm.buffers.mapped.bytes").getValue())
+                    .as("jvm.buffers.mapped.bytes")
+                    .isBetween(0L, 20L * 1024L * 1024L);
         }
     }
 
@@ -168,35 +149,38 @@ public class JvmMetricsTest {
     public void testRegisterGc() throws Exception {
         try (GaugesTestingMonitor monitor = new GaugesTestingMonitor()) {
             JvmMetrics.registerAll(monitor);
+
             List<Gauge<?>> gauges = monitor.getGauges();
 
-            Set<String> gcCollectionNames = JvmMetrics.GC_NAMES_MAPPING
-                    .values()
+
+            List<Gauge<?>> gcCollections = gauges
                     .stream()
-                    .map(name -> "jvm.gc." + name + ".collections")
-                    .collect(Collectors.toSet());
+                    .filter(gauge -> gauge.getName().startsWith("jvm.gc.") && gauge.getName().endsWith(".collections"))
+                    .collect(Collectors.toList());
 
-            Set<String> gcTimeNames = JvmMetrics.GC_NAMES_MAPPING
-                    .values()
+            assertThat(gcCollections.size())
+                    .as("GC collections size")
+                    .isEqualTo(2);
+
+            gcCollections.forEach(gauge ->
+                    assertThat((Long) gauge.getValue())
+                            .as(gauge.getName() + ", collections")
+                            .isBetween(0L, 1000L));
+
+
+            List<Gauge<?>> gcTimes = gauges
                     .stream()
-                    .map(name -> "jvm.gc." + name + ".time")
-                    .collect(Collectors.toSet());
+                    .filter(gauge -> gauge.getName().startsWith("jvm.gc.") && gauge.getName().endsWith(".time"))
+                    .collect(Collectors.toList());
 
-            long gcACollections = (Long) gauges.get(OFFSET_GC).getValue();
-            assertThat(gcCollectionNames).contains(gauges.get(OFFSET_GC).getName());
-            assertThat(gcACollections).as("GC A collections").isBetween(0L, 1000L);
+            assertThat(gcTimes.size())
+                    .as("GC times size")
+                    .isEqualTo(2);
 
-            long gcATime = (Long) gauges.get(OFFSET_GC + 1).getValue();
-            assertThat(gcTimeNames).contains(gauges.get(OFFSET_GC + 1).getName());
-            assertThat(gcATime).as("GC A time").isBetween(0L, Duration.ofSeconds(10).toMillis());
-
-            long gcBCollections = (Long) gauges.get(OFFSET_GC + 2).getValue();
-            assertThat(gcCollectionNames).contains(gauges.get(OFFSET_GC + 2).getName());
-            assertThat(gcBCollections).as("GC B collections").isBetween(0L, 1000L);
-
-            long gcBTime = (Long) gauges.get(OFFSET_GC + 3).getValue();
-            assertThat(gcTimeNames).contains(gauges.get(OFFSET_GC + 3).getName());
-            assertThat(gcBTime).as("GC B time").isBetween(0L, Duration.ofSeconds(10).toMillis());
+            gcTimes.forEach(gauge ->
+                    assertThat((Long) gauge.getValue())
+                            .as(gauge.getName() + ", time")
+                            .isBetween(0L, Duration.ofSeconds(10).toMillis()));
         }
     }
 }

@@ -74,6 +74,14 @@ class GaugesTestingMonitor implements Monitor {
 
     @Override
     public <T> Gauge<T> newGauge(String name, boolean replaceExisting, Supplier<T> gauge) {
+        gauges
+                .stream()
+                .filter(g -> g.getName().equals(monitorName + "." + name))
+                .findAny()
+                .ifPresent(g -> {
+                    throw new IllegalArgumentException("Gauge already defined: " + monitorName + "." + name);
+                });
+
         Gauge<T> g = new Gauge<T>() {
             @Override
             public T getValue() {
@@ -112,5 +120,13 @@ class GaugesTestingMonitor implements Monitor {
     @Override
     public void close() {
 
+    }
+
+    Gauge<?> findGauge(String name) {
+        return gauges
+                .stream()
+                .filter(gauge -> gauge.getName().equals(name))
+                .findAny()
+                .orElseThrow(() -> new IllegalStateException("No such gauge: " + name));
     }
 }
