@@ -12,7 +12,7 @@ import java.util.stream.Stream;
  * Graphite/StatsD formatter. Timestamp is NOT appended.
  * <p>
  * http://graphite.readthedocs.io/en/latest/feeding-carbon.html#the-plaintext-protocol
- * <metric path> <metric value> <metric timestamp>
+ * &lt;metric path&gt; &lt;metric value&gt; &lt;metric timestamp&gt;
  */
 public class GraphiteFormatter implements Formatter {
     private static final String SEPARATOR_NAME_PARTS = ".";

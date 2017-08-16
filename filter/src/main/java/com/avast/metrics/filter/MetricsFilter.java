@@ -15,7 +15,10 @@ public interface MetricsFilter {
     MetricsFilter ALL_DISABLED = metricName -> false;
 
     /**
-     * Get effective configuration for a metric according its name.
+     * Get effective configuration for a metric according to its name.
+     *
+     * @param metricName metric name in compatible format
+     * @return enabled/disabled
      */
     boolean isEnabled(String metricName);
 
