@@ -185,4 +185,11 @@ public class FormattingMetricsMonitorTest {
             assertEquals(expected, monitor.format(MetricsFilter.ALL_ENABLED, FIELDS_ALL_ENABLED));
         }
     }
+
+    @Test
+    public void testContentType() throws Exception {
+        try (FormattingMetricsMonitor monitor = newMonitor()) {
+            assertEquals("text/plain", monitor.contentType());
+        }
+    }
 }

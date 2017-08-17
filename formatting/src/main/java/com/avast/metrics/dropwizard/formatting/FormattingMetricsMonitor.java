@@ -108,6 +108,10 @@ public class FormattingMetricsMonitor extends MetricsMonitor {
         return constructMetricName(Optional.empty(), separator());
     }
 
+    public String contentType() {
+        return formatter.contentType();
+    }
+
     public String format(MetricsFilter filter, FieldsFormatting fieldsFormatting) {
         Stream<MetricValue> metrics = registry.getMetrics()
                 .entrySet()
