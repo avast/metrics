@@ -16,9 +16,9 @@ public class JvmMetricsTest {
     }
 
     @Test
-    public void testRegisterAll() throws Exception {
+    public void testRegisterDefault() throws Exception {
         try (GaugesTestingMonitor monitor = new GaugesTestingMonitor()) {
-            JvmMetrics.registerAll(monitor);
+            JvmMetrics.registerDefault(monitor);
             List<Gauge<?>> gauges = monitor.getGauges();
 
             if (isWindows()) {
@@ -34,7 +34,7 @@ public class JvmMetricsTest {
     @Test
     public void testRegisterCpu() throws Exception {
         try (GaugesTestingMonitor monitor = new GaugesTestingMonitor()) {
-            JvmMetrics.registerAll(monitor);
+            JvmMetrics.registerDefault(monitor);
 
             assertThat((Long) monitor.findGauge("jvm.cpu.time").getValue())
                     .as("jvm.cpu.time")
@@ -55,7 +55,7 @@ public class JvmMetricsTest {
         }
 
         try (GaugesTestingMonitor monitor = new GaugesTestingMonitor()) {
-            JvmMetrics.registerAll(monitor);
+            JvmMetrics.registerDefault(monitor);
 
             assertThat((Long) monitor.findGauge("jvm.fds.opened").getValue())
                     .as("jvm.fds.opened")
@@ -66,7 +66,7 @@ public class JvmMetricsTest {
     @Test
     public void testRegisterHeap() throws Exception {
         try (GaugesTestingMonitor monitor = new GaugesTestingMonitor()) {
-            JvmMetrics.registerAll(monitor);
+            JvmMetrics.registerDefault(monitor);
 
             assertThat((Long) monitor.findGauge("jvm.heap.used").getValue())
                     .as("jvm.heap.used")
@@ -85,7 +85,7 @@ public class JvmMetricsTest {
     @Test
     public void testRegisterNonHeap() throws Exception {
         try (GaugesTestingMonitor monitor = new GaugesTestingMonitor()) {
-            JvmMetrics.registerAll(monitor);
+            JvmMetrics.registerDefault(monitor);
 
             assertThat((Long) monitor.findGauge("jvm.nonheap.used").getValue())
                     .as("jvm.nonheap.used")
@@ -100,7 +100,7 @@ public class JvmMetricsTest {
     @Test
     public void testRegisterUptime() throws Exception {
         try (GaugesTestingMonitor monitor = new GaugesTestingMonitor()) {
-            JvmMetrics.registerAll(monitor);
+            JvmMetrics.registerDefault(monitor);
 
             assertThat((Long) monitor.findGauge("jvm.uptime").getValue())
                     .as("jvm.uptime")
@@ -111,7 +111,7 @@ public class JvmMetricsTest {
     @Test
     public void testRegisterThreads() throws Exception {
         try (GaugesTestingMonitor monitor = new GaugesTestingMonitor()) {
-            JvmMetrics.registerAll(monitor);
+            JvmMetrics.registerDefault(monitor);
 
             assertThat((Integer) monitor.findGauge("jvm.threads.total").getValue())
                     .as("jvm.threads.total")
@@ -130,7 +130,7 @@ public class JvmMetricsTest {
     @Test
     public void testRegisterClasses() throws Exception {
         try (GaugesTestingMonitor monitor = new GaugesTestingMonitor()) {
-            JvmMetrics.registerAll(monitor);
+            JvmMetrics.registerDefault(monitor);
 
             assertThat((Integer) monitor.findGauge("jvm.classes.loaded").getValue())
                     .as("jvm.classes.loaded")
@@ -141,7 +141,7 @@ public class JvmMetricsTest {
     @Test
     public void testRegisterBufferPools() throws Exception {
         try (GaugesTestingMonitor monitor = new GaugesTestingMonitor()) {
-            JvmMetrics.registerAll(monitor);
+            JvmMetrics.registerDefault(monitor);
 
             assertThat((Long) monitor.findGauge("jvm.buffers.direct.instances").getValue())
                     .as("jvm.buffers.direct.instances")
@@ -164,7 +164,7 @@ public class JvmMetricsTest {
     @Test
     public void testRegisterGc() throws Exception {
         try (GaugesTestingMonitor monitor = new GaugesTestingMonitor()) {
-            JvmMetrics.registerAll(monitor);
+            JvmMetrics.registerDefault(monitor);
 
             List<Gauge<?>> gauges = monitor.getGauges();
 

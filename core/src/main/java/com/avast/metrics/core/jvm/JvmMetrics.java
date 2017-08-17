@@ -34,7 +34,7 @@ public class JvmMetrics {
         GC_NAMES_MAPPING.put("G1 Old Generation", "g1old"); // -XX:+UseG1GC
     }
 
-    public static void registerAll(Monitor monitor) {
+    public static void registerDefault(Monitor monitor) {
         Monitor jvmMonitor = monitor.named("jvm");
 
         registerCpu(jvmMonitor.named("cpu"));
