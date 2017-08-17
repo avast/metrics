@@ -192,4 +192,11 @@ public class FormattingMetricsMonitorTest {
             assertEquals("text/plain", monitor.contentType());
         }
     }
+
+    @Test
+    public void testNameSeparator() throws Exception {
+        try (FormattingMetricsMonitor monitor = newMonitor()) {
+            assertEquals(".", monitor.nameSeparator());
+        }
+    }
 }
