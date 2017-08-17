@@ -8,7 +8,8 @@ import java.util.stream.Stream;
  * <p>
  * https://prometheus.io/docs/instrumenting/exposition_formats/
  * https://prometheus.io/docs/concepts/data_model/
- * <metric name>{<label name>=<label value>, ...}
+ * &lt;metric name&gt; value
+ * &lt;metric name&gt;{&lt;label name&gt;=&lt;label value&gt;, ...} value
  */
 public class PrometheusFormatter implements Formatter {
     private static final String SEPARATOR_NAME_PARTS = "_";
