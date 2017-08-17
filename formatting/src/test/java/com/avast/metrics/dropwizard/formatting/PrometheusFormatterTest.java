@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import java.util.stream.Stream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class PrometheusFormatterTest {
     private static final PrometheusFormatter formatter = new PrometheusFormatter();
@@ -26,7 +26,7 @@ public class PrometheusFormatterTest {
 
         String expected = "name_a valueA\n" +
                 "name_b valueB\n" +
-                "name_c valueC";
+                "name_c valueC\n";
 
         assertEquals(expected, formatter.format(values));
     }
@@ -64,9 +64,26 @@ public class PrometheusFormatterTest {
                     "monitor_timer_rate1m 0.0\n" +
                     "monitor_timer_rate5m 0.0\n" +
                     "monitor_timer_ratemean 0.0\n" +
-                    "monitor_timer_stddev 0.0";
+                    "monitor_timer_stddev 0.0\n";
 
             assertEquals(expected, monitor.format(MetricsFilter.ALL_ENABLED, FormattingMetricsMonitorTest.FIELDS_ALL_ENABLED));
         }
+    }
+
+    @Test
+    public void testLastLineEndsWithNewLineCharacter() throws Exception {
+        // "The last line must end with a line-feed character."
+        // https://prometheus.io/docs/instrumenting/exposition_formats/
+        Stream<MetricValue> values = Stream.of(new MetricValue("name", "value"));
+        assertEquals("name value\n", formatter.format(values));
+    }
+
+    @Test
+    public void testNoMetric() throws Exception {
+        // New line character is implementation specific, empty string would be correct too.
+        // "Empty lines are ignored."
+        // https://prometheus.io/docs/instrumenting/exposition_formats/
+        Stream<MetricValue> values = Stream.empty();
+        assertEquals("\n", formatter.format(values));
     }
 }

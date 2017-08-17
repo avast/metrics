@@ -45,6 +45,6 @@ public class PrometheusFormatter implements Formatter {
     public String format(Stream<MetricValue> metrics) {
         return metrics
                 .map(metric -> metric.getName() + SEPARATOR_NAME_VALUE + metric.getValue())
-                .collect(Collectors.joining(SEPARATOR_METRICS));
+                .collect(Collectors.joining(SEPARATOR_METRICS, "", SEPARATOR_METRICS));
     }
 }

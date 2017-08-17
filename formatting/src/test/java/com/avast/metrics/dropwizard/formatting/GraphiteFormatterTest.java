@@ -69,4 +69,10 @@ public class GraphiteFormatterTest {
             assertEquals(expected, monitor.format(MetricsFilter.ALL_ENABLED, FormattingMetricsMonitorTest.FIELDS_ALL_ENABLED));
         }
     }
+
+    @Test
+    public void testNoMetric() throws Exception {
+        Stream<MetricValue> values = Stream.empty();
+        assertEquals("", formatter.format(values));
+    }
 }
