@@ -11,6 +11,12 @@ import com.typesafe.config.ConfigFactory;
 public class FieldsFormatting {
     static final String SECTION_DEFAULTS = "metricsFieldsFormattingDefaults";
 
+    private static final FieldsFormatting DEFAULTS = fromConfig(ConfigFactory.defaultReference().getConfig(SECTION_DEFAULTS));
+
+    public static FieldsFormatting defaults() {
+        return DEFAULTS;
+    }
+
     public static FieldsFormatting fromConfig(Config config) {
         Config referenceConfig = ConfigFactory.defaultReference().getConfig(SECTION_DEFAULTS);
         Config mergedConfig = config.withFallback(referenceConfig);
