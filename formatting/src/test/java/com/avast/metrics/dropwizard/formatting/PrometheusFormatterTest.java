@@ -86,4 +86,9 @@ public class PrometheusFormatterTest {
         Stream<MetricValue> values = Stream.empty();
         assertEquals("\n", formatter.format(values));
     }
+
+    @Test
+    public void testContentType() throws Exception {
+        assertEquals("text/plain; version=0.0.4", formatter.contentType());
+    }
 }

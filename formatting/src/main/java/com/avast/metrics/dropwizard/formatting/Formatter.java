@@ -20,6 +20,13 @@ public interface Formatter {
     String sanitizeName(String namePart);
 
     /**
+     * HTTP Content-Type to be used in response.
+     *
+     * @return content type
+     */
+    String contentType();
+
+    /**
      * Format long number to string.
      */
     default String formatNumber(long number) {

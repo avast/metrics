@@ -75,4 +75,9 @@ public class GraphiteFormatterTest {
         Stream<MetricValue> values = Stream.empty();
         assertEquals("", formatter.format(values));
     }
+
+    @Test
+    public void testContentType() throws Exception {
+        assertEquals("text/plain", formatter.contentType());
+    }
 }

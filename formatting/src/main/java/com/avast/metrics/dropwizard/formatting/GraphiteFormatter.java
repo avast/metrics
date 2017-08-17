@@ -53,6 +53,11 @@ public class GraphiteFormatter implements Formatter {
     }
 
     @Override
+    public String contentType() {
+        return "text/plain";
+    }
+
+    @Override
     public String format(Stream<MetricValue> metrics) {
         return metrics
                 .map(metric -> metric.getName() + SEPARATOR_NAME_VALUE + metric.getValue())

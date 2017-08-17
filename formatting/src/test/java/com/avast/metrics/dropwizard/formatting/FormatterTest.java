@@ -5,7 +5,7 @@ import org.junit.Test;
 import java.util.Locale;
 import java.util.stream.Stream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class FormatterTest {
     private static final Formatter formatter = new Formatter() {
@@ -16,6 +16,11 @@ public class FormatterTest {
 
         @Override
         public String sanitizeName(String namePart) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public String contentType() {
             throw new UnsupportedOperationException();
         }
 

@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 /**
  * Graphite/StatsD formatter.
  * <p>
+ * https://prometheus.io/docs/instrumenting/exposition_formats/
  * https://prometheus.io/docs/concepts/data_model/
  * <metric name>{<label name>=<label value>, ...}
  */
@@ -39,6 +40,11 @@ public class PrometheusFormatter implements Formatter {
         }
 
         return result.toString();
+    }
+
+    @Override
+    public String contentType() {
+        return "text/plain; version=0.0.4";
     }
 
     @Override
