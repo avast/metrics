@@ -1,7 +1,7 @@
 package com.avast.metrics.dropwizard.formatting;
 
 import com.avast.metrics.api.Counter;
-import com.avast.metrics.dropwizard.formatting.config.FieldsFormatting;
+import com.avast.metrics.dropwizard.formatting.fields.FieldsFormatting;
 import com.avast.metrics.filter.MetricsFilter;
 import com.typesafe.config.ConfigFactory;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package com.avast.metrics.dropwizard.formatting.config;
+package com.avast.metrics.dropwizard.formatting.fields;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class GaugeFormatting {

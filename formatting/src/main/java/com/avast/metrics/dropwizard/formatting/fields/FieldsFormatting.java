@@ -1,4 +1,4 @@
-package com.avast.metrics.dropwizard.formatting.config;
+package com.avast.metrics.dropwizard.formatting.fields;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigBeanFactory;
