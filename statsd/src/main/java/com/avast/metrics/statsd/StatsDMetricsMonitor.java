@@ -1,10 +1,10 @@
 package com.avast.metrics.statsd;
 
 import com.avast.metrics.TimerPairImpl;
-import com.avast.metrics.api.Metric;
-import com.avast.metrics.api.Monitor;
-import com.avast.metrics.api.Naming;
-import com.avast.metrics.api.TimerPair;
+import com.avast.metrics.api.*;
+import com.avast.metrics.api.Timer;
+import com.avast.metrics.filter.MetricsFilter;
+import com.avast.metrics.test.NoOpMonitor;
 import com.timgroup.statsd.NonBlockingStatsDClient;
 import com.timgroup.statsd.StatsDClient;
 
@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-@SuppressWarnings({"WeakerAccess", "OptionalUsedAsFieldOrParameterType", "unused"})
+@SuppressWarnings({"WeakerAccess", "OptionalUsedAsFieldOrParameterType"})
 public class StatsDMetricsMonitor implements Monitor {
     protected final StatsDClient client;
     protected final String prefix;
@@ -25,15 +25,21 @@ public class StatsDMetricsMonitor implements Monitor {
     protected final Naming naming;
     protected final ScheduledExecutorService scheduler;
     protected final Duration gaugeSendPeriod;
+    protected final MetricsFilter metricsFilter;
 
     protected final Map<String, ScheduledFuture<?>> gauges = new HashMap<>();
 
-    public StatsDMetricsMonitor(String host, int port, String prefix, final Naming naming, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler) {
+    public StatsDMetricsMonitor(String host, int port, String prefix, final Naming naming, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler, MetricsFilter metricsFilter) {
         this.prefix = prefix;
         this.naming = naming;
         this.gaugeSendPeriod = gaugeSendPeriod;
         this.scheduler = scheduler;
         client = createStatsDClient(host, port, prefix);
+        this.metricsFilter = metricsFilter;
+    }
+
+    public StatsDMetricsMonitor(String host, int port, String prefix, final Naming naming, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler) {
+        this(host, port, prefix, naming, gaugeSendPeriod, scheduler, MetricsFilter.ALL_ENABLED);
     }
 
     public StatsDMetricsMonitor(String host, int port, String prefix, final Naming naming) {
@@ -48,12 +54,22 @@ public class StatsDMetricsMonitor implements Monitor {
         this(host, port, prefix, Naming.defaultNaming(), getDefaultGaugeSendPeriod(), createScheduler());
     }
 
+
+    public StatsDMetricsMonitor(String host, int port, String prefix, MetricsFilter metricsFilter) {
+        this(host, port, prefix, Naming.defaultNaming(), getDefaultGaugeSendPeriod(), createScheduler(), metricsFilter);
+    }
+
     protected StatsDMetricsMonitor(StatsDMetricsMonitor monitor, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler, String... newNames) {
+        this(monitor, gaugeSendPeriod, scheduler, MetricsFilter.ALL_ENABLED, newNames);
+    }
+
+    protected StatsDMetricsMonitor(StatsDMetricsMonitor monitor, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler, MetricsFilter metricsFilter, String... newNames) {
         this.prefix = monitor.prefix;
         this.client = monitor.client;
         this.naming = monitor.naming;
         this.scheduler = scheduler;
         this.gaugeSendPeriod = gaugeSendPeriod;
+        this.metricsFilter = metricsFilter;
 
         this.names.addAll(monitor.names);
         this.names.addAll(Arrays.asList(newNames));
@@ -73,68 +89,110 @@ public class StatsDMetricsMonitor implements Monitor {
 
     @Override
     public StatsDMetricsMonitor named(final String name) {
-        return new StatsDMetricsMonitor(this, gaugeSendPeriod, scheduler, name);
+        return new StatsDMetricsMonitor(this, gaugeSendPeriod, scheduler, metricsFilter, name);
     }
 
     @Override
     public StatsDMetricsMonitor named(final String name1, final String name2, final String... restOfNames) {
-        return new StatsDMetricsMonitor(named(name1).named(name2), gaugeSendPeriod, scheduler, restOfNames);
+        return new StatsDMetricsMonitor(named(name1).named(name2), gaugeSendPeriod, scheduler, metricsFilter, restOfNames);
     }
 
     @Override
-    public StatsDMeter newMeter(final String name) {
-        return new StatsDMeter(client, constructMetricName(name));
-    }
-
-    @Override
-    public StatsDCounter newCounter(final String name) {
-        return new StatsDCounter(client, constructMetricName(name));
-    }
-
-    @Override
-    public StatsDTimer newTimer(final String name) {
-        return new StatsDTimer(client, constructMetricName(name));
-    }
-
-    @Override
-    public TimerPair newTimerPair(final String name) {
-        return new TimerPairImpl(
-                newTimer(naming.successTimerName(name)),
-                newTimer(naming.failureTimerName(name))
-        );
-    }
-
-    @Override
-    public <T> StatsDGauge<T> newGauge(final String name, final Supplier<T> gauge) {
-        return newGauge(name, false, gauge);
-    }
-
-    @Override
-    public <T> StatsDGauge<T> newGauge(final String name, final boolean replaceExisting, final Supplier<T> supplier) {
-        final String finalName = constructMetricName(name);
-
-        synchronized (gauges) {
-            final ScheduledFuture<?> existing = gauges.get(finalName);
-
-            if (existing != null) {
-                if (!replaceExisting) throw new IllegalStateException("Gauge with name '" + name + "' is already registered");
-
-                existing.cancel(false);
-            }
-
-            final StatsDGauge<T> gauge = new StatsDGauge<>(client, finalName, supplier);
-
-            final ScheduledFuture<?> scheduled = scheduler.scheduleAtFixedRate(gauge::send, 0, gaugeSendPeriod.toMillis(), TimeUnit.MILLISECONDS);
-
-            gauges.put(name, scheduled);
-
-            return gauge;
+    public Meter newMeter(final String name) {
+        final String metricName = constructMetricName(name);
+        if (metricsFilter.isEnabled(metricName)) {
+            return new StatsDMeter(client, metricName);
+        } else {
+            return NoOpMonitor.INSTANCE.newMeter(metricName);
         }
     }
 
     @Override
-    public StatsDHistogram newHistogram(final String name) {
-        return new StatsDHistogram(client, constructMetricName(name));
+    public Counter newCounter(final String name) {
+        final String metricName = constructMetricName(name);
+        if (metricsFilter.isEnabled(metricName)) {
+            return new StatsDCounter(client, metricName);
+        } else {
+            return NoOpMonitor.INSTANCE.newCounter(metricName);
+        }
+
+    }
+
+    @Override
+    public Timer newTimer(final String name) {
+        final String metricName = constructMetricName(name);
+        if (metricsFilter.isEnabled(metricName)) {
+            return new StatsDTimer(client, metricName);
+        } else {
+            return NoOpMonitor.INSTANCE.newTimer(metricName);
+        }
+
+    }
+
+    @Override
+    public TimerPair newTimerPair(final String name) {
+        final String metricName = constructMetricName(name);
+        if (metricsFilter.isEnabled(metricName)) {
+            return new TimerPairImpl(
+                    newTimer(naming.successTimerName(name)),
+                    newTimer(naming.failureTimerName(name))
+            );
+        } else {
+            return NoOpMonitor.INSTANCE.newTimerPair(metricName);
+        }
+
+    }
+
+    @Override
+    public <T> Gauge<T> newGauge(final String name, final Supplier<T> gauge) {
+        final String metricName = constructMetricName(name);
+        if (metricsFilter.isEnabled(metricName)) {
+            return newGauge(name, false, gauge);
+        } else {
+            return NoOpMonitor.INSTANCE.newGauge(metricName, gauge);
+        }
+
+    }
+
+    @Override
+    public <T> Gauge<T> newGauge(final String name, final boolean replaceExisting, final Supplier<T> supplier) {
+
+        final String metricName = constructMetricName(name);
+        final String finalName = constructMetricName(name);
+
+        if (metricsFilter.isEnabled(metricName)) {
+            synchronized (gauges) {
+                final ScheduledFuture<?> existing = gauges.get(finalName);
+
+                if (existing != null) {
+                    if (!replaceExisting)
+                        throw new IllegalStateException("Gauge with name '" + name + "' is already registered");
+
+                    existing.cancel(false);
+                }
+
+                final StatsDGauge<T> gauge = new StatsDGauge<>(client, finalName, supplier);
+
+                final ScheduledFuture<?> scheduled = scheduler.scheduleAtFixedRate(gauge::send, 0, gaugeSendPeriod.toMillis(), TimeUnit.MILLISECONDS);
+
+                gauges.put(name, scheduled);
+
+                return gauge;
+            }
+        } else {
+            return NoOpMonitor.INSTANCE.newGauge(metricName, replaceExisting, supplier);
+        }
+    }
+
+    @Override
+    public Histogram newHistogram(final String name) {
+        final String metricName = constructMetricName(name);
+        if (metricsFilter.isEnabled(metricName)) {
+            return new StatsDHistogram(client, metricName);
+        } else {
+            return NoOpMonitor.INSTANCE.newHistogram(metricName);
+        }
+
     }
 
     @Override

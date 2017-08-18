@@ -137,4 +137,4 @@ lazy val statsd = (project in file("statsd")).
     libraryDependencies ++= Seq(
       "com.datadoghq" % "java-dogstatsd-client" % "2.3"
     )
-  ).dependsOn(core)
+  ).dependsOn(core, filter)
