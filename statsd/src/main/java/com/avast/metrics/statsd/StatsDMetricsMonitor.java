@@ -131,16 +131,10 @@ public class StatsDMetricsMonitor implements Monitor {
 
     @Override
     public TimerPair newTimerPair(final String name) {
-        final String metricName = constructMetricName(name);
-        if (metricsFilter.isEnabled(metricName)) {
-            return new TimerPairImpl(
-                    newTimer(naming.successTimerName(name)),
-                    newTimer(naming.failureTimerName(name))
-            );
-        } else {
-            return NoOpMonitor.INSTANCE.newTimerPair(metricName);
-        }
-
+        return new TimerPairImpl(
+                newTimer(naming.successTimerName(name)),
+                newTimer(naming.failureTimerName(name))
+        );
     }
 
     @Override
