@@ -10,26 +10,41 @@ import java.util.stream.Stream;
 public interface Formatter {
     /**
      * Separator of name parts.
+     *
+     * @return separator
      */
     String nameSeparator();
 
     /**
      * Sanitize part of a metric name to not contain any illegal character. Escape, replace or delete them.
+     *
+     * @param namePart part of name
+     * @return same or sanitized name
      */
     String sanitizeName(String namePart);
 
     /**
      * Format long number to string.
+     *
+     * @param number number
+     * @return formatted number
      */
     String formatNumber(long number);
 
     /**
      * Format double number to string.
+     *
+     * @param number number
+     * @return formatted number
      */
     String formatNumber(double number);
 
     /**
      * Format an object of unknown type to string.
+     *
+     * @param object object
+     * @param <T>    type of object
+     * @return formatted object (best effort)
      */
     default <T> String formatObject(T object) {
         if (object == null) {
@@ -63,6 +78,9 @@ public interface Formatter {
 
     /**
      * Format metrics and their values.
+     *
+     * @param metrics metrics to be formatted
+     * @return formatted representation
      */
     String format(Stream<MetricValues> metrics);
 }

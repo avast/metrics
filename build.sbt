@@ -22,6 +22,8 @@ lazy val javaSettings = Seq(
 lazy val Versions = new {
   val dropwizard = "3.2.2"
   val typesafeConfig = "1.3.1"
+  val slf4j = "1.7.25"
+  val assertj = "3.8.0"
 }
 
 lazy val commonSettings = Seq(
@@ -78,7 +80,11 @@ lazy val core = (project in file("core")).
   settings(
     commonSettings,
     javaSettings,
-    name := "metrics-core"
+    name := "metrics-core",
+    libraryDependencies ++= Seq(
+      "org.slf4j" % "slf4j-api" % Versions.slf4j,
+      "org.assertj" % "assertj-core" % Versions.assertj % "test"
+    )
   ).dependsOn(api)
 
 lazy val dropwizardCommon = (project in file("dropwizard-common")).
@@ -88,7 +94,7 @@ lazy val dropwizardCommon = (project in file("dropwizard-common")).
     name := "metrics-dropwizard-common",
     libraryDependencies ++= Seq(
       "io.dropwizard.metrics" % "metrics-core" % Versions.dropwizard,
-      "org.slf4j" % "slf4j-api" % "1.7.22"
+      "org.slf4j" % "slf4j-api" % Versions.slf4j
     )
   ).dependsOn(core)
 
