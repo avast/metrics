@@ -2,12 +2,15 @@ package com.avast.metrics.dropwizard.formatting;
 
 import com.avast.metrics.api.Counter;
 import com.avast.metrics.dropwizard.formatting.fields.FieldsFormatting;
+import com.avast.metrics.filter.FilterConfig;
 import com.avast.metrics.filter.MetricsFilter;
 import com.typesafe.config.ConfigFactory;
 import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,7 +18,7 @@ public class FormattingMetricsMonitorTest {
     static final FieldsFormatting FIELDS_ALL_ENABLED = FieldsFormatting.fromConfig(ConfigFactory.load().getConfig("metricsFieldsFormattingAllEnabled"));
 
     private FormattingMetricsMonitor newMonitor() {
-        return new FormattingMetricsMonitor(new GraphiteFormatter());
+        return new FormattingMetricsMonitor(new GraphiteFormatter(), Collections.emptyList());
     }
 
     @Test
@@ -76,7 +79,7 @@ public class FormattingMetricsMonitorTest {
 
     @Test
     public void testTimerPairName() throws Exception {
-        try (FormattingMetricsMonitor monitor = new FormattingMetricsMonitor(new GraphiteFormatter())) {
+        try (FormattingMetricsMonitor monitor = new FormattingMetricsMonitor(new GraphiteFormatter(), Collections.emptyList())) {
             monitor.named("monitor").newTimerPair("timer.pair.x");
 
             String expected = "monitor.timer-pair-xFailures.count 0\n" +
@@ -197,6 +200,93 @@ public class FormattingMetricsMonitorTest {
     public void testNameSeparator() throws Exception {
         try (FormattingMetricsMonitor monitor = newMonitor()) {
             assertEquals(".", monitor.nameSeparator());
+        }
+    }
+
+    @Test
+    public void testNamePrefix() throws Exception {
+        try (FormattingMetricsMonitor monitor = new FormattingMetricsMonitor(
+                new GraphiteFormatter(), Arrays.asList("env", "dc", "app", "inst"))) {
+            monitor.named("monitor").newCounter("counter");
+            monitor.named("monitor").newGauge("gauge", () -> 0);
+            monitor.named("monitor").newMeter("meter");
+            monitor.named("monitor").newTimer("timer");
+            monitor.named("monitor").newHistogram("histogram");
+
+            String expected = "env.dc.app.inst.monitor.counter.count 0\n" +
+                    "env.dc.app.inst.monitor.gauge.value 0\n" +
+                    "env.dc.app.inst.monitor.histogram.count 0\n" +
+                    "env.dc.app.inst.monitor.histogram.max 0\n" +
+                    "env.dc.app.inst.monitor.histogram.mean 0.0\n" +
+                    "env.dc.app.inst.monitor.histogram.min 0\n" +
+                    "env.dc.app.inst.monitor.histogram.p50 0.0\n" +
+                    "env.dc.app.inst.monitor.histogram.p99 0.0\n" +
+                    "env.dc.app.inst.monitor.histogram.stddev 0.0\n" +
+                    "env.dc.app.inst.monitor.meter.count 0\n" +
+                    "env.dc.app.inst.monitor.meter.rate15m 0.0\n" +
+                    "env.dc.app.inst.monitor.meter.rate1m 0.0\n" +
+                    "env.dc.app.inst.monitor.meter.rate5m 0.0\n" +
+                    "env.dc.app.inst.monitor.meter.ratemean 0.0\n" +
+                    "env.dc.app.inst.monitor.timer.count 0\n" +
+                    "env.dc.app.inst.monitor.timer.max 0\n" +
+                    "env.dc.app.inst.monitor.timer.mean 0.0\n" +
+                    "env.dc.app.inst.monitor.timer.min 0\n" +
+                    "env.dc.app.inst.monitor.timer.p50 0.0\n" +
+                    "env.dc.app.inst.monitor.timer.p99 0.0\n" +
+                    "env.dc.app.inst.monitor.timer.rate15m 0.0\n" +
+                    "env.dc.app.inst.monitor.timer.rate1m 0.0\n" +
+                    "env.dc.app.inst.monitor.timer.rate5m 0.0\n" +
+                    "env.dc.app.inst.monitor.timer.ratemean 0.0\n" +
+                    "env.dc.app.inst.monitor.timer.stddev 0.0";
+
+            assertEquals(expected, monitor.format(MetricsFilter.ALL_ENABLED, FormattingMetricsMonitorTest.FIELDS_ALL_ENABLED));
+        }
+    }
+
+    @Test
+    public void testNamePrefix_FilterWithoutPrefix() throws Exception {
+        try (FormattingMetricsMonitor monitor = new FormattingMetricsMonitor(
+                new GraphiteFormatter(), Arrays.asList("env", "dc", "app", "inst"))) {
+            monitor.named("monitor").newCounter("counter");
+            monitor.named("monitor").newGauge("gauge", () -> 0);
+            monitor.named("monitor").newMeter("meter");
+            monitor.named("monitor").newTimer("timer");
+            monitor.named("monitor").newHistogram("histogram");
+
+            // Filter histogram out
+            MetricsFilter filter = MetricsFilter.newInstance(
+                    Arrays.asList(
+                            new FilterConfig(MetricsFilter.ROOT_FILTER_NAME, true),
+                            new FilterConfig("monitor.histogram", false)),
+                    monitor.nameSeparator());
+
+            String expected = "env.dc.app.inst.monitor.counter.count 0\n" +
+                    "env.dc.app.inst.monitor.gauge.value 0\n" +
+                    // "env.dc.app.inst.monitor.histogram.count 0\n" +
+                    // "env.dc.app.inst.monitor.histogram.max 0\n" +
+                    // "env.dc.app.inst.monitor.histogram.mean 0.0\n" +
+                    // "env.dc.app.inst.monitor.histogram.min 0\n" +
+                    // "env.dc.app.inst.monitor.histogram.p50 0.0\n" +
+                    // "env.dc.app.inst.monitor.histogram.p99 0.0\n" +
+                    // "env.dc.app.inst.monitor.histogram.stddev 0.0\n" +
+                    "env.dc.app.inst.monitor.meter.count 0\n" +
+                    "env.dc.app.inst.monitor.meter.rate15m 0.0\n" +
+                    "env.dc.app.inst.monitor.meter.rate1m 0.0\n" +
+                    "env.dc.app.inst.monitor.meter.rate5m 0.0\n" +
+                    "env.dc.app.inst.monitor.meter.ratemean 0.0\n" +
+                    "env.dc.app.inst.monitor.timer.count 0\n" +
+                    "env.dc.app.inst.monitor.timer.max 0\n" +
+                    "env.dc.app.inst.monitor.timer.mean 0.0\n" +
+                    "env.dc.app.inst.monitor.timer.min 0\n" +
+                    "env.dc.app.inst.monitor.timer.p50 0.0\n" +
+                    "env.dc.app.inst.monitor.timer.p99 0.0\n" +
+                    "env.dc.app.inst.monitor.timer.rate15m 0.0\n" +
+                    "env.dc.app.inst.monitor.timer.rate1m 0.0\n" +
+                    "env.dc.app.inst.monitor.timer.rate5m 0.0\n" +
+                    "env.dc.app.inst.monitor.timer.ratemean 0.0\n" +
+                    "env.dc.app.inst.monitor.timer.stddev 0.0";
+
+            assertEquals(expected, monitor.format(filter, FormattingMetricsMonitorTest.FIELDS_ALL_ENABLED));
         }
     }
 }

@@ -3,6 +3,7 @@ package com.avast.metrics.dropwizard.formatting;
 import com.avast.metrics.filter.MetricsFilter;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
@@ -33,7 +34,7 @@ public class PrometheusFormatterTest {
 
     @Test
     public void testWithFormattingMonitor() throws Exception {
-        try (FormattingMetricsMonitor monitor = new FormattingMetricsMonitor(formatter)) {
+        try (FormattingMetricsMonitor monitor = new FormattingMetricsMonitor(formatter, Collections.emptyList())) {
             monitor.named("monitor").newCounter("counter");
             monitor.named("monitor").newGauge("gauge", () -> 0);
             monitor.named("monitor").newMeter("meter");
