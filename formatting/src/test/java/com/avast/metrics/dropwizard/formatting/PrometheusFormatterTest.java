@@ -17,6 +17,11 @@ public class PrometheusFormatterTest {
                 formatter.sanitizeName(". :|@\n=()abcdefgh_. :|@\n=()abcdefgh_"));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testSanitizeEmpty() throws Exception {
+        formatter.sanitizeName(""); // Exception
+    }
+
     @Test
     public void testFormat() throws Exception {
         Stream<MetricValue> values = Stream.of(

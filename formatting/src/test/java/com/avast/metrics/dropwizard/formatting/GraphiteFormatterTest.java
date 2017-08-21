@@ -17,6 +17,11 @@ public class GraphiteFormatterTest {
                 formatter.sanitizeName(". :|@\n=()abcdefgh. :|@\n=()abcdefgh"));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testSanitizeEmpty() throws Exception {
+        formatter.sanitizeName(""); // Exception
+    }
+
     @Test
     public void testFormat() throws Exception {
         Stream<MetricValue> values = Stream.of(
