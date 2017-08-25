@@ -1,10 +1,8 @@
 package com.avast.metrics.statsd;
 
 import com.avast.metrics.TimerPairImpl;
-import com.avast.metrics.api.Metric;
-import com.avast.metrics.api.Monitor;
-import com.avast.metrics.api.Naming;
-import com.avast.metrics.api.TimerPair;
+import com.avast.metrics.api.*;
+import com.avast.metrics.api.Timer;
 import com.timgroup.statsd.NonBlockingStatsDClient;
 import com.timgroup.statsd.StatsDClient;
 
@@ -83,7 +81,11 @@ public class StatsDMetricsMonitor implements Monitor {
 
     @Override
     public StatsDMeter newMeter(final String name) {
-        return new StatsDMeter(client, constructMetricName(name));
+        return newMeter(name, 1.0);
+    }
+
+    public StatsDMeter newMeter(String name, double sampleRate) {
+        return new StatsDMeter(client, constructMetricName(name), sampleRate);
     }
 
     @Override
@@ -91,26 +93,46 @@ public class StatsDMetricsMonitor implements Monitor {
         return new StatsDCounter(client, constructMetricName(name));
     }
 
+    public Counter newCounter(String name, double sampleRate) {
+        return new StatsDCounter(client, constructMetricName(name), sampleRate);
+    }
+
     @Override
     public StatsDTimer newTimer(final String name) {
-        return new StatsDTimer(client, constructMetricName(name));
+        return newTimer(name, 1.0);
+    }
+
+    public StatsDTimer newTimer(String name, double sampleRate) {
+        return new StatsDTimer(client, constructMetricName(name), sampleRate);
     }
 
     @Override
     public TimerPair newTimerPair(final String name) {
+        return newTimerPair(name, 1.0);
+    }
+
+    public TimerPair newTimerPair(String name, double sampleRate) {
         return new TimerPairImpl(
-                newTimer(naming.successTimerName(name)),
-                newTimer(naming.failureTimerName(name))
+                newTimer(naming.successTimerName(name), sampleRate),
+                newTimer(naming.failureTimerName(name), sampleRate)
         );
     }
 
     @Override
     public <T> StatsDGauge<T> newGauge(final String name, final Supplier<T> gauge) {
-        return newGauge(name, false, gauge);
+        return newGauge(name, false, gauge, 1.0);
+    }
+
+    public <T> Gauge<T> newGauge(final String name, final Supplier<T> gauge, double sampleRate) {
+        return newGauge(name, false, gauge, sampleRate);
     }
 
     @Override
     public <T> StatsDGauge<T> newGauge(final String name, final boolean replaceExisting, final Supplier<T> supplier) {
+        return newGauge(name, replaceExisting, supplier, 1.0);
+    }
+
+    public <T> Gauge<T> newGauge(final String name, final boolean replaceExisting, final Supplier<T> supplier, double sampleRate) {
         final String finalName = constructMetricName(name);
 
         synchronized (gauges) {
@@ -122,7 +144,7 @@ public class StatsDMetricsMonitor implements Monitor {
                 existing.cancel(false);
             }
 
-            final StatsDGauge<T> gauge = new StatsDGauge<>(client, finalName, supplier);
+            final StatsDGauge<T> gauge = new StatsDGauge<>(client, finalName, supplier, sampleRate);
 
             final ScheduledFuture<?> scheduled = scheduler.scheduleAtFixedRate(gauge::send, 0, gaugeSendPeriod.toMillis(), TimeUnit.MILLISECONDS);
 
