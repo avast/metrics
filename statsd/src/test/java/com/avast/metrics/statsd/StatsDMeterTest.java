@@ -20,7 +20,7 @@ public class StatsDMeterTest {
             meter.mark();
         }
 
-        verify(client, times(5)).count(Matchers.eq(name), Matchers.anyLong(), Matchers.<String>anyVararg());
+        verify(client, times(5)).count(Matchers.eq(name), Matchers.anyLong(), Matchers.anyDouble(), Matchers.<String>anyVararg());
         assertEquals(5, meter.count());
     }
 }

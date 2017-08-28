@@ -15,11 +15,17 @@ public class StatsDGauge<T> implements Gauge<T> {
     private final StatsDClient client;
     private final String name;
     private final Supplier<T> supplier;
+    private double sampleRate;
 
     StatsDGauge(final StatsDClient client, final String name, final Supplier<T> supplier) {
+        this(client, name, supplier, 1.0);
+    }
+
+    StatsDGauge(final StatsDClient client, final String name, final Supplier<T> supplier, double sampleRate) {
         this.client = client;
         this.name = name;
         this.supplier = supplier;
+        this.sampleRate = sampleRate;
     }
 
     @Override
@@ -57,11 +63,11 @@ public class StatsDGauge<T> implements Gauge<T> {
     }
 
     private void sendLongValue(long l) {
-        client.recordGaugeValue(name, l);
+        client.recordGaugeValue(name, l, sampleRate);
     }
 
     private void sendDoubleValue(double d) {
-        client.recordGaugeValue(name, d);
+        client.recordGaugeValue(name, d, sampleRate);
     }
 
     @Override
