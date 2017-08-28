@@ -1,10 +1,5 @@
 package com.avast.metrics.dropwizard.formatting;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Comparator;
-import java.util.Locale;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -58,29 +53,14 @@ public class GraphiteFormatter implements Formatter {
     }
 
     @Override
-    public String formatNumber(long number) {
-        return Long.toString(number);
+    public String contentType() {
+        return "text/plain";
     }
 
     @Override
-    public String formatNumber(double number) {
-        return String.format(Locale.ENGLISH, "%s", number);
-    }
-
-    @Override
-    public String format(Stream<MetricValues> metrics) {
+    public String format(Stream<MetricValue> metrics) {
         return metrics
-                .flatMap(this::formatValues)
+                .map(metric -> metric.getName() + SEPARATOR_NAME_VALUE + metric.getValue())
                 .collect(Collectors.joining(SEPARATOR_METRICS));
-    }
-
-    private Stream<String> formatValues(MetricValues values) {
-        return values
-                .getFieldsValues()
-                .entrySet()
-                .stream()
-                .sorted(Comparator.comparing(Map.Entry::getKey))
-                .map(fieldValue -> values.getName() + SEPARATOR_NAME_PARTS + fieldValue.getKey()
-                        + SEPARATOR_NAME_VALUE + fieldValue.getValue());
     }
 }

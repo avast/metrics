@@ -3,10 +3,10 @@ package com.avast.metrics.dropwizard.formatting;
 import com.avast.metrics.api.*;
 import com.avast.metrics.api.Timer;
 import com.avast.metrics.dropwizard.MetricsMonitor;
-import com.avast.metrics.dropwizard.formatting.config.FieldsFormatting;
-import com.avast.metrics.dropwizard.formatting.config.HistogramFormatting;
-import com.avast.metrics.dropwizard.formatting.config.MeterFormatting;
-import com.avast.metrics.dropwizard.formatting.config.TimerFormatting;
+import com.avast.metrics.dropwizard.formatting.fields.FieldsFormatting;
+import com.avast.metrics.dropwizard.formatting.fields.HistogramFormatting;
+import com.avast.metrics.dropwizard.formatting.fields.MeterFormatting;
+import com.avast.metrics.dropwizard.formatting.fields.TimerFormatting;
 import com.avast.metrics.filter.MetricsFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Snapshot;
@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 /**
  * Metrics monitor that formats names and values of the monitored objects.
  */
+@SuppressWarnings("WeakerAccess")
 public class FormattingMetricsMonitor extends MetricsMonitor {
     private final Formatter formatter;
 
@@ -99,7 +100,7 @@ public class FormattingMetricsMonitor extends MetricsMonitor {
     /**
      * Implementation in parent class can be considered broken from contract point of view. It uses hardcoded "/" as a
      * separator. The unexpected behavior is needed by JmxMetricsMonitor that internally uses group of unusual characters.
-     *
+     * <p>
      * TODO: Define expected behavior by writing contract of MetricsMonitor.getName(), optionally refactor all related code.
      */
     @Override
@@ -107,19 +108,27 @@ public class FormattingMetricsMonitor extends MetricsMonitor {
         return constructMetricName(Optional.empty(), separator());
     }
 
+    public String nameSeparator() {
+        return formatter.nameSeparator();
+    }
+
+    public String contentType() {
+        return formatter.contentType();
+    }
+
     public String format(MetricsFilter filter, FieldsFormatting fieldsFormatting) {
-        Stream<MetricValues> metrics = registry.getMetrics()
+        Stream<MetricValue> metrics = registry.getMetrics()
                 .entrySet()
                 .stream()
                 .filter(entry -> filter.isEnabled(entry.getKey()))
-                .map(entry -> toMetricValue(entry.getKey(), entry.getValue(), fieldsFormatting))
-                .filter(values -> !values.getFieldsValues().isEmpty())
-                .sorted(Comparator.comparing(MetricValues::getName));
+                .flatMap(entry -> toMetricValue(entry.getKey(), entry.getValue(), fieldsFormatting))
+                .sorted(Comparator.comparing(MetricValue::getName));
 
         return formatter.format(metrics);
     }
 
-    private MetricValues toMetricValue(String name, com.codahale.metrics.Metric metric, FieldsFormatting fieldsFormatting) {
+    private Stream<MetricValue> toMetricValue(String name, com.codahale.metrics.Metric metric,
+                                              FieldsFormatting fieldsFormatting) {
         if (metric instanceof com.codahale.metrics.Counter) {
             return mapCounter(name, (com.codahale.metrics.Counter) metric, fieldsFormatting);
         } else if (metric instanceof com.codahale.metrics.Gauge) {
@@ -132,99 +141,118 @@ public class FormattingMetricsMonitor extends MetricsMonitor {
             return mapTimer(name, (com.codahale.metrics.Timer) metric, fieldsFormatting);
         } else {
             LOGGER.error("Unexpected metric class: {}", metric.getClass());
-            return new MetricValues(name, Collections.emptyMap());
+            return Stream.empty();
         }
     }
 
-    private MetricValues mapCounter(String name, com.codahale.metrics.Counter counter, FieldsFormatting fieldsFormatting) {
+    private Stream<MetricValue> mapCounter(String name, com.codahale.metrics.Counter counter,
+                                           FieldsFormatting fieldsFormatting) {
         if (fieldsFormatting.getCounter().isCount()) {
-            return new MetricValues(name, Collections.singletonMap("count", formatter.formatNumber(counter.getCount())));
+            return Stream.of(new MetricValue(appendName(name, "count"), formatter.formatNumber(counter.getCount())));
         } else {
-            return new MetricValues(name, Collections.emptyMap());
+            return Stream.empty();
         }
     }
 
-    private MetricValues mapGauge(String name, com.codahale.metrics.Gauge gauge, FieldsFormatting fieldsFormatting) {
+    private Stream<MetricValue> mapGauge(String name, com.codahale.metrics.Gauge gauge,
+                                         FieldsFormatting fieldsFormatting) {
         if (fieldsFormatting.getGauge().isValue()) {
-            return new MetricValues(name, Collections.singletonMap("value", formatter.formatObject(gauge.getValue())));
+            return Stream.of(new MetricValue(appendName(name, "value"), formatter.formatObject(gauge.getValue())));
         } else {
-            return new MetricValues(name, Collections.emptyMap());
+            return Stream.empty();
         }
     }
 
-    private MetricValues mapMeter(String name, com.codahale.metrics.Meter meter, FieldsFormatting fieldsFormatting) {
+    private Stream<MetricValue> mapMeter(String name, com.codahale.metrics.Meter meter,
+                                         FieldsFormatting fieldsFormatting) {
         MeterFormatting meterFormatting = fieldsFormatting.getMeter();
-        Map<String, String> fieldsValues = new HashMap<>();
+        List<MetricValue> values = new LinkedList<>();
 
         if (meterFormatting.isCount())
-            fieldsValues.put("count", formatter.formatNumber(meter.getCount()));
+            values.add(new MetricValue(appendName(name, "count"), formatter.formatNumber(meter.getCount())));
         if (meterFormatting.isMean())
-            fieldsValues.put("mean", formatter.formatNumber(meter.getMeanRate()));
+            values.add(new MetricValue(appendName(name, "ratemean"), formatter.formatNumber(meter.getMeanRate())));
         if (meterFormatting.isOneMinuteRate())
-            fieldsValues.put("m1", formatter.formatNumber(meter.getOneMinuteRate()));
+            values.add(new MetricValue(appendName(name, "rate1m"), formatter.formatNumber(meter.getOneMinuteRate())));
         if (meterFormatting.isFiveMinuteRate())
-            fieldsValues.put("m5", formatter.formatNumber(meter.getFiveMinuteRate()));
+            values.add(new MetricValue(appendName(name, "rate5m"), formatter.formatNumber(meter.getFiveMinuteRate())));
         if (meterFormatting.isFifteenMinuteRate())
-            fieldsValues.put("m15", formatter.formatNumber(meter.getFifteenMinuteRate()));
+            values.add(new MetricValue(appendName(name, "rate15m"), formatter.formatNumber(meter.getFifteenMinuteRate())));
 
-        return new MetricValues(name, fieldsValues);
+        return values.stream();
     }
 
-    private MetricValues mapHistogram(String name, com.codahale.metrics.Histogram histogram, FieldsFormatting fieldsFormatting) {
+    private Stream<MetricValue> mapHistogram(String name, com.codahale.metrics.Histogram histogram,
+                                             FieldsFormatting fieldsFormatting) {
         HistogramFormatting histogramFormatting = fieldsFormatting.getHistogram();
         Snapshot snapshot = histogram.getSnapshot();
-        Map<String, String> fieldsValues = new HashMap<>();
+        List<MetricValue> values = new LinkedList<>();
 
         if (histogramFormatting.isCount())
-            fieldsValues.put("count", formatter.formatNumber(histogram.getCount()));
+            values.add(new MetricValue(appendName(name, "count"), formatter.formatNumber(histogram.getCount())));
         if (histogramFormatting.isMin())
-            fieldsValues.put("min", formatter.formatNumber(snapshot.getMin()));
+            values.add(new MetricValue(appendName(name, "min"), formatter.formatNumber(snapshot.getMin())));
         if (histogramFormatting.isMax())
-            fieldsValues.put("max", formatter.formatNumber(snapshot.getMax()));
+            values.add(new MetricValue(appendName(name, "max"), formatter.formatNumber(snapshot.getMax())));
         if (histogramFormatting.isMean())
-            fieldsValues.put("mean", formatter.formatNumber(snapshot.getMean()));
+            values.add(new MetricValue(appendName(name, "mean"), formatter.formatNumber(snapshot.getMean())));
         if (histogramFormatting.isStdDev())
-            fieldsValues.put("stddev", formatter.formatNumber(snapshot.getStdDev()));
+            values.add(new MetricValue(appendName(name, "stddev"), formatter.formatNumber(snapshot.getStdDev())));
 
         histogramFormatting
                 .getPercentiles()
-                .forEach(percentile -> fieldsValues.put(percentileName(percentile), formatter.formatNumber(snapshot.getValue(percentile))));
+                .forEach(percentile ->
+                        values.add(new MetricValue(appendName(name, percentileName(percentile)),
+                                formatter.formatNumber(snapshot.getValue(percentile)))));
 
-        return new MetricValues(name, fieldsValues);
+        return values.stream();
     }
 
-    private MetricValues mapTimer(String name, com.codahale.metrics.Timer timer, FieldsFormatting fieldsFormatting) {
+    private Stream<MetricValue> mapTimer(String name, com.codahale.metrics.Timer timer, FieldsFormatting fieldsFormatting) {
         TimerFormatting timerFormatting = fieldsFormatting.getTimer();
         Snapshot snapshot = timer.getSnapshot();
-        Map<String, String> fieldsValues = new HashMap<>();
+        List<MetricValue> values = new LinkedList<>();
 
         if (timerFormatting.isCount())
-            fieldsValues.put("count", formatter.formatNumber(timer.getCount()));
+            values.add(new MetricValue(appendName(name, "count"), formatter.formatNumber(timer.getCount())));
         if (timerFormatting.isMean())
-            fieldsValues.put("mean", formatter.formatNumber(timer.getMeanRate()));
+            values.add(new MetricValue(appendName(name, "ratemean"), formatter.formatNumber(timer.getMeanRate())));
         if (timerFormatting.isOneMinuteRate())
-            fieldsValues.put("m1", formatter.formatNumber(timer.getOneMinuteRate()));
+            values.add(new MetricValue(appendName(name, "rate1m"), formatter.formatNumber(timer.getOneMinuteRate())));
         if (timerFormatting.isFiveMinuteRate())
-            fieldsValues.put("m5", formatter.formatNumber(timer.getFiveMinuteRate()));
+            values.add(new MetricValue(appendName(name, "rate5m"), formatter.formatNumber(timer.getFiveMinuteRate())));
         if (timerFormatting.isFifteenMinuteRate())
-            fieldsValues.put("m15", formatter.formatNumber(timer.getFifteenMinuteRate()));
+            values.add(new MetricValue(appendName(name, "rate15m"), formatter.formatNumber(timer.getFifteenMinuteRate())));
         if (timerFormatting.isMin())
-            fieldsValues.put("min", formatter.formatNumber(snapshot.getMin()));
+            values.add(new MetricValue(appendName(name, "min"), formatter.formatNumber(snapshot.getMin())));
         if (timerFormatting.isMax())
-            fieldsValues.put("max", formatter.formatNumber(snapshot.getMax()));
+            values.add(new MetricValue(appendName(name, "max"), formatter.formatNumber(snapshot.getMax())));
         if (timerFormatting.isMean())
-            fieldsValues.put("mean", formatter.formatNumber(snapshot.getMean()));
+            values.add(new MetricValue(appendName(name, "mean"), formatter.formatNumber(snapshot.getMean())));
         if (timerFormatting.isStdDev())
-            fieldsValues.put("stddev", formatter.formatNumber(snapshot.getStdDev()));
+            values.add(new MetricValue(appendName(name, "stddev"), formatter.formatNumber(snapshot.getStdDev())));
 
         timerFormatting
                 .getPercentiles()
-                .forEach(percentile -> fieldsValues.put(percentileName(percentile), formatter.formatNumber(snapshot.getValue(percentile))));
+                .forEach(percentile ->
+                        values.add(new MetricValue(appendName(name, percentileName(percentile)),
+                                formatter.formatNumber(snapshot.getValue(percentile)))));
 
-        return new MetricValues(name, fieldsValues);
+        return values.stream();
     }
 
     private String percentileName(Double percentile) {
-        return formatter.sanitizeName(String.format(Locale.ENGLISH, "p%s", percentile * 100));
+        double percent = percentile * 100;
+
+        // https://stackoverflow.com/questions/15963895/how-to-check-if-a-double-value-has-no-decimal-part
+        if (percent % 1 == 0) {
+            return formatter.sanitizeName(String.format(Locale.ENGLISH, "p%.0f", percent));
+        } else {
+            return formatter.sanitizeName(String.format(Locale.ENGLISH, "p%s", percent));
+        }
+    }
+
+    private String appendName(String base, String part) {
+        return base + formatter.nameSeparator() + part;
     }
 }

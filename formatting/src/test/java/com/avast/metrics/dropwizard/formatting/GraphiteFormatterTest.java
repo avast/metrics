@@ -1,8 +1,9 @@
 package com.avast.metrics.dropwizard.formatting;
 
+import com.avast.metrics.filter.MetricsFilter;
 import org.junit.Test;
 
-import java.util.Locale;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,62 +16,68 @@ public class GraphiteFormatterTest {
                 formatter.sanitizeName(". :|@\n=()abcdefgh. :|@\n=()abcdefgh"));
     }
 
-    private void testFormatDoubleWithChangedDefaultLocale(Locale locale) throws Exception {
-        Locale.setDefault(locale);
-        assertEquals("0.0", formatter.formatNumber(0.0));
-        assertEquals("1.0", formatter.formatNumber(1.0));
-        assertEquals("-1.0", formatter.formatNumber(-1.0));
-        assertEquals("3.14", formatter.formatNumber(3.14));
-        assertEquals("3.141592653589793", formatter.formatNumber(Math.PI));
-        assertEquals("1.7976931348623157E308", formatter.formatNumber(Double.MAX_VALUE));
-        assertEquals("4.9E-324", formatter.formatNumber(Double.MIN_VALUE));
-        assertEquals("NaN", formatter.formatNumber(Double.NaN));
-        assertEquals("Infinity", formatter.formatNumber(Double.POSITIVE_INFINITY));
-        assertEquals("-Infinity", formatter.formatNumber(Double.NEGATIVE_INFINITY));
+    @Test
+    public void testFormat() throws Exception {
+        Stream<MetricValue> values = Stream.of(
+                new MetricValue("name.a", "valueA"),
+                new MetricValue("name.b", "valueB"),
+                new MetricValue("name.c", "valueC")
+        );
+
+        String expected = "name.a valueA\n" +
+                "name.b valueB\n" +
+                "name.c valueC";
+
+        assertEquals(expected, formatter.format(values));
     }
 
     @Test
-    public void testFormatDouble() throws Exception {
-        Locale defaultLocale = Locale.getDefault();
-        testFormatDoubleWithChangedDefaultLocale(Locale.ENGLISH);
-        testFormatDoubleWithChangedDefaultLocale(Locale.GERMAN);
-        testFormatDoubleWithChangedDefaultLocale(Locale.FRENCH);
-        testFormatDoubleWithChangedDefaultLocale(Locale.CHINESE);
-        testFormatDoubleWithChangedDefaultLocale(defaultLocale);
-    }
+    public void testWithFormattingMonitor() throws Exception {
+        try (FormattingMetricsMonitor monitor = new FormattingMetricsMonitor(formatter)) {
+            monitor.named("monitor").newCounter("counter");
+            monitor.named("monitor").newGauge("gauge", () -> 0);
+            monitor.named("monitor").newMeter("meter");
+            monitor.named("monitor").newTimer("timer");
+            monitor.named("monitor").newHistogram("histogram");
 
-    private void testFormatLongWithChangedDefaultLocale(Locale locale) throws Exception {
-        Locale.setDefault(locale);
-        assertEquals("0", formatter.formatNumber(0L));
-        assertEquals("1", formatter.formatNumber(1L));
-        assertEquals("-1", formatter.formatNumber(-1L));
-        assertEquals("9223372036854775807", formatter.formatNumber(Long.MAX_VALUE));
-        assertEquals("-9223372036854775808", formatter.formatNumber(Long.MIN_VALUE));
+            String expected = "monitor.counter.count 0\n" +
+                    "monitor.gauge.value 0\n" +
+                    "monitor.histogram.count 0\n" +
+                    "monitor.histogram.max 0\n" +
+                    "monitor.histogram.mean 0.0\n" +
+                    "monitor.histogram.min 0\n" +
+                    "monitor.histogram.p50 0.0\n" +
+                    "monitor.histogram.p99 0.0\n" +
+                    "monitor.histogram.stddev 0.0\n" +
+                    "monitor.meter.count 0\n" +
+                    "monitor.meter.rate15m 0.0\n" +
+                    "monitor.meter.rate1m 0.0\n" +
+                    "monitor.meter.rate5m 0.0\n" +
+                    "monitor.meter.ratemean 0.0\n" +
+                    "monitor.timer.count 0\n" +
+                    "monitor.timer.max 0\n" +
+                    "monitor.timer.mean 0.0\n" +
+                    "monitor.timer.min 0\n" +
+                    "monitor.timer.p50 0.0\n" +
+                    "monitor.timer.p99 0.0\n" +
+                    "monitor.timer.rate15m 0.0\n" +
+                    "monitor.timer.rate1m 0.0\n" +
+                    "monitor.timer.rate5m 0.0\n" +
+                    "monitor.timer.ratemean 0.0\n" +
+                    "monitor.timer.stddev 0.0";
+
+            assertEquals(expected, monitor.format(MetricsFilter.ALL_ENABLED, FormattingMetricsMonitorTest.FIELDS_ALL_ENABLED));
+        }
     }
 
     @Test
-    public void testFormatLong() throws Exception {
-        Locale defaultLocale = Locale.getDefault();
-        testFormatLongWithChangedDefaultLocale(Locale.ENGLISH);
-        testFormatLongWithChangedDefaultLocale(Locale.GERMAN);
-        testFormatLongWithChangedDefaultLocale(Locale.FRENCH);
-        testFormatLongWithChangedDefaultLocale(Locale.CHINESE);
-        testFormatLongWithChangedDefaultLocale(defaultLocale);
+    public void testNoMetric() throws Exception {
+        Stream<MetricValue> values = Stream.empty();
+        assertEquals("", formatter.format(values));
     }
 
     @Test
-    public void testFormatObject() throws Exception {
-        assertEquals("null", formatter.formatObject(null));
-        assertEquals("4", formatter.formatObject(4));
-        assertEquals("4.2", formatter.formatObject(4.2));
-        assertEquals("a", formatter.formatObject('a'));
-        assertEquals("1", formatter.formatObject(true));
-    }
-
-    @Test
-    public void testFormatObjectUnsupported() throws Exception {
-        assertEquals("unsupported", formatter.formatObject("a\nb\nc"));
-        assertEquals("unsupported", formatter.formatObject("vrku vrku"));
-        assertEquals("unsupported", formatter.formatObject("buuuu"));
+    public void testContentType() throws Exception {
+        assertEquals("text/plain", formatter.contentType());
     }
 }

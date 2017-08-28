@@ -1,7 +1,7 @@
 package com.avast.metrics.dropwizard.formatting;
 
 import com.avast.metrics.api.Counter;
-import com.avast.metrics.dropwizard.formatting.config.FieldsFormatting;
+import com.avast.metrics.dropwizard.formatting.fields.FieldsFormatting;
 import com.avast.metrics.filter.MetricsFilter;
 import com.typesafe.config.ConfigFactory;
 import org.junit.Test;
@@ -12,7 +12,7 @@ import java.math.BigInteger;
 import static org.junit.Assert.assertEquals;
 
 public class FormattingMetricsMonitorTest {
-    private static final FieldsFormatting FIELDS_ALL_ENABLED = FieldsFormatting.fromConfig(ConfigFactory.load().getConfig("metricsFieldsFormattingAllEnabled"));
+    static final FieldsFormatting FIELDS_ALL_ENABLED = FieldsFormatting.fromConfig(ConfigFactory.load().getConfig("metricsFieldsFormattingAllEnabled"));
 
     private FormattingMetricsMonitor newMonitor() {
         return new FormattingMetricsMonitor(new GraphiteFormatter());
@@ -80,24 +80,26 @@ public class FormattingMetricsMonitorTest {
             monitor.named("monitor").newTimerPair("timer.pair.x");
 
             String expected = "monitor.timer-pair-xFailures.count 0\n" +
-                    "monitor.timer-pair-xFailures.m1 0.0\n" +
-                    "monitor.timer-pair-xFailures.m15 0.0\n" +
-                    "monitor.timer-pair-xFailures.m5 0.0\n" +
                     "monitor.timer-pair-xFailures.max 0\n" +
                     "monitor.timer-pair-xFailures.mean 0.0\n" +
                     "monitor.timer-pair-xFailures.min 0\n" +
-                    "monitor.timer-pair-xFailures.p50-0 0.0\n" +
-                    "monitor.timer-pair-xFailures.p99-0 0.0\n" +
+                    "monitor.timer-pair-xFailures.p50 0.0\n" +
+                    "monitor.timer-pair-xFailures.p99 0.0\n" +
+                    "monitor.timer-pair-xFailures.rate15m 0.0\n" +
+                    "monitor.timer-pair-xFailures.rate1m 0.0\n" +
+                    "monitor.timer-pair-xFailures.rate5m 0.0\n" +
+                    "monitor.timer-pair-xFailures.ratemean 0.0\n" +
                     "monitor.timer-pair-xFailures.stddev 0.0\n" +
                     "monitor.timer-pair-xSuccesses.count 0\n" +
-                    "monitor.timer-pair-xSuccesses.m1 0.0\n" +
-                    "monitor.timer-pair-xSuccesses.m15 0.0\n" +
-                    "monitor.timer-pair-xSuccesses.m5 0.0\n" +
                     "monitor.timer-pair-xSuccesses.max 0\n" +
                     "monitor.timer-pair-xSuccesses.mean 0.0\n" +
                     "monitor.timer-pair-xSuccesses.min 0\n" +
-                    "monitor.timer-pair-xSuccesses.p50-0 0.0\n" +
-                    "monitor.timer-pair-xSuccesses.p99-0 0.0\n" +
+                    "monitor.timer-pair-xSuccesses.p50 0.0\n" +
+                    "monitor.timer-pair-xSuccesses.p99 0.0\n" +
+                    "monitor.timer-pair-xSuccesses.rate15m 0.0\n" +
+                    "monitor.timer-pair-xSuccesses.rate1m 0.0\n" +
+                    "monitor.timer-pair-xSuccesses.rate5m 0.0\n" +
+                    "monitor.timer-pair-xSuccesses.ratemean 0.0\n" +
                     "monitor.timer-pair-xSuccesses.stddev 0.0";
 
             assertEquals(expected, monitor.format(MetricsFilter.ALL_ENABLED, FIELDS_ALL_ENABLED));
@@ -181,6 +183,20 @@ public class FormattingMetricsMonitorTest {
                     "gauge.short.value 3";
 
             assertEquals(expected, monitor.format(MetricsFilter.ALL_ENABLED, FIELDS_ALL_ENABLED));
+        }
+    }
+
+    @Test
+    public void testContentType() throws Exception {
+        try (FormattingMetricsMonitor monitor = newMonitor()) {
+            assertEquals("text/plain", monitor.contentType());
+        }
+    }
+
+    @Test
+    public void testNameSeparator() throws Exception {
+        try (FormattingMetricsMonitor monitor = newMonitor()) {
+            assertEquals(".", monitor.nameSeparator());
         }
     }
 }

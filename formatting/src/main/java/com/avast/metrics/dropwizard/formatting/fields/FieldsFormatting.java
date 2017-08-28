@@ -1,4 +1,4 @@
-package com.avast.metrics.dropwizard.formatting.config;
+package com.avast.metrics.dropwizard.formatting.fields;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigBeanFactory;
@@ -10,6 +10,12 @@ import com.typesafe.config.ConfigFactory;
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class FieldsFormatting {
     static final String SECTION_DEFAULTS = "metricsFieldsFormattingDefaults";
+
+    private static final FieldsFormatting DEFAULTS = fromConfig(ConfigFactory.defaultReference().getConfig(SECTION_DEFAULTS));
+
+    public static FieldsFormatting defaults() {
+        return DEFAULTS;
+    }
 
     public static FieldsFormatting fromConfig(Config config) {
         Config referenceConfig = ConfigFactory.defaultReference().getConfig(SECTION_DEFAULTS);
