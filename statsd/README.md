@@ -18,3 +18,11 @@ import com.avast.metrics.dropwizard._
 
 val rootMonitor = Monitor(new StatsDMetricsMonitor(statsDHost, statsDPort, prefix))
 ```
+
+StatsDMetricsMonitor supports sampling which prevents your statsd backend to be overloaded. It takes advantage of [statsd metrics format](https://github.com/etsy/statsd/blob/master/docs/metric_types.md) feature directly supported by statsd client libraries.
+
+To enable sampling on counter use following code (other metric types support sampling too):
+```java
+StatsDMetricsMonitor monitor = ...;
+monitor.newCounter("requests", 0.5);
+```
