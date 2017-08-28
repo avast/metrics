@@ -119,7 +119,7 @@ public class StatsDMetricsMonitor implements Monitor {
     }
 
     @Override
-    public <T> StatsDGauge<T> newGauge(final String name, final Supplier<T> gauge) {
+    public <T> Gauge<T> newGauge(final String name, final Supplier<T> gauge) {
         return newGauge(name, false, gauge, 1.0);
     }
 
@@ -128,7 +128,7 @@ public class StatsDMetricsMonitor implements Monitor {
     }
 
     @Override
-    public <T> StatsDGauge<T> newGauge(final String name, final boolean replaceExisting, final Supplier<T> supplier) {
+    public <T> Gauge<T> newGauge(final String name, final boolean replaceExisting, final Supplier<T> supplier) {
         return newGauge(name, replaceExisting, supplier, 1.0);
     }
 
