@@ -152,11 +152,11 @@ public class StatsDMetricsMonitor implements Monitor {
     public <T> Gauge<T> newGauge(final String name, final boolean replaceExisting, final Supplier<T> supplier) {
 
         final String metricName = constructMetricName(name);
-        final String finalName = constructMetricName(name);
+
 
         if (metricsFilter.isEnabled(metricName)) {
             synchronized (gauges) {
-                final ScheduledFuture<?> existing = gauges.get(finalName);
+                final ScheduledFuture<?> existing = gauges.get(metricName);
 
                 if (existing != null) {
                     if (!replaceExisting)
@@ -165,7 +165,7 @@ public class StatsDMetricsMonitor implements Monitor {
                     existing.cancel(false);
                 }
 
-                final StatsDGauge<T> gauge = new StatsDGauge<>(client, finalName, supplier);
+                final StatsDGauge<T> gauge = new StatsDGauge<>(client, metricName, supplier);
 
                 final ScheduledFuture<?> scheduled = scheduler.scheduleAtFixedRate(gauge::send, 0, gaugeSendPeriod.toMillis(), TimeUnit.MILLISECONDS);
 
