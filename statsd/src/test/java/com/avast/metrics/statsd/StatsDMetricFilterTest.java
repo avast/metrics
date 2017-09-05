@@ -20,44 +20,43 @@ public class StatsDMetricFilterTest {
     private final Class noopGaugeClazz = NoOpMonitor.INSTANCE.newGauge("testGauge", () -> "").getClass();
     private final Class noopHistogramClazz = NoOpMonitor.INSTANCE.newHistogram("testHistogram").getClass();
     private final Class noopTimerClazz = NoOpMonitor.INSTANCE.newTimer("testTimer").getClass();
-    private final Class noopTimePairClazz = NoOpMonitor.INSTANCE.newTimerPair("testTimePair").getClass();
 
     @Test
     public void testAllDisabled() {
-        StatsDMetricsMonitor monitor = new StatsDMetricsMonitor("localhost", 80, "test-app", MetricsFilter.ALL_DISABLED);
+        try (StatsDMetricsMonitor monitor = new StatsDMetricsMonitor("localhost", 80, "test-app", MetricsFilter.ALL_DISABLED)) {
+            Meter meter = monitor.newMeter("meter");
+            Counter counter = monitor.newCounter("counter");
+            Gauge gauge = monitor.newGauge("gauge", () -> "");
+            Histogram histogram = monitor.newHistogram("histogram");
+            Timer timer = monitor.newTimer("timer");
+            TimerPair timerPair = monitor.newTimerPair("timerPair");
 
-        Meter meter = monitor.newMeter("meter");
-        Counter counter = monitor.newCounter("counter");
-        Gauge gauge = monitor.newGauge("gauge", () -> "");
-        Histogram histogram = monitor.newHistogram("histogram");
-        Timer timer = monitor.newTimer("timer");
-        TimerPair timerPair = monitor.newTimerPair("timerPair");
-
-        assertTrue(meter.getClass().equals(noopMeterClazz));
-        assertTrue(counter.getClass().equals(noopCounterClazz));
-        assertTrue(gauge.getClass().equals(noopGaugeClazz));
-        assertTrue(histogram.getClass().equals(noopHistogramClazz));
-        assertTrue(timer.getClass().equals(noopTimerClazz));
-        assertTrue(timerPair.getClass().equals(noopTimePairClazz));
+            assertTrue(meter.getClass().equals(noopMeterClazz));
+            assertTrue(counter.getClass().equals(noopCounterClazz));
+            assertTrue(gauge.getClass().equals(noopGaugeClazz));
+            assertTrue(histogram.getClass().equals(noopHistogramClazz));
+            assertTrue(timer.getClass().equals(noopTimerClazz));
+            assertTrue(timerPair.getClass().equals(TimerPairImpl.class)); // no-op are timers inside
+        }
     }
 
     @Test
     public void testAllEnabled() {
-        StatsDMetricsMonitor monitor = new StatsDMetricsMonitor("localhost", 80, "test-app", MetricsFilter.ALL_ENABLED);
+        try (StatsDMetricsMonitor monitor = new StatsDMetricsMonitor("localhost", 80, "test-app", MetricsFilter.ALL_ENABLED)) {
+            Meter meter = monitor.newMeter("meter");
+            Counter counter = monitor.newCounter("counter");
+            Gauge gauge = monitor.newGauge("gauge", () -> "");
+            Histogram histogram = monitor.newHistogram("histogram");
+            Timer timer = monitor.newTimer("timer");
+            TimerPair timerPair = monitor.newTimerPair("timerPair");
 
-        Meter meter = monitor.newMeter("meter");
-        Counter counter = monitor.newCounter("counter");
-        Gauge gauge = monitor.newGauge("gauge", () -> "");
-        Histogram histogram = monitor.newHistogram("histogram");
-        Timer timer = monitor.newTimer("timer");
-        TimerPair timerPair = monitor.newTimerPair("timerPair");
-
-        assertTrue(meter.getClass().equals(StatsDMeter.class));
-        assertTrue(counter.getClass().equals(StatsDCounter.class));
-        assertTrue(gauge.getClass().equals(StatsDGauge.class));
-        assertTrue(histogram.getClass().equals(StatsDHistogram.class));
-        assertTrue(timer.getClass().equals(StatsDTimer.class));
-        assertTrue(timerPair.getClass().equals(TimerPairImpl.class));
+            assertTrue(meter.getClass().equals(StatsDMeter.class));
+            assertTrue(counter.getClass().equals(StatsDCounter.class));
+            assertTrue(gauge.getClass().equals(StatsDGauge.class));
+            assertTrue(histogram.getClass().equals(StatsDHistogram.class));
+            assertTrue(timer.getClass().equals(StatsDTimer.class));
+            assertTrue(timerPair.getClass().equals(TimerPairImpl.class));
+        }
     }
 
     @Test
@@ -66,21 +65,21 @@ public class StatsDMetricFilterTest {
         FilterConfig filterConfig = new FilterConfig("level1.level2", false);
         MetricsFilter metricsFilter = buildMetricsFilter(filterConfigRoot, filterConfig);
 
-        final StatsDMetricsMonitor monitor = buildMonitor(metricsFilter).named("level1");
+        try (final StatsDMetricsMonitor monitor = buildMonitor(metricsFilter).named("level1")) {
+            Meter meter = monitor.newMeter("level2");
+            Counter counter = monitor.newCounter("level2");
+            Gauge gauge = monitor.newGauge("level2", () -> "");
+            Histogram histogram = monitor.newHistogram("level2");
+            Timer timer = monitor.newTimer("level2");
+            TimerPair timerPair = monitor.newTimerPair("level2");
 
-        Meter meter = monitor.newMeter("level2");
-        Counter counter = monitor.newCounter("level2");
-        Gauge gauge = monitor.newGauge("level2", () -> "");
-        Histogram histogram = monitor.newHistogram("level2");
-        Timer timer = monitor.newTimer("level2");
-        TimerPair timerPair = monitor.newTimerPair("level2");
-
-        assertTrue(meter.getClass().equals(noopMeterClazz));
-        assertTrue(counter.getClass().equals(noopCounterClazz));
-        assertTrue(gauge.getClass().equals(noopGaugeClazz));
-        assertTrue(histogram.getClass().equals(noopHistogramClazz));
-        assertTrue(timer.getClass().equals(noopTimerClazz));
-        assertTrue(timerPair.getClass().equals(noopTimePairClazz));
+            assertTrue(meter.getClass().equals(noopMeterClazz));
+            assertTrue(counter.getClass().equals(noopCounterClazz));
+            assertTrue(gauge.getClass().equals(noopGaugeClazz));
+            assertTrue(histogram.getClass().equals(noopHistogramClazz));
+            assertTrue(timer.getClass().equals(noopTimerClazz));
+            assertTrue(timerPair.getClass().equals(TimerPairImpl.class)); // no-op are timers inside
+        }
     }
 
     @Test
@@ -89,22 +88,21 @@ public class StatsDMetricFilterTest {
         FilterConfig filterConfig = new FilterConfig("level1.level2", true);
         MetricsFilter metricsFilter = buildMetricsFilter(filterConfigRoot, filterConfig);
 
-        final StatsDMetricsMonitor monitor = buildMonitor(metricsFilter).named("level1");
+        try (final StatsDMetricsMonitor monitor = buildMonitor(metricsFilter).named("level1")) {
+            Meter meter = monitor.newMeter("level2");
+            Counter counter = monitor.newCounter("level2");
+            Gauge gauge = monitor.newGauge("level2", () -> "");
+            Histogram histogram = monitor.newHistogram("level2");
+            Timer timer = monitor.newTimer("level2");
+            TimerPair timerPair = monitor.newTimerPair("level2");
 
-
-        Meter meter = monitor.newMeter("level2");
-        Counter counter = monitor.newCounter("level2");
-        Gauge gauge = monitor.newGauge("level2", () -> "");
-        Histogram histogram = monitor.newHistogram("level2");
-        Timer timer = monitor.newTimer("level2");
-        TimerPair timerPair = monitor.newTimerPair("level2");
-
-        assertTrue(meter.getClass().equals(StatsDMeter.class));
-        assertTrue(counter.getClass().equals(StatsDCounter.class));
-        assertTrue(gauge.getClass().equals(StatsDGauge.class));
-        assertTrue(histogram.getClass().equals(StatsDHistogram.class));
-        assertTrue(timer.getClass().equals(StatsDTimer.class));
-        assertTrue(timerPair.getClass().equals(TimerPairImpl.class));
+            assertTrue(meter.getClass().equals(StatsDMeter.class));
+            assertTrue(counter.getClass().equals(StatsDCounter.class));
+            assertTrue(gauge.getClass().equals(StatsDGauge.class));
+            assertTrue(histogram.getClass().equals(StatsDHistogram.class));
+            assertTrue(timer.getClass().equals(StatsDTimer.class));
+            assertTrue(timerPair.getClass().equals(TimerPairImpl.class));
+        }
     }
 
     @Test
@@ -127,24 +125,22 @@ public class StatsDMetricFilterTest {
                 filterConfigTimerPair
         );
 
-        StatsDMetricsMonitor monitor = buildMonitor(metricsFilter).named("level1");
-        monitor = monitor.named("level2");
+        try (StatsDMetricsMonitor monitor = buildMonitor(metricsFilter).named("level1").named("level2")) {
+            Meter meter = monitor.newMeter("meter");
+            Counter counter = monitor.newCounter("counter");
+            Gauge gauge = monitor.newGauge("gauge", () -> "");
+            Histogram histogram = monitor.newHistogram("histogram");
+            Timer timer = monitor.newTimer("timer");
+            TimerPair timerPair = monitor.newTimerPair("timePair");
 
-        Meter meter = monitor.newMeter("meter");
-        Counter counter = monitor.newCounter("counter");
-        Gauge gauge = monitor.newGauge("gauge", () -> "");
-        Histogram histogram = monitor.newHistogram("histogram");
-        Timer timer = monitor.newTimer("timer");
-        TimerPair timerPair = monitor.newTimerPair("timePair");
-
-        assertTrue(meter.getClass().equals(StatsDMeter.class));
-        assertTrue(counter.getClass().equals(noopCounterClazz));
-        assertTrue(gauge.getClass().equals(StatsDGauge.class));
-        assertTrue(histogram.getClass().equals(noopHistogramClazz));
-        assertTrue(timer.getClass().equals(StatsDTimer.class));
-        assertTrue(timerPair.getClass().equals(noopTimePairClazz));
+            assertTrue(meter.getClass().equals(StatsDMeter.class));
+            assertTrue(counter.getClass().equals(noopCounterClazz));
+            assertTrue(gauge.getClass().equals(StatsDGauge.class));
+            assertTrue(histogram.getClass().equals(noopHistogramClazz));
+            assertTrue(timer.getClass().equals(StatsDTimer.class));
+            assertTrue(timerPair.getClass().equals(TimerPairImpl.class)); // no-op are timers inside
+        }
     }
-
 
     private StatsDMetricsMonitor buildMonitor(MetricsFilter metricsFilter) {
         return new StatsDMetricsMonitor("localhost", 80, "statsd-prefix", metricsFilter);
@@ -155,6 +151,4 @@ public class StatsDMetricFilterTest {
         Collections.addAll(filterConfigsList, filterConfigs);
         return MetricsFilter.newInstance(filterConfigsList, ".");
     }
-
-
 }

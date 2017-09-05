@@ -115,15 +115,15 @@ public class JvmMetricsTest {
 
             assertThat((Integer) monitor.findGauge("jvm.threads.total").getValue())
                     .as("jvm.threads.total")
-                    .isBetween(0, 100);
+                    .isBetween(0, 1000);
 
             assertThat((Integer) monitor.findGauge("jvm.threads.daemon").getValue())
                     .as("jvm.threads.daemon")
-                    .isBetween(0, 100);
+                    .isBetween(0, 1000);
 
             assertThat((Long) monitor.findGauge("jvm.threads.started").getValue())
                     .as("jvm.threads.started")
-                    .isBetween(0L, 500L);
+                    .isBetween(0L, 10000L);
         }
     }
 
@@ -145,7 +145,7 @@ public class JvmMetricsTest {
 
             assertThat((Long) monitor.findGauge("jvm.buffers.direct.instances").getValue())
                     .as("jvm.buffers.direct.instances")
-                    .isBetween(0L, 100L);
+                    .isBetween(0L, 1000L);
 
             assertThat((Long) monitor.findGauge("jvm.buffers.direct.bytes").getValue())
                     .as("jvm.buffers.direct.bytes")
@@ -153,7 +153,7 @@ public class JvmMetricsTest {
 
             assertThat((Long) monitor.findGauge("jvm.buffers.mapped.instances").getValue())
                     .as("jvm.buffers.mapped.instances")
-                    .isBetween(0L, 100L);
+                    .isBetween(0L, 1000L);
 
             assertThat((Long) monitor.findGauge("jvm.buffers.mapped.bytes").getValue())
                     .as("jvm.buffers.mapped.bytes")
