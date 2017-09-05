@@ -23,6 +23,10 @@ public class PrometheusFormatter implements Formatter {
 
     @Override
     public String sanitizeName(String namePart) {
+        if (namePart.isEmpty()) {
+            throw new IllegalArgumentException("Name is empty string");
+        }
+
         StringBuilder result = new StringBuilder(namePart.length());
 
         for (int i = 0; i < namePart.length(); ++i) {

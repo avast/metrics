@@ -23,18 +23,34 @@ import java.util.stream.Stream;
 public class FormattingMetricsMonitor extends MetricsMonitor {
     private final Formatter formatter;
 
-    public FormattingMetricsMonitor(Formatter formatter) {
-        this(new MetricRegistry(), Naming.defaultNaming(), formatter);
+    /**
+     * Constant prefix that is prepended to names of all metrics but is not used for any filtering logic.
+     * The parts may be for example: environment, datacenter, application and instance.
+     */
+    private final String namePrefix;
+
+    public FormattingMetricsMonitor(Formatter formatter, List<String> namePrefix) {
+        this(new MetricRegistry(), Naming.defaultNaming(), formatter, namePrefix);
     }
 
-    public FormattingMetricsMonitor(MetricRegistry metricRegistry, Naming naming, Formatter formatter) {
+    public FormattingMetricsMonitor(MetricRegistry metricRegistry, Naming naming, Formatter formatter, List<String> namePrefix) {
         super(metricRegistry, naming);
         this.formatter = formatter;
+
+        if (namePrefix.isEmpty()) {
+            this.namePrefix = "";
+        } else {
+            this.namePrefix = namePrefix
+                    .stream()
+                    .map(formatter::sanitizeName)
+                    .collect(Collectors.joining(formatter.nameSeparator(), "", formatter.nameSeparator()));
+        }
     }
 
     private FormattingMetricsMonitor(FormattingMetricsMonitor original, String... names) {
         super(original, names);
         this.formatter = original.formatter;
+        this.namePrefix = original.namePrefix;
     }
 
     @Override
@@ -129,16 +145,18 @@ public class FormattingMetricsMonitor extends MetricsMonitor {
 
     private Stream<MetricValue> toMetricValue(String name, com.codahale.metrics.Metric metric,
                                               FieldsFormatting fieldsFormatting) {
+        String prefixedName = namePrefix + name;
+
         if (metric instanceof com.codahale.metrics.Counter) {
-            return mapCounter(name, (com.codahale.metrics.Counter) metric, fieldsFormatting);
+            return mapCounter(prefixedName, (com.codahale.metrics.Counter) metric, fieldsFormatting);
         } else if (metric instanceof com.codahale.metrics.Gauge) {
-            return mapGauge(name, (com.codahale.metrics.Gauge) metric, fieldsFormatting);
+            return mapGauge(prefixedName, (com.codahale.metrics.Gauge) metric, fieldsFormatting);
         } else if (metric instanceof com.codahale.metrics.Meter) {
-            return mapMeter(name, (com.codahale.metrics.Meter) metric, fieldsFormatting);
+            return mapMeter(prefixedName, (com.codahale.metrics.Meter) metric, fieldsFormatting);
         } else if (metric instanceof com.codahale.metrics.Histogram) {
-            return mapHistogram(name, (com.codahale.metrics.Histogram) metric, fieldsFormatting);
+            return mapHistogram(prefixedName, (com.codahale.metrics.Histogram) metric, fieldsFormatting);
         } else if (metric instanceof com.codahale.metrics.Timer) {
-            return mapTimer(name, (com.codahale.metrics.Timer) metric, fieldsFormatting);
+            return mapTimer(prefixedName, (com.codahale.metrics.Timer) metric, fieldsFormatting);
         } else {
             LOGGER.error("Unexpected metric class: {}", metric.getClass());
             return Stream.empty();
