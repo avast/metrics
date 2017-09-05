@@ -42,10 +42,9 @@ public class StatsDTimer implements Timer {
 
     @Override
     public <T> T time(final Callable<T> operation) throws Exception {
-        final TimeContext context = start();
-        final T result = operation.call();
-        context.stop();
-        return result;
+        try (TimeContext ignored = start()) {
+            return operation.call();
+        }
     }
 
     @Override
@@ -60,7 +59,7 @@ public class StatsDTimer implements Timer {
 
     @Override
     public <T> CompletableFuture<T> timeAsync(Callable<CompletableFuture<T>> operation, Timer failureTimer, Executor executor) throws Exception {
-        return TimerHelper.timeAsync(operation, this, executor);
+        return TimerHelper.timeAsync(operation, this, failureTimer, executor);
     }
 
     @Override

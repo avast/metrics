@@ -2,12 +2,16 @@ package com.avast.metrics.statsd;
 
 import com.avast.metrics.api.Gauge;
 import com.timgroup.statsd.StatsDClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.function.Supplier;
 
 public class StatsDGauge<T> implements Gauge<T> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(StatsDGauge.class);
+
     private final StatsDClient client;
     private final String name;
     private final Supplier<T> supplier;
@@ -47,6 +51,8 @@ public class StatsDGauge<T> implements Gauge<T> {
             sendDoubleValue(((BigDecimal) o).doubleValue());
         } else if (o instanceof Boolean) {
             sendLongValue(((Boolean) o) ? 1 : 0);
+        } else {
+            LOGGER.warn("Unsupported gauge type: {}", o.getClass());
         }
     }
 

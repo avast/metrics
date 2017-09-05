@@ -51,8 +51,10 @@ lazy val commonSettings = Seq(
   libraryDependencies ++= Seq(
     "org.mockito" % "mockito-all" % "1.10.19" % "test",
     "junit" % "junit" % "4.12" % "test",
+    "com.novocode" % "junit-interface" % "0.10" % "test", // Required by sbt to execute JUnit tests
     "ch.qos.logback" % "logback-classic" % "1.1.8" % "test"
-  )
+  ),
+  testOptions += Tests.Argument(TestFrameworks.JUnit)
 )
 
 lazy val root = (project in file("."))
@@ -141,6 +143,7 @@ lazy val statsd = (project in file("statsd")).
     javaSettings,
     name := "metrics-statsd",
     libraryDependencies ++= Seq(
-      "com.datadoghq" % "java-dogstatsd-client" % "2.3"
+      "com.datadoghq" % "java-dogstatsd-client" % "2.3",
+      "org.slf4j" % "slf4j-api" % "1.7.22"
     )
   ).dependsOn(core, filter)
