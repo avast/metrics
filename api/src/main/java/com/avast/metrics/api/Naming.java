@@ -1,8 +1,7 @@
 package com.avast.metrics.api;
 
 public interface Naming {
-
-    public static Naming defaultNaming() {
+    static Naming defaultNaming() {
         return new Naming() {
             @Override
             public String successTimerName(String base) {
@@ -16,6 +15,7 @@ public interface Naming {
         };
     }
 
-    public String successTimerName(String base);
-    public String failureTimerName(String base);
+    String successTimerName(String base);
+
+    String failureTimerName(String base);
 }
