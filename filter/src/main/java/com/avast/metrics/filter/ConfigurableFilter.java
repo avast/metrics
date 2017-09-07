@@ -16,7 +16,6 @@ class ConfigurableFilter implements MetricsFilter {
     /**
      * List of configurations sorted from the most concrete ones to the less concrete ones. The first prefix that
      * matches beginning of the metric name will win. The last record is root filter that matches everything.
-     *
      * Only very small number of records is expected, so O(n) complexity should be acceptable. Alternative and faster
      * implementation would be a tree data structure with O(log(n)) complexity.
      */
@@ -40,15 +39,14 @@ class ConfigurableFilter implements MetricsFilter {
     }
 
     @Override
-    public boolean isEnabled(String metricName) {
+    public FilterConfig getConfig(String metricName) {
         String nameWithSeparator = appendNameSeparator(metricName);
 
         return configuration
                 .stream()
                 .filter(cfg -> nameWithSeparator.startsWith(cfg.getMetricName()))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Root filter should be defined, this should never happen"))
-                .isEnabled();
+                .orElseThrow(() -> new IllegalStateException("Root filter should be defined, this should never happen"));
     }
 
     private FilterConfig mapRootName(FilterConfig config) {
