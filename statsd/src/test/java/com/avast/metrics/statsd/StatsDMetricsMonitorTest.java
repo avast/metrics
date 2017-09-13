@@ -48,7 +48,7 @@ public class StatsDMetricsMonitorTest {
 
             verify(scheduler, times(1)).scheduleAtFixedRate(Matchers.any(), Matchers.anyLong(), Matchers.anyLong(), Matchers.any());
 
-            verify(statsDClient, times(5)).recordGaugeValue(Matchers.eq(name), Matchers.eq(Math.PI));
+            verify(statsDClient, times(5)).recordGaugeValue(Matchers.eq(name), Matchers.eq(Math.PI), Matchers.anyDouble());
         }
     }
 
@@ -79,13 +79,13 @@ public class StatsDMetricsMonitorTest {
             assertNotNull(monitor.newGauge(name, () -> Math.PI));
 
             verify(scheduler, times(1)).scheduleAtFixedRate(Matchers.any(), Matchers.anyLong(), Matchers.anyLong(), Matchers.any());
-            verify(statsDClient, times(1)).recordGaugeValue(Matchers.eq(name), Matchers.eq(Math.PI));
+            verify(statsDClient, times(1)).recordGaugeValue(Matchers.eq(name), Matchers.eq(Math.PI), Matchers.anyDouble());
 
 
             // request the same again, the old one should be cancelled
             assertNotNull(monitor.newGauge(name, true, () -> Math.PI));
 
-            verify(statsDClient, times(2)).recordGaugeValue(Matchers.eq(name), Matchers.eq(Math.PI));
+            verify(statsDClient, times(2)).recordGaugeValue(Matchers.eq(name), Matchers.eq(Math.PI), Matchers.anyDouble());
             verify(scheduler, times(2)).scheduleAtFixedRate(Matchers.any(), Matchers.anyLong(), Matchers.anyLong(), Matchers.any());
             verify(scheduledFuture, times(1)).cancel(Matchers.anyBoolean());
         }

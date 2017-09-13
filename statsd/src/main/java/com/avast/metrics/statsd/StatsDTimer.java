@@ -16,12 +16,18 @@ import java.util.function.Supplier;
 public class StatsDTimer implements Timer {
     private final StatsDClient client;
     private final String name;
+    private double sampleRate;
 
     private final AtomicLong count = new AtomicLong(0);
 
     StatsDTimer(final StatsDClient client, final String name) {
+        this(client, name, 1.0);
+    }
+
+    StatsDTimer(final StatsDClient client, final String name, double sampleRate) {
         this.client = client;
         this.name = name;
+        this.sampleRate = sampleRate;
     }
 
     @Override
@@ -37,7 +43,7 @@ public class StatsDTimer implements Timer {
     @Override
     public void update(final Duration duration) {
         count.incrementAndGet();
-        client.recordExecutionTime(name, duration.toMillis());
+        client.recordExecutionTime(name, duration.toMillis(), sampleRate);
     }
 
     @Override

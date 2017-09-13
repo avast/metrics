@@ -11,16 +11,20 @@ import java.util.List;
 public interface MetricsFilter {
     String ROOT_FILTER_NAME = "root";
 
-    MetricsFilter ALL_ENABLED = metricName -> true;
-    MetricsFilter ALL_DISABLED = metricName -> false;
+    MetricsFilter ALL_ENABLED = metricName -> FilterConfig.ENABLED;
+    MetricsFilter ALL_DISABLED = metricName -> FilterConfig.DISABLED;
 
     /**
      * Get effective configuration for a metric according to its name.
      *
      * @param metricName metric name in compatible format
-     * @return enabled/disabled
+     * @return configuration
      */
-    boolean isEnabled(String metricName);
+    FilterConfig getConfig(String metricName);
+
+    default boolean isEnabled(String metricName) {
+        return getConfig(metricName).isEnabled();
+    }
 
     static MetricsFilter newInstance(List<FilterConfig> configuration, String nameSeparator) {
         return new ConfigurableFilter(configuration, nameSeparator);

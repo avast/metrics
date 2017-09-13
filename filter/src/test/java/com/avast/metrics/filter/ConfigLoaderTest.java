@@ -24,7 +24,7 @@ public class ConfigLoaderTest {
         List<FilterConfig> filterConfigs = loadConfig("testEmpty");
 
         List<FilterConfig> expected = Collections.singletonList(
-                new FilterConfig(MetricsFilter.ROOT_FILTER_NAME, true));
+                new FilterConfig(MetricsFilter.ROOT_FILTER_NAME, true, 1.0));
 
         assertEquals(expected, filterConfigs);
     }
@@ -34,7 +34,7 @@ public class ConfigLoaderTest {
         List<FilterConfig> filterConfigs = loadConfig("testAllEnabled");
 
         List<FilterConfig> expected = Collections.singletonList(
-                new FilterConfig(MetricsFilter.ROOT_FILTER_NAME, true));
+                new FilterConfig(MetricsFilter.ROOT_FILTER_NAME, true, 1.0));
 
         assertEquals(expected, filterConfigs);
     }
@@ -44,12 +44,12 @@ public class ConfigLoaderTest {
         List<FilterConfig> filterConfigs = loadConfig("testAllDisabled");
 
         List<FilterConfig> expected = Collections.singletonList(
-                new FilterConfig(MetricsFilter.ROOT_FILTER_NAME, false));
+                new FilterConfig(MetricsFilter.ROOT_FILTER_NAME, false, 0.0));
 
         assertEquals(expected, filterConfigs);
     }
 
-    @Test(expected = ConfigException.WrongType.class)
+    @Test(expected = ConfigException.BadPath.class)
     public void testBroken() throws Exception {
         loadConfig("testBroken"); // Exception
     }
@@ -64,6 +64,16 @@ public class ConfigLoaderTest {
         loadConfig("testBrokenDisabled"); // Exception
     }
 
+    @Test(expected = ConfigException.Missing.class)
+    public void testBrokenOnlySampleRate() throws Exception {
+        loadConfig("testBrokenOnlySampleRate"); // Exception
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testBrokenSampleRatePercent() throws Exception {
+        loadConfig("testBrokenSampleRatePercent"); // Exception
+    }
+
     @Test
     public void testStructuredName() throws Exception {
         List<FilterConfig> filterConfigs = loadConfig("testStructuredName")
@@ -72,8 +82,8 @@ public class ConfigLoaderTest {
                 .collect(Collectors.toList());
 
         List<FilterConfig> expected = Arrays.asList(
-                new FilterConfig("name1.name2.nameN", false),
-                new FilterConfig(MetricsFilter.ROOT_FILTER_NAME, true));
+                new FilterConfig("name1.name2.nameN", false, 0.5),
+                new FilterConfig(MetricsFilter.ROOT_FILTER_NAME, true, 1.0));
 
         assertEquals(expected, filterConfigs);
     }
@@ -86,11 +96,11 @@ public class ConfigLoaderTest {
                 .collect(Collectors.toList());
 
         List<FilterConfig> expected = Arrays.asList(
-                new FilterConfig("name1", false),
-                new FilterConfig("name1.name2", true),
-                new FilterConfig("name1.name2.nameN", false),
-                new FilterConfig("name1.name2.nameN.myCounter", true),
-                new FilterConfig(MetricsFilter.ROOT_FILTER_NAME, true));
+                new FilterConfig("name1", false, 0.0),
+                new FilterConfig("name1.name2", true, 0.4),
+                new FilterConfig("name1.name2.nameN", false, 0.5),
+                new FilterConfig("name1.name2.nameN.myCounter", true, 0.6),
+                new FilterConfig(MetricsFilter.ROOT_FILTER_NAME, true, 1.0));
 
         assertEquals(expected, filterConfigs);
     }

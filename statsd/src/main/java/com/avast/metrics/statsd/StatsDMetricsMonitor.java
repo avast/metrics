@@ -3,6 +3,7 @@ package com.avast.metrics.statsd;
 import com.avast.metrics.TimerPairImpl;
 import com.avast.metrics.api.*;
 import com.avast.metrics.api.Timer;
+import com.avast.metrics.filter.FilterConfig;
 import com.avast.metrics.filter.MetricsFilter;
 import com.avast.metrics.test.NoOpMonitor;
 import com.timgroup.statsd.NonBlockingStatsDClient;
@@ -100,8 +101,10 @@ public class StatsDMetricsMonitor implements Monitor {
     @Override
     public Meter newMeter(final String name) {
         final String metricName = constructMetricName(name);
-        if (metricsFilter.isEnabled(metricName)) {
-            return new StatsDMeter(client, metricName);
+        FilterConfig config = metricsFilter.getConfig(metricName);
+
+        if (config.isEnabled()) {
+            return new StatsDMeter(client, metricName, config.getSampleRate());
         } else {
             return NoOpMonitor.INSTANCE.newMeter(metricName);
         }
@@ -110,19 +113,22 @@ public class StatsDMetricsMonitor implements Monitor {
     @Override
     public Counter newCounter(final String name) {
         final String metricName = constructMetricName(name);
-        if (metricsFilter.isEnabled(metricName)) {
-            return new StatsDCounter(client, metricName);
+        FilterConfig config = metricsFilter.getConfig(metricName);
+
+        if (config.isEnabled()) {
+            return new StatsDCounter(client, metricName, config.getSampleRate());
         } else {
             return NoOpMonitor.INSTANCE.newCounter(metricName);
         }
-
     }
 
     @Override
     public Timer newTimer(final String name) {
         final String metricName = constructMetricName(name);
-        if (metricsFilter.isEnabled(metricName)) {
-            return new StatsDTimer(client, metricName);
+        FilterConfig config = metricsFilter.getConfig(metricName);
+
+        if (config.isEnabled()) {
+            return new StatsDTimer(client, metricName, config.getSampleRate());
         } else {
             return NoOpMonitor.INSTANCE.newTimer(metricName);
         }
@@ -139,22 +145,15 @@ public class StatsDMetricsMonitor implements Monitor {
 
     @Override
     public <T> Gauge<T> newGauge(final String name, final Supplier<T> gauge) {
-        final String metricName = constructMetricName(name);
-        if (metricsFilter.isEnabled(metricName)) {
-            return newGauge(name, false, gauge);
-        } else {
-            return NoOpMonitor.INSTANCE.newGauge(metricName, gauge);
-        }
-
+        return newGauge(name, false, gauge);
     }
 
     @Override
     public <T> Gauge<T> newGauge(final String name, final boolean replaceExisting, final Supplier<T> supplier) {
-
         final String metricName = constructMetricName(name);
+        FilterConfig config = metricsFilter.getConfig(metricName);
 
-
-        if (metricsFilter.isEnabled(metricName)) {
+        if (config.isEnabled()) {
             synchronized (gauges) {
                 final ScheduledFuture<?> existing = gauges.get(metricName);
 
@@ -165,7 +164,7 @@ public class StatsDMetricsMonitor implements Monitor {
                     existing.cancel(false);
                 }
 
-                final StatsDGauge<T> gauge = new StatsDGauge<>(client, metricName, supplier);
+                final StatsDGauge<T> gauge = new StatsDGauge<>(client, metricName, supplier, config.getSampleRate());
 
                 final ScheduledFuture<?> scheduled = scheduler.scheduleAtFixedRate(gauge::send, 0, gaugeSendPeriod.toMillis(), TimeUnit.MILLISECONDS);
 
@@ -181,12 +180,13 @@ public class StatsDMetricsMonitor implements Monitor {
     @Override
     public Histogram newHistogram(final String name) {
         final String metricName = constructMetricName(name);
-        if (metricsFilter.isEnabled(metricName)) {
+        FilterConfig config = metricsFilter.getConfig(metricName);
+
+        if (config.isEnabled()) {
             return new StatsDHistogram(client, metricName);
         } else {
             return NoOpMonitor.INSTANCE.newHistogram(metricName);
         }
-
     }
 
     @Override

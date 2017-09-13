@@ -5,12 +5,15 @@ import com.typesafe.config.ConfigException;
 import com.typesafe.config.ConfigFactory;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 class ConfigLoader {
     static final String SECTION_DEFAULTS = "metricsFiltersDefaults";
-    private static final String CONFIG_NAME_SEPARATOR = ".";
-    private static final String ENABLED_SUFFIX = CONFIG_NAME_SEPARATOR + "enabled";
+    private static final String SEPARATOR = ".";
+
+    private static final String ENABLED = SEPARATOR + "enabled";
+    private static final String SAMPLE_RATE = SEPARATOR + "sampleRate";
 
     private final String nameSeparator;
 
@@ -22,26 +25,36 @@ class ConfigLoader {
         Config referenceConfig = ConfigFactory.defaultReference().getConfig(SECTION_DEFAULTS);
         Config mergedConfig = config.withFallback(referenceConfig);
 
-        return mergedConfig
+        Set<String> metricNames = mergedConfig
                 .entrySet()
                 .stream()
-                .map(section -> parseRecord(section.getKey(), mergedConfig.getBoolean(section.getKey())))
+                .map(section -> metricName(section.getKey()))
+                .collect(Collectors.toSet());
+
+        return metricNames
+                .stream()
+                .map(metricName -> parseConfig(mergedConfig, metricName))
                 .collect(Collectors.toList());
     }
 
-    private FilterConfig parseRecord(String metricName, boolean enabled) {
-        return new FilterConfig(parseName(metricName), enabled);
+    private String metricName(String metricNameWithSuffix) {
+        if (metricNameWithSuffix.endsWith(ENABLED)) {
+            return metricNameWithSuffix.substring(0, metricNameWithSuffix.length() - ENABLED.length());
+        } else if (metricNameWithSuffix.endsWith(SAMPLE_RATE)) {
+            return metricNameWithSuffix.substring(0, metricNameWithSuffix.length() - SAMPLE_RATE.length());
+        } else {
+            throw new ConfigException.BadPath(metricNameWithSuffix,
+                    "Expecting metric name with '" + ENABLED + "|" + SAMPLE_RATE + "' suffix");
+        }
     }
 
-    /**
-     * Remove suffix from name and replace separator characters.
-     */
-    private String parseName(String metricName) {
-        if (!metricName.endsWith(ENABLED_SUFFIX)) {
-            throw new ConfigException.BadPath(metricName, "Expecting '" + ENABLED_SUFFIX + "' suffix");
-        }
+    private FilterConfig parseConfig(Config config, String metricName) {
+        String finalName = metricName.replace(SEPARATOR, nameSeparator);
+        boolean enabled = config.getBoolean(metricName + ENABLED);
+        double sampleRate = config.hasPath(metricName + SAMPLE_RATE)
+                ? config.getDouble(metricName + SAMPLE_RATE)
+                : FilterConfig.enabledToSampleRate(enabled);
 
-        return metricName.substring(0, metricName.length() - ENABLED_SUFFIX.length())
-                .replace(CONFIG_NAME_SEPARATOR, nameSeparator);
+        return new FilterConfig(finalName, enabled, sampleRate);
     }
 }
