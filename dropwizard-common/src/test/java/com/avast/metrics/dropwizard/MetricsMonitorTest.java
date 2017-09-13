@@ -55,16 +55,21 @@ public class MetricsMonitorTest {
 
     @Test
     public void timing() throws InterruptedException {
-        long toleranceNanos = 10000000;
+        long toleranceNanos = Duration.ofMillis(200).toNanos();
+
         try (Monitor monitor = new MetricsMonitor().named("timing")) {
             Timer timer = monitor.newTimer("test");
+
             Timer.TimeContext ctx = timer.start();
             long time1 = System.nanoTime();
+
             long elapsedTime = ctx.stopAndGetTime();
             long time2 = System.nanoTime();
+
             long measuredElapsedTime = time2 - time1;
+
+            // The test is time dependent and may incorrectly fail
             assertTrue(Math.abs(measuredElapsedTime - elapsedTime) < toleranceNanos);
         }
     }
-
 }
