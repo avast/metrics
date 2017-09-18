@@ -89,7 +89,7 @@ public class SummaryMonitor implements Monitor {
         return new SummaryMonitor(allMonitors, naming);
     }
 
-    private SummaryMonitor(List<Monitor> monitors, Naming naming) {
+    SummaryMonitor(List<Monitor> monitors, Naming naming) {
         if (monitors.size() < 2) {
             throw new IllegalArgumentException("Summary monitor from less than 2 monitors makes no sense");
         }
