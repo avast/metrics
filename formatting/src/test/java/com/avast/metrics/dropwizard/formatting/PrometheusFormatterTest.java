@@ -13,7 +13,7 @@ public class PrometheusFormatterTest {
 
     @Test
     public void testSanitize() throws Exception {
-        assertEquals("XX:XXXXXXabcdefghXXX:XXXXXXabcdefghX",
+        assertEquals(":abcdefgh:abcdefgh",
                 formatter.sanitizeName(". :|@\n=()abcdefgh_. :|@\n=()abcdefgh_"));
     }
 

@@ -39,9 +39,8 @@ public class PrometheusFormatter implements Formatter {
                     || c >= '0' && c <= '9'
                     || c == ':') {
                 result.append(c);
-            } else {
-                result.append('X'); // Nothing better in the allowed characters
             }
+            // else remove the character, there is no usable replacement in the set of allowed characters
         }
 
         return result.toString();
