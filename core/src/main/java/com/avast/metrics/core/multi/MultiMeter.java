@@ -5,7 +5,7 @@ import com.avast.metrics.api.Meter;
 import java.util.List;
 
 /**
- * Meter used by {@link MultiMonitor}.
+ * Meter used by {@link GroupMonitor} and {@link SummaryMonitor}.
  */
 class MultiMeter implements Meter {
     private final List<Meter> meters;

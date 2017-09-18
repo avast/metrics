@@ -5,7 +5,7 @@ import com.avast.metrics.api.Histogram;
 import java.util.List;
 
 /**
- * Histogram used by {@link MultiMonitor}.
+ * Histogram used by {@link GroupMonitor} and {@link SummaryMonitor}.
  */
 class MultiHistogram implements Histogram {
     private final List<Histogram> histograms;

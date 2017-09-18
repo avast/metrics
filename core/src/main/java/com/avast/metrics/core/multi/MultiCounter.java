@@ -5,7 +5,7 @@ import com.avast.metrics.api.Counter;
 import java.util.List;
 
 /**
- * Counter used by {@link MultiMonitor}.
+ * Counter used by {@link GroupMonitor} and {@link SummaryMonitor}.
  */
 class MultiCounter implements Counter {
     private final List<Counter> counters;

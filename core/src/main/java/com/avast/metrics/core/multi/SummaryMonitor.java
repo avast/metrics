@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  * on the first one which represents the monitored instance. Note it is impossible to return two ints at place of one int,
  * adding them together would typically produce a value that doesn't make any sense at all.
  * <p>
- * {@link #named(String)} creates a new multi monitor with the name applied only to the instance monitor, the summary
+ * {@link #named(String)} creates a new summary monitor with the name applied only to the instance monitor, the summary
  * one is untouched and only copied. This allows to dynamically create new sub-monitors while summary is preserved.
  * <p>
  * {@link #remove(Metric)} removes the metric only from the first wrapped monitor. The summary monitor is shared by
@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
  *     Monitor summaryMonitor = monitor.named("path");
  *     Monitor instanceMonitor = summaryMonitor.named("instance");
  *
- *     Monitor monitor = MultiMonitor.of(instanceMonitor, summaryMonitor);
+ *     Monitor monitor = SummaryMonitor.of(instanceMonitor, summaryMonitor);
  *
  *     this.errors = monitor.newMeter("errors");
  *     this.requests = monitor.newMeter("requests");
@@ -45,40 +45,40 @@ import java.util.stream.Collectors;
  * <p>
  * <pre><code>
  *     Monitor summaryMonitor = monitor.named("path");
- *     Monitor monitor = MultiMonitor.of(summaryMonitor, summaryMonitor);
+ *     Monitor monitor = SummaryMonitor.of(summaryMonitor, summaryMonitor);
  *     ConcurrentMap&lt;String, Meter&gt; requests = new ConcurrentHashMap&lt;&gt;()
  *
  *     // Dynamically create a new meter if not present in the cache and increment its value
  *     requests.computeIfAbsent(topic, t -&gt; monitor.named(t).newMeter("requests")).mark();
  * </code></pre>
  */
-public class MultiMonitor implements Monitor {
+public class SummaryMonitor implements Monitor {
 
     private final List<Monitor> monitors;
     private final Naming naming;
 
     /**
-     * Factory method. Read {@link MultiMonitor} limitations!
+     * Factory method. Read {@link SummaryMonitor} limitations!
      *
      * @param instanceMonitor non-shared main monitor for data from a single instance
      * @param summaryMonitor  shared summary monitor counting sums per all instances
-     * @return multi monitor containing all passed monitors
+     * @return summary monitor containing all passed monitors
      */
     public static Monitor of(Monitor instanceMonitor, Monitor summaryMonitor) {
         List<Monitor> allMonitors = new ArrayList<>(2);
         allMonitors.add(instanceMonitor);
         allMonitors.add(summaryMonitor);
 
-        return new MultiMonitor(allMonitors, Naming.defaultNaming());
+        return new SummaryMonitor(allMonitors, Naming.defaultNaming());
     }
 
     /**
-     * Factory method. Read {@link MultiMonitor} limitations!
+     * Factory method. Read {@link SummaryMonitor} limitations!
      *
      * @param instanceMonitor non-shared main monitor for data from a single instance
      * @param summaryMonitor  shared summary monitor counting sums per all instances
      * @param naming          naming conventions for TimerPair
-     * @return multi monitor containing all passed monitors
+     * @return summary monitor containing all passed monitors
      */
 
     public static Monitor of(Monitor instanceMonitor, Monitor summaryMonitor, Naming naming) {
@@ -86,12 +86,12 @@ public class MultiMonitor implements Monitor {
         allMonitors.add(instanceMonitor);
         allMonitors.add(summaryMonitor);
 
-        return new MultiMonitor(allMonitors, naming);
+        return new SummaryMonitor(allMonitors, naming);
     }
 
-    private MultiMonitor(List<Monitor> monitors, Naming naming) {
+    private SummaryMonitor(List<Monitor> monitors, Naming naming) {
         if (monitors.size() < 2) {
-            throw new IllegalArgumentException("Multi monitor from less than 2 monitors makes no sense");
+            throw new IllegalArgumentException("Summary monitor from less than 2 monitors makes no sense");
         }
 
         this.monitors = monitors;
@@ -102,11 +102,11 @@ public class MultiMonitor implements Monitor {
      * {@inheritDoc}
      *
      * @param name name of the next sub-level
-     * @return new multi monitor with name applied only on the instance one, the summary one is left untouched
+     * @return new summary monitor with name applied only on the instance one, the summary one is left untouched
      */
     @Override
     public Monitor named(String name) {
-        return MultiMonitor.of(monitors.get(0).named(name), monitors.get(1));
+        return SummaryMonitor.of(monitors.get(0).named(name), monitors.get(1));
     }
 
     /**
@@ -115,11 +115,11 @@ public class MultiMonitor implements Monitor {
      * @param name1       name of the next sub-level
      * @param name2       name of the next sub-level
      * @param restOfNames name of the next sub-level
-     * @return new multi monitor with names applied only on the instance one, the summary one is left untouched
+     * @return new summary monitor with names applied only on the instance one, the summary one is left untouched
      */
     @Override
     public Monitor named(String name1, String name2, String... restOfNames) {
-        return MultiMonitor.of(monitors.get(0).named(name1, name2, restOfNames), monitors.get(1));
+        return SummaryMonitor.of(monitors.get(0).named(name1, name2, restOfNames), monitors.get(1));
     }
 
     @Override
