@@ -39,7 +39,7 @@ public class GroupMonitor implements Monitor {
 
     private GroupMonitor(List<Monitor> monitors, Naming naming) {
         if (monitors.size() == 0) {
-            throw new IllegalArgumentException("Group monitor from requires at least single instance of Monitor.");
+            throw new IllegalArgumentException("Group monitor requires at least single instance of Monitor.");
         }
         this.monitors = monitors;
         this.naming = naming;
