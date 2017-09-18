@@ -23,7 +23,7 @@ public class GroupMonitor implements Monitor {
      * @return multiple  monitor containing all passed monitors
      */
     public static Monitor of(Monitor... monitors) {
-        return new GroupMonitor(Arrays.asList(monitors),Naming.defaultNaming());
+        return new GroupMonitor(Arrays.asList(monitors), Naming.defaultNaming());
     }
 
     /**
