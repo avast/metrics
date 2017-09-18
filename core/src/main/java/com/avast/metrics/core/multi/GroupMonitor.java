@@ -38,8 +38,8 @@ public class GroupMonitor implements Monitor {
     }
 
     private GroupMonitor(List<Monitor> monitors, Naming naming) {
-        if (monitors.size() == 0) {
-            throw new IllegalArgumentException("Group monitor requires at least single instance of Monitor.");
+        if (monitors.size() < 2) {
+            throw new IllegalArgumentException("Group monitor from less than 2 counters makes no sense");
         }
         this.monitors = monitors;
         this.naming = naming;
