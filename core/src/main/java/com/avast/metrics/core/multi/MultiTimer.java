@@ -11,7 +11,7 @@ import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 /**
- * Timer used by {@link MultiMonitor}.
+ * Timer used by {@link GroupMonitor} and {@link SummaryMonitor}.
  */
 class MultiTimer implements Timer {
     private final List<Timer> timers;
