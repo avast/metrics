@@ -2,15 +2,11 @@ package com.avast.metrics.dropwizard;
 
 import com.avast.metrics.api.Gauge;
 import com.avast.metrics.api.Monitor;
-import com.avast.metrics.api.Timer;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.time.Duration;
-
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class MetricsMonitorTest {
 
@@ -49,26 +45,6 @@ public class MetricsMonitorTest {
 
                 assertEquals(name1, name2);
             }
-        }
-    }
-
-    @Test
-    public void timing() throws InterruptedException {
-        long toleranceNanos = Duration.ofMillis(200).toNanos();
-
-        try (Monitor monitor = new JmxMetricsMonitor("brm").named("timing")) {
-            Timer timer = monitor.newTimer("test");
-
-            Timer.TimeContext ctx = timer.start();
-            long time1 = System.nanoTime();
-
-            long elapsedTime = ctx.stopAndGetTime();
-            long time2 = System.nanoTime();
-
-            long measuredElapsedTime = time2 - time1;
-
-            // The test is time dependent and may incorrectly fail
-            assertTrue(Math.abs(measuredElapsedTime - elapsedTime) < toleranceNanos);
         }
     }
 }

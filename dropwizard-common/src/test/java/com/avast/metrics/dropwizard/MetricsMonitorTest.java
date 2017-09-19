@@ -8,7 +8,6 @@ import org.junit.rules.ExpectedException;
 import java.time.Duration;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class MetricsMonitorTest {
 
@@ -50,26 +49,6 @@ public class MetricsMonitorTest {
             thrown.expect(IllegalArgumentException.class);
             int value3 = 3;
             Gauge<Integer> gauge3 = monitor.newGauge("gauge", () -> value3);
-        }
-    }
-
-    @Test
-    public void timing() throws InterruptedException {
-        long toleranceNanos = Duration.ofMillis(200).toNanos();
-
-        try (Monitor monitor = new MetricsMonitor().named("timing")) {
-            Timer timer = monitor.newTimer("test");
-
-            Timer.TimeContext ctx = timer.start();
-            long time1 = System.nanoTime();
-
-            long elapsedTime = ctx.stopAndGetTime();
-            long time2 = System.nanoTime();
-
-            long measuredElapsedTime = time2 - time1;
-
-            // The test is time dependent and may incorrectly fail
-            assertTrue(Math.abs(measuredElapsedTime - elapsedTime) < toleranceNanos);
         }
     }
 }
