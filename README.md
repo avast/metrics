@@ -25,7 +25,7 @@ Currently there are multiple implementations/exports:
 There is Scala API available in `metrics-scala`. See the example below.
 
 ## Adding to project
-The library is published to the [Bintray](https://bintray.com/avast/maven/metrics/). Example usage of the [StatsD](statsd) in Gradle project: 
+The library is published to [Bintray](https://bintray.com/avast/maven/metrics/). Example usage of the [StatsD](statsd) in Gradle project: 
 ```gradle
 repositories {
     jcenter()
