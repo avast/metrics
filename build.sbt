@@ -62,7 +62,7 @@ lazy val root = (project in file("."))
     name := "metrics",
     publish := {},
     publishLocal := {}
-  ).aggregate(api, scalaApi, core, dropwizardCommon, jmx, graphite, filter, formatting, statsd)
+  ).aggregate(api, scalaApi, core, dropwizardCommon, jmx, jmxAvast, graphite, filter, formatting, statsd)
 
 lazy val api = (project in file("api")).
   settings(
@@ -106,6 +106,13 @@ lazy val jmx = (project in file("jmx")).
     javaSettings,
     name := "metrics-jmx"
   ).dependsOn(dropwizardCommon)
+
+lazy val jmxAvast = (project in file("jmx-avast")).
+  settings(
+    commonSettings,
+    javaSettings,
+    name := "metrics-jmx-avast"
+  ).dependsOn(jmx)
 
 lazy val graphite = (project in file("graphite")).
   settings(

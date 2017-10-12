@@ -17,7 +17,7 @@ The entry-point into the library is the interface `Monitor`. Your classes need t
 Instances of the individuals metrics can be used to monitor your application.
 
 Currently there are multiple implementations/exports:
-* [JMX](jmx) 
+* [JMX](jmx) (+ Avast specific format of export [jmx-avast](jmx-avast))
 * [Graphite](graphite)
 * [StatsD](statsd)
 * [Formatting](formatting) to string in configurable formats, e.g. for serving via HTTP server
@@ -25,7 +25,7 @@ Currently there are multiple implementations/exports:
 There is Scala API available in `metrics-scala`. See the example below.
 
 ## Adding to project
-The library is published to [Bintray](https://bintray.com/avast/maven/metrics/) E.g. usage of the [StatsD](statsd) in Gradle project: 
+The library is published to the [Bintray](https://bintray.com/avast/maven/metrics/). Example usage of the [StatsD](statsd) in Gradle project: 
 ```gradle
 repositories {
     jcenter()

@@ -39,7 +39,7 @@ public class JmxMetricsMonitor extends MetricsMonitor {
         }
     }
 
-    private JmxMetricsMonitor(JmxMetricsMonitor original, String... names) {
+    protected JmxMetricsMonitor(JmxMetricsMonitor original, String... names) {
         super(original, names);
         this.reporter = original.reporter;
     }
