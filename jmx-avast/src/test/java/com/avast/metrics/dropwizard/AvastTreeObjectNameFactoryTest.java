@@ -19,4 +19,15 @@ public class AvastTreeObjectNameFactoryTest {
 
         assertEquals("theDomain:type=l1,scope=l2,name=l3/l4/l5", name);
     }
+
+    @Test
+    public void correctQuoting() {
+        final AvastTreeObjectNameFactory nameFactory = AvastTreeObjectNameFactory.getInstance();
+
+        final String name = nameFactory.createName("theType", "theDomain",
+                String.join(AvastTreeObjectNameFactory.SEPARATOR, "l1.name", "l2?name", "l3*name", "l4", "l5")
+        ).toString();
+
+        assertEquals("theDomain:type=l1_name,scope=l2_name,name=l3_name/l4/l5", name);
+    }
 }
