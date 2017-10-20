@@ -68,7 +68,7 @@ public class AvastTreeObjectNameFactory implements ObjectNameFactory {
     private String quote(String objectName) {
         return objectName
                 .replaceAll(Pattern.quote(SEPARATOR), "/")
-                .replaceAll("[\\Q?*\"\\E]", "_");
+                .replaceAll("[\\Q.?*\"\\E]", "_");
     }
 
     private static class Holder {
