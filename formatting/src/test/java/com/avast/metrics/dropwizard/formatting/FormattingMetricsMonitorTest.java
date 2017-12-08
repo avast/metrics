@@ -1,6 +1,7 @@
 package com.avast.metrics.dropwizard.formatting;
 
 import com.avast.metrics.api.Counter;
+import com.avast.metrics.api.Timer;
 import com.avast.metrics.dropwizard.formatting.fields.FieldsFormatting;
 import com.avast.metrics.filter.FilterConfig;
 import com.avast.metrics.filter.MetricsFilter;
@@ -9,6 +10,7 @@ import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -287,6 +289,25 @@ public class FormattingMetricsMonitorTest {
                     "env.dc.app.inst.monitor.timer.stddev 0.0";
 
             assertEquals(expected, monitor.format(filter, FormattingMetricsMonitorTest.FIELDS_ALL_ENABLED));
+        }
+    }
+
+    @Test
+    public void testTimerDurationUnit() throws Exception {
+        try (FormattingMetricsMonitor monitor = new FormattingMetricsMonitor(new GraphiteFormatter(), Collections.emptyList())) {
+            Timer timer = monitor.newTimer("timer");
+            timer.update(Duration.ofMillis(42));
+
+            Timer timerNs = monitor.newTimer("timerNs");
+            timerNs.update(Duration.ofNanos(42));
+
+            String expected = "timer.count 1\n" +
+                    "timer.p50 42.0\n" +
+                    "timer.p99 42.0\n" +
+                    "timerNs.count 1\n" +
+                    "timerNs.p50 4.2E-5\n" +
+                    "timerNs.p99 4.2E-5";
+            assertEquals(expected, monitor.format(MetricsFilter.ALL_ENABLED, FieldsFormatting.defaults()));
         }
     }
 }

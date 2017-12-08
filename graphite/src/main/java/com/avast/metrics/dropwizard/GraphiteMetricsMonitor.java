@@ -1,7 +1,6 @@
 package com.avast.metrics.dropwizard;
 
 import com.avast.metrics.api.Naming;
-import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.graphite.Graphite;
 import com.codahale.metrics.graphite.GraphiteReporter;
