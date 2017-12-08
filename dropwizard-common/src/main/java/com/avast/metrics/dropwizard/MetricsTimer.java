@@ -25,7 +25,7 @@ public class MetricsTimer implements Timer {
 
     @Override
     public void update(Duration duration) {
-        metricsTimer.update(duration.toMillis(), TimeUnit.MILLISECONDS);
+        metricsTimer.update(duration.toNanos(), TimeUnit.NANOSECONDS);
     }
 
     @Override
