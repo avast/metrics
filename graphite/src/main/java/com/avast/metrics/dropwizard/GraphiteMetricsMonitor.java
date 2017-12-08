@@ -1,7 +1,6 @@
 package com.avast.metrics.dropwizard;
 
 import com.avast.metrics.api.Naming;
-import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.graphite.Graphite;
 import com.codahale.metrics.graphite.GraphiteReporter;
@@ -9,7 +8,6 @@ import com.codahale.metrics.graphite.GraphiteReporter;
 import java.net.InetSocketAddress;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
-
 
 public class GraphiteMetricsMonitor extends MetricsMonitor {
 
