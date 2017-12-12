@@ -109,7 +109,7 @@ public class FormattingMetricsMonitor extends MetricsMonitor {
     }
 
     @Override
-    protected String separator() {
+    public String separator() {
         return formatter.nameSeparator();
     }
 
