@@ -4,7 +4,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Graphite/StatsD formatter.
+ * Prometheus formatter.
  * <p>
  * https://prometheus.io/docs/instrumenting/exposition_formats/
  * https://prometheus.io/docs/concepts/data_model/

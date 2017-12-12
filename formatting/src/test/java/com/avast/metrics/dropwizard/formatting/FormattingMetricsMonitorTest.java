@@ -201,7 +201,7 @@ public class FormattingMetricsMonitorTest {
     @Test
     public void testNameSeparator() throws Exception {
         try (FormattingMetricsMonitor monitor = newMonitor()) {
-            assertEquals(".", monitor.nameSeparator());
+            assertEquals(".", monitor.separator());
         }
     }
 
@@ -260,7 +260,7 @@ public class FormattingMetricsMonitorTest {
                     Arrays.asList(
                             new FilterConfig(MetricsFilter.ROOT_FILTER_NAME, true),
                             new FilterConfig("monitor.histogram", false)),
-                    monitor.nameSeparator());
+                    monitor.separator());
 
             String expected = "env.dc.app.inst.monitor.counter.count 0\n" +
                     "env.dc.app.inst.monitor.gauge.value 0\n" +

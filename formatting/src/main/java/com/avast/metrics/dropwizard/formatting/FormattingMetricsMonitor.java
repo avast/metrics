@@ -124,10 +124,6 @@ public class FormattingMetricsMonitor extends MetricsMonitor {
         return constructMetricName(Optional.empty(), separator());
     }
 
-    public String nameSeparator() {
-        return formatter.nameSeparator();
-    }
-
     public String contentType() {
         return formatter.contentType();
     }

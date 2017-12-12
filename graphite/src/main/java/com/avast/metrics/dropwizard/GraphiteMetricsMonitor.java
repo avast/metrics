@@ -9,7 +9,6 @@ import java.net.InetSocketAddress;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
-
 public class GraphiteMetricsMonitor extends MetricsMonitor {
 
     public static final Duration DEFAULT_PERIOD = Duration.ofSeconds(5);
