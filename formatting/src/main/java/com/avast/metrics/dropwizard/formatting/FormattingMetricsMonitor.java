@@ -109,7 +109,7 @@ public class FormattingMetricsMonitor extends MetricsMonitor {
     }
 
     @Override
-    protected String separator() {
+    public String separator() {
         return formatter.nameSeparator();
     }
 
@@ -122,10 +122,6 @@ public class FormattingMetricsMonitor extends MetricsMonitor {
     @Override
     public String getName() {
         return constructMetricName(Optional.empty(), separator());
-    }
-
-    public String nameSeparator() {
-        return formatter.nameSeparator();
     }
 
     public String contentType() {
@@ -242,19 +238,19 @@ public class FormattingMetricsMonitor extends MetricsMonitor {
         if (timerFormatting.isFifteenMinuteRate())
             values.add(new MetricValue(appendName(name, "rate15m"), formatter.formatNumber(timer.getFifteenMinuteRate())));
         if (timerFormatting.isMin())
-            values.add(new MetricValue(appendName(name, "min"), formatter.formatNumber(snapshot.getMin())));
+            values.add(new MetricValue(appendName(name, "min"), formatter.formatNumber(ns2ms(snapshot.getMin()))));
         if (timerFormatting.isMax())
-            values.add(new MetricValue(appendName(name, "max"), formatter.formatNumber(snapshot.getMax())));
+            values.add(new MetricValue(appendName(name, "max"), formatter.formatNumber(ns2ms(snapshot.getMax()))));
         if (timerFormatting.isMean())
-            values.add(new MetricValue(appendName(name, "mean"), formatter.formatNumber(snapshot.getMean())));
+            values.add(new MetricValue(appendName(name, "mean"), formatter.formatNumber(ns2ms(snapshot.getMean()))));
         if (timerFormatting.isStdDev())
-            values.add(new MetricValue(appendName(name, "stddev"), formatter.formatNumber(snapshot.getStdDev())));
+            values.add(new MetricValue(appendName(name, "stddev"), formatter.formatNumber(ns2ms(snapshot.getStdDev()))));
 
         timerFormatting
                 .getPercentiles()
                 .forEach(percentile ->
                         values.add(new MetricValue(appendName(name, percentileName(percentile)),
-                                formatter.formatNumber(snapshot.getValue(percentile)))));
+                                formatter.formatNumber(ns2ms(snapshot.getValue(percentile))))));
 
         return values.stream();
     }
@@ -272,5 +268,13 @@ public class FormattingMetricsMonitor extends MetricsMonitor {
 
     private String appendName(String base, String part) {
         return base + formatter.nameSeparator() + part;
+    }
+
+    private long ns2ms(long nanoseconds) {
+        return nanoseconds / 1_000_000L;
+    }
+
+    private double ns2ms(double nanoseconds) {
+        return nanoseconds / 1_000_000.0;
     }
 }
