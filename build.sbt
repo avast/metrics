@@ -22,6 +22,7 @@ lazy val javaSettings = Seq(
 lazy val Versions = new {
   val dropwizard = "3.2.2"
   val typesafeConfig = "1.3.1"
+  val grpc = "1.9.1"
   val slf4j = "1.7.25"
   val assertj = "3.8.0"
 }
@@ -133,6 +134,17 @@ lazy val filter = (project in file("filter")).
       "com.typesafe" % "config" % Versions.typesafeConfig
     )
   ).dependsOn(dropwizardCommon)
+
+lazy val grpc = (project in file("grpc")).
+  settings(
+    commonSettings,
+    javaSettings,
+    name := "metrics-grpc",
+    libraryDependencies ++= Seq(
+      "io.grpc" % "grpc-services" % Versions.grpc,
+      "io.grpc" % "grpc-stub" % Versions.grpc
+    )
+  ).dependsOn(core)
 
 lazy val formatting = (project in file("formatting")).
   settings(
