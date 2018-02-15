@@ -8,17 +8,16 @@ import java.time.Duration;
 import java.time.Instant;
 
 public class GrpcClientMonitoringInterceptor implements ClientInterceptor {
-    private final Monitor monitor;
+    private final TimersCache timers;
     private final Clock clock;
 
     public GrpcClientMonitoringInterceptor(final Monitor monitor, final Clock clock) {
-        this.monitor = monitor;
         this.clock = clock;
+        timers = new TimersCache(monitor);
     }
 
-    protected GrpcClientMonitoringInterceptor(final Monitor monitor) {
-        this.monitor = monitor;
-        this.clock = Clock.systemUTC();
+    public GrpcClientMonitoringInterceptor(final Monitor monitor) {
+        this(monitor, Clock.systemUTC());
     }
 
     @Override
@@ -37,10 +36,10 @@ public class GrpcClientMonitoringInterceptor implements ClientInterceptor {
                                 final Duration duration = Duration.between(start, clock.instant());
 
                                 if (status.isOk()) {
-                                    monitor.newTimer(method.getFullMethodName().replace("/", "_") + "Successes")
+                                    timers.get(method.getFullMethodName().replace("/", "_") + "Successes")
                                             .update(duration);
                                 } else {
-                                    monitor.newTimer(method.getFullMethodName().replace("/", "_") + "Failures")
+                                    timers.get(method.getFullMethodName().replace("/", "_") + "Failures")
                                             .update(duration);
                                 }
 
