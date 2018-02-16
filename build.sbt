@@ -141,8 +141,7 @@ lazy val grpc = (project in file("grpc")).
     javaSettings,
     name := "metrics-grpc",
     libraryDependencies ++= Seq(
-      "io.grpc" % "grpc-services" % Versions.grpc,
-      "io.grpc" % "grpc-stub" % Versions.grpc
+      "io.grpc" % "grpc-core" % Versions.grpc
     )
   ).dependsOn(core)
 

@@ -14,12 +14,6 @@ class TimersCache {
     }
 
     public Timer get(String name) {
-        if (timers.containsKey(name)) {
-            return timers.get(name);
-        } else {
-            synchronized (timers) {
-                return timers.computeIfAbsent(name, monitor::newTimer);
-            }
-        }
+        return timers.computeIfAbsent(name, monitor::newTimer);
     }
 }
