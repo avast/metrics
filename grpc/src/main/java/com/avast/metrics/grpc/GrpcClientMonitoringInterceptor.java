@@ -36,10 +36,10 @@ public class GrpcClientMonitoringInterceptor implements ClientInterceptor {
                                 final Duration duration = Duration.between(start, clock.instant());
 
                                 if (status.isOk()) {
-                                    timers.get(method.getFullMethodName().replace("/", "_") + "Successes")
+                                    timers.get(method.getFullMethodName().replace('/', '_') + "Successes")
                                             .update(duration);
                                 } else {
-                                    timers.get(method.getFullMethodName().replace("/", "_") + "Failures")
+                                    timers.get(method.getFullMethodName().replace('/', '_') + "Failures")
                                             .update(duration);
                                 }
 

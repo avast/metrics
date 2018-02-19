@@ -30,10 +30,10 @@ public class GrpcServerMonitoringInterceptor implements ServerInterceptor {
                 final Duration duration = Duration.between(start, clock.instant());
 
                 if (status.isOk()) {
-                    timers.get(call.getMethodDescriptor().getFullMethodName().replace("/", "_") + "Successes")
+                    timers.get(call.getMethodDescriptor().getFullMethodName().replace('/', '_') + "Successes")
                             .update(duration);
                 } else {
-                    timers.get(call.getMethodDescriptor().getFullMethodName().replace("/", "_") + "Failures")
+                    timers.get(call.getMethodDescriptor().getFullMethodName().replace('/', '_') + "Failures")
                             .update(duration);
                 }
 
