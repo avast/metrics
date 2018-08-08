@@ -3,6 +3,7 @@ package com.avast.metrics;
 import com.avast.metrics.api.Timer;
 import com.avast.metrics.api.TimerPair;
 
+import java.time.Duration;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -15,6 +16,21 @@ public class TimerPairImpl implements TimerPair {
     public TimerPairImpl(Timer successTimer, Timer failureTimer) {
         this.successTimer = successTimer;
         this.failureTimer = failureTimer;
+    }
+
+    @Override
+    public TimeContext start() {
+        return new Context(successTimer.start(), failureTimer.start());
+    }
+
+    @Override
+    public void update(Duration duration) {
+        successTimer.update(duration);
+    }
+
+    @Override
+    public void updateFailure(Duration duration) {
+        failureTimer.update(duration);
     }
 
     public <T> T time(Callable<T> operation) throws Exception {
@@ -52,6 +68,27 @@ public class TimerPairImpl implements TimerPair {
         } catch (Exception ex) {
             failureContext.stop();
             throw ex;
+        }
+    }
+
+    private static class Context implements TimeContext {
+
+        private final Timer.TimeContext successContext;
+        private final Timer.TimeContext failureContext;
+
+        Context(Timer.TimeContext successContext, Timer.TimeContext failureContext) {
+            this.successContext = successContext;
+            this.failureContext = failureContext;
+        }
+
+        @Override
+        public void stop() {
+            successContext.stop();
+        }
+
+        @Override
+        public void stopFailure() {
+            failureContext.stop();
         }
     }
 }
