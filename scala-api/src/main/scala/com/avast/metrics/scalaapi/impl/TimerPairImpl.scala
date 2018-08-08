@@ -7,6 +7,18 @@ import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
 
 private class TimerPairImpl(success: Timer, failure: Timer) extends TimerPair {
+
+  override def start(): TimeContext = {
+    val succCtx = success.start()
+    val failCtx = failure.start()
+
+    new TimeContext {
+      override def stop(): Unit = succCtx.stop()
+
+      override def stopFailure(): Unit = failCtx.stop()
+    }
+  }
+
   override def time[A](block: => A): A = {
     val succCtx = success.start()
     val failCtx = failure.start()

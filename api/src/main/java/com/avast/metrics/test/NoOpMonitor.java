@@ -140,6 +140,20 @@ public class NoOpMonitor implements Monitor {
     @Override
     public TimerPair newTimerPair(String name) {
         return new TimerPair() {
+
+            @Override
+            public TimeContext start() {
+                return new TimeContext() {
+                    @Override
+                    public void stop() {
+                    }
+
+                    @Override
+                    public void stopFailure() {
+                    }
+                };
+            }
+
             @Override
             public <T> T time(Callable<T> operation) throws Exception {
                 return operation.call();
