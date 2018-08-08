@@ -1,5 +1,6 @@
 package com.avast.metrics.api;
 
+import java.time.Duration;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -18,6 +19,10 @@ public interface TimerPair {
     }
 
     TimeContext start();
+
+    void update(Duration duration);
+
+    void updateFailure(Duration duration);
 
     <T> T time(Callable<T> operation) throws Exception;
 

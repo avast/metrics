@@ -23,6 +23,16 @@ public class TimerPairImpl implements TimerPair {
         return new Context(successTimer.start(), failureTimer.start());
     }
 
+    @Override
+    public void update(Duration duration) {
+        successTimer.update(duration);
+    }
+
+    @Override
+    public void updateFailure(Duration duration) {
+        failureTimer.update(duration);
+    }
+
     public <T> T time(Callable<T> operation) throws Exception {
         Timer.TimeContext successContext = successTimer.start();
         Timer.TimeContext failureContext = failureTimer.start();

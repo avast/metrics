@@ -155,6 +155,14 @@ public class NoOpMonitor implements Monitor {
             }
 
             @Override
+            public void update(Duration duration) {
+            }
+
+            @Override
+            public void updateFailure(Duration duration) {
+            }
+
+            @Override
             public <T> T time(Callable<T> operation) throws Exception {
                 return operation.call();
             }
