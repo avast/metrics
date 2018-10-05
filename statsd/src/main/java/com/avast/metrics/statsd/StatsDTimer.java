@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 @SuppressWarnings("Duplicates")
-public class StatsDTimer implements Timer {
+public class StatsDTimer implements Timer, StatsDMetric {
     private final StatsDClient client;
     private final String name;
     private double sampleRate;
@@ -28,7 +28,6 @@ public class StatsDTimer implements Timer {
         this.client = client;
         this.name = name;
         this.sampleRate = sampleRate;
-        this.client.recordExecutionTime(name, 0, sampleRate);
     }
 
     @Override
@@ -72,6 +71,11 @@ public class StatsDTimer implements Timer {
     @Override
     public long count() {
         return count.get();
+    }
+
+    @Override
+    public void init() {
+        this.client.recordExecutionTime(name, 0, sampleRate);
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")

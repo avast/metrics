@@ -5,7 +5,7 @@ import com.timgroup.statsd.StatsDClient;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-public class StatsDMeter implements Meter {
+public class StatsDMeter implements Meter, StatsDMetric {
     private final StatsDClient client;
     private final String name;
     private double sampleRate;
@@ -42,6 +42,12 @@ public class StatsDMeter implements Meter {
     @Override
     public long count() {
         return marks.get();
+    }
+
+
+    @Override
+    public void init() {
+        underlying(1);
     }
 
     private void underlying(long value) {
