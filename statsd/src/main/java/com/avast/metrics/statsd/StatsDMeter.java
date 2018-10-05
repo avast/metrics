@@ -47,10 +47,10 @@ public class StatsDMeter implements Meter, StatsDMetric {
 
     @Override
     public void init() {
-        underlying(1);
+        client.count(name, 1);
     }
 
     private void underlying(long value) {
-        client.count(name, value);
+        client.count(name, value, sampleRate);
     }
 }

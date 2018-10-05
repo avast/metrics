@@ -61,10 +61,10 @@ public class StatsDCounter implements Counter, StatsDMetric {
 
     @Override
     public void init() {
-        underlying(0);
+        client.count(name, 0, sampleRate);
     }
 
     private void underlying(final long value) {
-        client.count(name, value);
+        client.count(name, value, sampleRate);
     }
 }
