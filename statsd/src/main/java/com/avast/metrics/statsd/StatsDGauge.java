@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.function.Supplier;
 
-public class StatsDGauge<T> implements Gauge<T> {
+public class StatsDGauge<T> implements Gauge<T>, StatsDMetric {
     private static final Logger LOGGER = LoggerFactory.getLogger(StatsDGauge.class);
 
     private final StatsDClient client;
@@ -75,4 +75,8 @@ public class StatsDGauge<T> implements Gauge<T> {
         return name;
     }
 
+    @Override
+    public void init() {
+        client.recordGaugeValue(name, 0);
+    }
 }

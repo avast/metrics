@@ -27,16 +27,23 @@ public class StatsDMetricsMonitor implements Monitor {
     protected final ScheduledExecutorService scheduler;
     protected final Duration gaugeSendPeriod;
     protected final MetricsFilter metricsFilter;
+    protected final boolean autoRegisterMetric;
 
     protected final Map<String, ScheduledFuture<?>> gauges = new HashMap<>();
 
-    public StatsDMetricsMonitor(String host, int port, String prefix, final Naming naming, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler, MetricsFilter metricsFilter) {
+    public StatsDMetricsMonitor(String host, int port, boolean autoRegisterMetrics, String prefix, final Naming naming, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler, MetricsFilter metricsFilter) {
         this.prefix = prefix;
         this.naming = naming;
         this.gaugeSendPeriod = gaugeSendPeriod;
         this.scheduler = scheduler;
         client = createStatsDClient(host, port, prefix);
         this.metricsFilter = metricsFilter;
+        this.autoRegisterMetric = autoRegisterMetrics;
+    }
+
+
+    public StatsDMetricsMonitor(String host, int port, String prefix, final Naming naming, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler, MetricsFilter metricsFilter) {
+        this(host, port, false, prefix, naming, gaugeSendPeriod, scheduler, metricsFilter);
     }
 
     public StatsDMetricsMonitor(String host, int port, String prefix, final Naming naming, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler) {
@@ -71,7 +78,7 @@ public class StatsDMetricsMonitor implements Monitor {
         this.scheduler = scheduler;
         this.gaugeSendPeriod = gaugeSendPeriod;
         this.metricsFilter = metricsFilter;
-
+        this.autoRegisterMetric = monitor.isAutoRegisterMetric();
         this.names.addAll(monitor.names);
         this.names.addAll(Arrays.asList(newNames));
     }
@@ -104,7 +111,7 @@ public class StatsDMetricsMonitor implements Monitor {
         FilterConfig config = metricsFilter.getConfig(metricName);
 
         if (config.isEnabled()) {
-            return new StatsDMeter(client, metricName, config.getSampleRate());
+            return init(new StatsDMeter(client, metricName, config.getSampleRate()));
         } else {
             return NoOpMonitor.INSTANCE.newMeter(metricName);
         }
@@ -116,7 +123,7 @@ public class StatsDMetricsMonitor implements Monitor {
         FilterConfig config = metricsFilter.getConfig(metricName);
 
         if (config.isEnabled()) {
-            return new StatsDCounter(client, metricName, config.getSampleRate());
+            return init(new StatsDCounter(client, metricName, config.getSampleRate()));
         } else {
             return NoOpMonitor.INSTANCE.newCounter(metricName);
         }
@@ -128,7 +135,7 @@ public class StatsDMetricsMonitor implements Monitor {
         FilterConfig config = metricsFilter.getConfig(metricName);
 
         if (config.isEnabled()) {
-            return new StatsDTimer(client, metricName, config.getSampleRate());
+            return init(new StatsDTimer(client, metricName, config.getSampleRate()));
         } else {
             return NoOpMonitor.INSTANCE.newTimer(metricName);
         }
@@ -164,7 +171,7 @@ public class StatsDMetricsMonitor implements Monitor {
                     existing.cancel(false);
                 }
 
-                final StatsDGauge<T> gauge = new StatsDGauge<>(client, metricName, supplier, config.getSampleRate());
+                final StatsDGauge<T> gauge = init(new StatsDGauge<>(client, metricName, supplier, config.getSampleRate()));
 
                 final ScheduledFuture<?> scheduled = scheduler.scheduleAtFixedRate(gauge::send, 0, gaugeSendPeriod.toMillis(), TimeUnit.MILLISECONDS);
 
@@ -183,7 +190,7 @@ public class StatsDMetricsMonitor implements Monitor {
         FilterConfig config = metricsFilter.getConfig(metricName);
 
         if (config.isEnabled()) {
-            return new StatsDHistogram(client, metricName);
+            return init(new StatsDHistogram(client, metricName));
         } else {
             return NoOpMonitor.INSTANCE.newHistogram(metricName);
         }
@@ -205,6 +212,10 @@ public class StatsDMetricsMonitor implements Monitor {
         return constructMetricName(Optional.empty());
     }
 
+    public boolean isAutoRegisterMetric() {
+        return autoRegisterMetric;
+    }
+
     @Override
     public void close() {
         scheduler.shutdown();
@@ -219,5 +230,14 @@ public class StatsDMetricsMonitor implements Monitor {
         List<String> copy = new ArrayList<>(names);
         finalName.ifPresent(copy::add);
         return copy.stream().collect(Collectors.joining("."));
+    }
+
+    private <A extends StatsDMetric> A init(A a) {
+        if (autoRegisterMetric) {
+            a.init();
+            return a;
+        } else {
+            return a;
+        }
     }
 }
