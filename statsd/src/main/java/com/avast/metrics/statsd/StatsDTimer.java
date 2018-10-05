@@ -28,6 +28,7 @@ public class StatsDTimer implements Timer {
         this.client = client;
         this.name = name;
         this.sampleRate = sampleRate;
+        this.client.recordExecutionTime(name, 0, sampleRate);
     }
 
     @Override

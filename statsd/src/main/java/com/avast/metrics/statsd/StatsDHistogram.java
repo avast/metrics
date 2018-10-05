@@ -10,6 +10,7 @@ public class StatsDHistogram implements Histogram {
     public StatsDHistogram(final StatsDClient client, final String name) {
         this.client = client;
         this.name = name;
+        this.client.recordSetValue(name, String.valueOf(0));
     }
 
     @Override

@@ -25,7 +25,7 @@ public class StatsDTimerTest {
 
         timer.update(Duration.ZERO);
 
-        verify(client, times(1)).recordExecutionTime(Matchers.eq(name), Matchers.anyLong(), Matchers.anyDouble(), Matchers.anyVararg());
+        verify(client, times(2)).recordExecutionTime(Matchers.eq(name), Matchers.anyLong(), Matchers.anyDouble(), Matchers.anyVararg());
 
         assertEquals(1, timer.count());
     }
@@ -56,7 +56,7 @@ public class StatsDTimerTest {
 
         // verify results
 
-        verify(client, times(6)).recordExecutionTime(Matchers.eq(name), Matchers.anyLong(), Matchers.anyDouble(), Matchers.anyVararg());
+        verify(client, times(8)).recordExecutionTime(Matchers.eq(name), Matchers.anyLong(), Matchers.anyDouble(), Matchers.anyVararg());
 
         assertEquals(5, timer.count());
         assertEquals(1, failureTimer.count());
@@ -96,7 +96,7 @@ public class StatsDTimerTest {
 
         // verify results
 
-        verify(client, times(4)).recordExecutionTime(Matchers.eq(name), Matchers.anyLong(), Matchers.anyDouble(), Matchers.anyVararg());
+        verify(client, times(6)).recordExecutionTime(Matchers.eq(name), Matchers.anyLong(), Matchers.anyDouble(), Matchers.anyVararg());
 
         assertEquals(3, timer.count());
         assertEquals(1, failureTimer.count());

@@ -44,7 +44,7 @@ public class StatsDCounterTest {
             counter.inc();
         }
 
-        verify(client, times(5)).count(Matchers.eq(name), Matchers.anyLong(), Matchers.anyDouble(), Matchers.<String>anyVararg());
+        verify(client, times(6)).count(Matchers.eq(name), Matchers.anyLong(), Matchers.anyDouble(), Matchers.<String>anyVararg());
     }
 
     @Test
@@ -59,7 +59,7 @@ public class StatsDCounterTest {
             counter.dec();
         }
 
-        verify(client, times(3)).count(Matchers.eq(name), Matchers.anyLong(), Matchers.anyDouble(), Matchers.<String>anyVararg());
+        verify(client, times(4)).count(Matchers.eq(name), Matchers.anyLong(), Matchers.anyDouble(), Matchers.<String>anyVararg());
     }
 
     @Test
@@ -73,6 +73,7 @@ public class StatsDCounterTest {
         counter.inc(4);
 
         verify(client, times(1)).count(Matchers.eq(name), eq(4L), Matchers.anyDouble(), Matchers.<String>anyVararg());
+        verify(client, times(1)).count(Matchers.eq(name), eq(0L), Matchers.anyDouble(), Matchers.<String>anyVararg());
     }
 
     @Test
@@ -86,5 +87,6 @@ public class StatsDCounterTest {
         counter.inc(4);
 
         verify(client, times(1)).count(Matchers.eq(name), eq(4L), eq(0.1), Matchers.<String>anyVararg());
+        verify(client, times(1)).count(Matchers.eq(name), eq(0L), Matchers.anyDouble(), Matchers.<String>anyVararg());
     }
 }

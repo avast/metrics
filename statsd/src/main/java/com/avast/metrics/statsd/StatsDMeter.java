@@ -30,17 +30,21 @@ public class StatsDMeter implements Meter {
     @Override
     public void mark() {
         marks.incrementAndGet();
-        client.count(name, 1, sampleRate);
+        underlying(1);
     }
 
     @Override
     public void mark(final long n) {
         marks.addAndGet(n);
-        client.count(name, n, sampleRate);
+        underlying(n);
     }
 
     @Override
     public long count() {
         return marks.get();
+    }
+
+    private void underlying(long value) {
+        client.count(name, value, sampleRate);
     }
 }
