@@ -75,7 +75,7 @@ public class StatsDTimer implements Timer, StatsDMetric {
 
     @Override
     public void init() {
-        this.client.recordExecutionTime(name, 0, sampleRate);
+        this.client.recordExecutionTime(name, 0);
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")

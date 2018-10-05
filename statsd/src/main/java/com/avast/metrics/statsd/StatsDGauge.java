@@ -77,6 +77,6 @@ public class StatsDGauge<T> implements Gauge<T>, StatsDMetric {
 
     @Override
     public void init() {
-        sendLongValue(0);
+        client.recordGaugeValue(name, 0);
     }
 }

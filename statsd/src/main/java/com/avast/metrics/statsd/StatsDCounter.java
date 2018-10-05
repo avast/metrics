@@ -65,6 +65,6 @@ public class StatsDCounter implements Counter, StatsDMetric {
     }
 
     private void underlying(final long value) {
-        client.count(name, value, sampleRate);
+        client.count(name, value);
     }
 }

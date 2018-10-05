@@ -51,6 +51,6 @@ public class StatsDMeter implements Meter, StatsDMetric {
     }
 
     private void underlying(long value) {
-        client.count(name, value, sampleRate);
+        client.count(name, value);
     }
 }
