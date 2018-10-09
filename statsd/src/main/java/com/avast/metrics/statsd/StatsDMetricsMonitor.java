@@ -51,7 +51,9 @@ public class StatsDMetricsMonitor implements Monitor {
     }
 
     /**
-     * @deprecated As caller should be owner of thread pool.
+     * @deprecated This constructor is only for backward compatibility and should be no longer used.
+     * It internally builds an instance of scheduler that will be never shutted down and causes threads leak.
+     * Prefer to use builder or other constructors.
      */
     @Deprecated
     public StatsDMetricsMonitor(String host, int port, String prefix, final Naming naming) {
@@ -63,8 +65,9 @@ public class StatsDMetricsMonitor implements Monitor {
     }
 
     /**
-     * @deprecated As caller should be owner of thread pool.
-     *
+     * @deprecated This constructor is only for backward compatibility and should be no longer used.
+     * It internally builds an instance of scheduler that will be never shutted down and causes threads leak.
+     * Prefer to use builder or other constructors.
      */
     @Deprecated
     public StatsDMetricsMonitor(String host, int port, String prefix) {
@@ -72,8 +75,9 @@ public class StatsDMetricsMonitor implements Monitor {
     }
 
     /**
-     * @deprecated As caller should be owner of thread pool.
-     *
+     * @deprecated This constructor is only for backward compatibility and should be no longer used.
+     * It internally builds an instance of scheduler that will be never shutted down and causes threads leak.
+     * Prefer to use builder or other constructors.
      */
     @Deprecated
     public StatsDMetricsMonitor(String host, int port, String prefix, MetricsFilter metricsFilter) {
@@ -231,8 +235,6 @@ public class StatsDMetricsMonitor implements Monitor {
 
     @Override
     public void close() {
-        // TODO: Remove when constructors without scheduler will be removed
-        scheduler.shutdown();
         client.stop();
     }
 
