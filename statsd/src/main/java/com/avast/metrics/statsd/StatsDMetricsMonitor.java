@@ -50,6 +50,12 @@ public class StatsDMetricsMonitor implements Monitor {
         this(host, port, prefix, naming, gaugeSendPeriod, scheduler, MetricsFilter.ALL_ENABLED);
     }
 
+    /**
+     * @deprecated This constructor is only for backward compatibility and should be no longer used.
+     * It internally builds an instance of scheduler that will be never shutted down and causes threads leak.
+     * Prefer to use builder or other constructors.
+     */
+    @Deprecated
     public StatsDMetricsMonitor(String host, int port, String prefix, final Naming naming) {
         this(host, port, prefix, naming, getDefaultGaugeSendPeriod(), createScheduler());
     }
@@ -58,11 +64,22 @@ public class StatsDMetricsMonitor implements Monitor {
         this(host, port, prefix, Naming.defaultNaming(), gaugeSendPeriod, scheduler);
     }
 
+    /**
+     * @deprecated This constructor is only for backward compatibility and should be no longer used.
+     * It internally builds an instance of scheduler that will be never shutted down and causes threads leak.
+     * Prefer to use builder or other constructors.
+     */
+    @Deprecated
     public StatsDMetricsMonitor(String host, int port, String prefix) {
         this(host, port, prefix, Naming.defaultNaming(), getDefaultGaugeSendPeriod(), createScheduler());
     }
 
-
+    /**
+     * @deprecated This constructor is only for backward compatibility and should be no longer used.
+     * It internally builds an instance of scheduler that will be never shutted down and causes threads leak.
+     * Prefer to use builder or other constructors.
+     */
+    @Deprecated
     public StatsDMetricsMonitor(String host, int port, String prefix, MetricsFilter metricsFilter) {
         this(host, port, prefix, Naming.defaultNaming(), getDefaultGaugeSendPeriod(), createScheduler(), metricsFilter);
     }
@@ -218,7 +235,6 @@ public class StatsDMetricsMonitor implements Monitor {
 
     @Override
     public void close() {
-        scheduler.shutdown();
         client.stop();
     }
 
