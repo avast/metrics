@@ -50,6 +50,10 @@ public class StatsDMetricsMonitor implements Monitor {
         this(host, port, prefix, naming, gaugeSendPeriod, scheduler, MetricsFilter.ALL_ENABLED);
     }
 
+    /**
+     * @deprecated As caller should be owner of thread pool.
+     */
+    @Deprecated
     public StatsDMetricsMonitor(String host, int port, String prefix, final Naming naming) {
         this(host, port, prefix, naming, getDefaultGaugeSendPeriod(), createScheduler());
     }
@@ -58,11 +62,20 @@ public class StatsDMetricsMonitor implements Monitor {
         this(host, port, prefix, Naming.defaultNaming(), gaugeSendPeriod, scheduler);
     }
 
+    /**
+     * @deprecated As caller should be owner of thread pool.
+     *
+     */
+    @Deprecated
     public StatsDMetricsMonitor(String host, int port, String prefix) {
         this(host, port, prefix, Naming.defaultNaming(), getDefaultGaugeSendPeriod(), createScheduler());
     }
 
-
+    /**
+     * @deprecated As caller should be owner of thread pool.
+     *
+     */
+    @Deprecated
     public StatsDMetricsMonitor(String host, int port, String prefix, MetricsFilter metricsFilter) {
         this(host, port, prefix, Naming.defaultNaming(), getDefaultGaugeSendPeriod(), createScheduler(), metricsFilter);
     }
@@ -218,6 +231,7 @@ public class StatsDMetricsMonitor implements Monitor {
 
     @Override
     public void close() {
+        // TODO: Remove when constructors without scheduler will be removed
         scheduler.shutdown();
         client.stop();
     }
