@@ -14,8 +14,7 @@ public class StatsDHistogram implements Histogram, StatsDMetric {
 
     @Override
     public void update(final long value) {
-        // TODO: client.histogram() supports sample rate, what is recordSetValue?
-        client.recordSetValue(name, String.valueOf(value));
+        client.histogram(name, value);
     }
 
     @Override

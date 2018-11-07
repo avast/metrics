@@ -18,6 +18,6 @@ public class StatsDHistogramTest {
             histogram.update(10);
         }
 
-        verify(client, times(5)).recordSetValue(name, "10");
+        verify(client, times(5)).histogram(name, 10);
     }
 }
