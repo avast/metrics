@@ -108,4 +108,13 @@ public class StatsDMetricsMonitorTest {
             }
         }
     }
+
+    @Test
+    public void nameSanitizationWorks() {
+        try(final StatsDMetricsMonitor monitor = new StatsDMetricsMonitor("",1234,"com.avast.domain")) {
+            assertEquals(monitor.named("hello*").getName(), "hello_");
+            assertEquals(monitor.named("2001:***@1.00").getName(), "2001_____1.00");
+            assertEquals(monitor.newMeter("hello$"), "hello_");
+        }
+    }
 }

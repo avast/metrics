@@ -36,7 +36,7 @@ public class StatsDMetricsMonitor implements Monitor {
         this.naming = naming;
         this.gaugeSendPeriod = gaugeSendPeriod;
         this.scheduler = scheduler;
-        client = createStatsDClient(host, port, prefix);
+        client = createStatsDClient(host, port, sanitizeNames(prefix));
         this.metricsFilter = metricsFilter;
         this.autoRegisterMetric = autoRegisterMetrics;
     }
@@ -97,7 +97,7 @@ public class StatsDMetricsMonitor implements Monitor {
         this.metricsFilter = metricsFilter;
         this.autoRegisterMetric = monitor.isAutoRegisterMetric();
         this.names.addAll(monitor.names);
-        this.names.addAll(Arrays.asList(newNames));
+        this.names.addAll(Arrays.stream(newNames).map(this::sanitizeNames).collect(Collectors.toList()));
     }
 
     protected StatsDClient createStatsDClient(final String host, final int port, final String prefix) {
@@ -114,7 +114,7 @@ public class StatsDMetricsMonitor implements Monitor {
 
     @Override
     public StatsDMetricsMonitor named(final String name) {
-        return new StatsDMetricsMonitor(this, gaugeSendPeriod, scheduler, metricsFilter, name);
+        return new StatsDMetricsMonitor(this, gaugeSendPeriod, scheduler, metricsFilter, sanitizeNames(name));
     }
 
     @Override
@@ -244,7 +244,7 @@ public class StatsDMetricsMonitor implements Monitor {
 
     protected String constructMetricName(Optional<String> finalName) {
         List<String> copy = new ArrayList<>(names);
-        finalName.ifPresent(copy::add);
+        finalName.map(this::sanitizeNames).ifPresent(copy::add);
         return copy.stream().collect(Collectors.joining("."));
     }
 
@@ -255,5 +255,9 @@ public class StatsDMetricsMonitor implements Monitor {
         } else {
             return a;
         }
+    }
+
+    private String sanitizeNames(String name) {
+        return name.replaceAll("[^a-zA-Z0-9-]", "_");
     }
 }
