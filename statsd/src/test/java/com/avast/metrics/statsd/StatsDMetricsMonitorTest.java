@@ -1,5 +1,6 @@
 package com.avast.metrics.statsd;
 
+import com.avast.metrics.api.Monitor;
 import com.timgroup.statsd.StatsDClient;
 import org.junit.Test;
 import org.mockito.Matchers;
@@ -111,10 +112,20 @@ public class StatsDMetricsMonitorTest {
 
     @Test
     public void nameSanitizationWorks() {
-        try(final StatsDMetricsMonitor monitor = new StatsDMetricsMonitor("",1234,"com.avast.domain")) {
+        try (final StatsDMetricsMonitor monitor = new StatsDMetricsMonitor("", 1234, "com.avast.domain")) {
+            assertEquals(monitor.prefix, "com.avast.domain");
             assertEquals(monitor.named("hello*").getName(), "hello_");
-            assertEquals(monitor.named("2001:***@1.00").getName(), "2001_____1.00");
-            assertEquals(monitor.newMeter("hello$"), "hello_");
+            assertEquals(monitor.named("2001:***@1.00").getName(), "2001_____1_00");
+            assertEquals(monitor.newMeter("hello$").getName(), "hello_");
+
+            for (byte b = 32; b <= 126; ++b) {
+                char ch = (char) b;
+                if (!(Character.isAlphabetic(b) || Character.isDigit(b) || ch == '_')) {
+                    String name = "test" + ch;
+                    assertEquals(monitor.named(name).getName(), "test_");
+                    assertEquals(monitor.newMeter(name).getName(), "test_");
+                }
+            }
         }
     }
 }

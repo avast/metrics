@@ -32,11 +32,11 @@ public class StatsDMetricsMonitor implements Monitor {
     protected final Map<String, ScheduledFuture<?>> gauges = new HashMap<>();
 
     public StatsDMetricsMonitor(String host, int port, boolean autoRegisterMetrics, String prefix, final Naming naming, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler, MetricsFilter metricsFilter) {
-        this.prefix = prefix;
+        this.prefix = sanitizePrefix(prefix);
         this.naming = naming;
         this.gaugeSendPeriod = gaugeSendPeriod;
         this.scheduler = scheduler;
-        client = createStatsDClient(host, port, sanitizeNames(prefix));
+        client = createStatsDClient(host, port, this.prefix);
         this.metricsFilter = metricsFilter;
         this.autoRegisterMetric = autoRegisterMetrics;
     }
@@ -257,7 +257,11 @@ public class StatsDMetricsMonitor implements Monitor {
         }
     }
 
+    private String sanitizePrefix(String name) {
+        return name.replaceAll("[^a-zA-Z0-9.]", "_");
+    }
+
     private String sanitizeNames(String name) {
-        return name.replaceAll("[^a-zA-Z0-9-]", "_");
+        return name.replaceAll("[^a-zA-Z0-9]", "_");
     }
 }
