@@ -28,10 +28,13 @@ public class StatsDMetricsMonitor implements Monitor {
     protected final Duration gaugeSendPeriod;
     protected final MetricsFilter metricsFilter;
     protected final boolean autoRegisterMetric;
+    protected final String invalidCharactersRegex;
+
+    public static String DEFAULT_INVALID_CHARACTERS_REGEX = "[^a-zA-Z0-9.]";
 
     protected final Map<String, ScheduledFuture<?>> gauges = new HashMap<>();
 
-    public StatsDMetricsMonitor(String host, int port, boolean autoRegisterMetrics, String prefix, final Naming naming, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler, MetricsFilter metricsFilter) {
+    public StatsDMetricsMonitor(String host, int port, boolean autoRegisterMetrics, String prefix, final Naming naming, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler, MetricsFilter metricsFilter, String invalidCharactersRegex) {
         this.prefix = sanitizeNames(prefix);
         this.naming = naming;
         this.gaugeSendPeriod = gaugeSendPeriod;
@@ -39,11 +42,12 @@ public class StatsDMetricsMonitor implements Monitor {
         client = createStatsDClient(host, port, this.prefix);
         this.metricsFilter = metricsFilter;
         this.autoRegisterMetric = autoRegisterMetrics;
+        this.invalidCharactersRegex = invalidCharactersRegex;
     }
 
 
     public StatsDMetricsMonitor(String host, int port, String prefix, final Naming naming, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler, MetricsFilter metricsFilter) {
-        this(host, port, false, prefix, naming, gaugeSendPeriod, scheduler, metricsFilter);
+        this(host, port, false, prefix, naming, gaugeSendPeriod, scheduler, metricsFilter, DEFAULT_INVALID_CHARACTERS_REGEX);
     }
 
     public StatsDMetricsMonitor(String host, int port, String prefix, final Naming naming, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler) {
@@ -84,11 +88,11 @@ public class StatsDMetricsMonitor implements Monitor {
         this(host, port, prefix, Naming.defaultNaming(), getDefaultGaugeSendPeriod(), createScheduler(), metricsFilter);
     }
 
-    protected StatsDMetricsMonitor(StatsDMetricsMonitor monitor, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler, String... newNames) {
-        this(monitor, gaugeSendPeriod, scheduler, MetricsFilter.ALL_ENABLED, newNames);
+    protected StatsDMetricsMonitor(StatsDMetricsMonitor monitor, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler, String invalidCharactersRegex, String... newNames) {
+        this(monitor, gaugeSendPeriod, scheduler, MetricsFilter.ALL_ENABLED, invalidCharactersRegex, newNames);
     }
 
-    protected StatsDMetricsMonitor(StatsDMetricsMonitor monitor, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler, MetricsFilter metricsFilter, String... newNames) {
+    protected StatsDMetricsMonitor(StatsDMetricsMonitor monitor, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler, MetricsFilter metricsFilter, String invalidCharactersRegex, String... newNames) {
         this.prefix = monitor.prefix;
         this.client = monitor.client;
         this.naming = monitor.naming;
@@ -98,6 +102,7 @@ public class StatsDMetricsMonitor implements Monitor {
         this.autoRegisterMetric = monitor.isAutoRegisterMetric();
         this.names.addAll(monitor.names);
         this.names.addAll(Arrays.stream(newNames).map(this::sanitizeNames).collect(Collectors.toList()));
+        this.invalidCharactersRegex = invalidCharactersRegex;
     }
 
     protected StatsDClient createStatsDClient(final String host, final int port, final String prefix) {
@@ -114,12 +119,12 @@ public class StatsDMetricsMonitor implements Monitor {
 
     @Override
     public StatsDMetricsMonitor named(final String name) {
-        return new StatsDMetricsMonitor(this, gaugeSendPeriod, scheduler, metricsFilter, sanitizeNames(name));
+        return new StatsDMetricsMonitor(this, gaugeSendPeriod, scheduler, metricsFilter, invalidCharactersRegex, sanitizeNames(name));
     }
 
     @Override
     public StatsDMetricsMonitor named(final String name1, final String name2, final String... restOfNames) {
-        return new StatsDMetricsMonitor(named(name1).named(name2), gaugeSendPeriod, scheduler, metricsFilter, restOfNames);
+        return new StatsDMetricsMonitor(named(name1).named(name2), gaugeSendPeriod, scheduler, metricsFilter, invalidCharactersRegex, restOfNames);
     }
 
     @Override
@@ -258,6 +263,6 @@ public class StatsDMetricsMonitor implements Monitor {
     }
 
     private String sanitizeNames(String name) {
-        return name.replaceAll("[^a-zA-Z0-9.]", "_");
+        return name.replaceAll(invalidCharactersRegex, "_");
     }
 }

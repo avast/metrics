@@ -15,6 +15,7 @@ public class StatsDMetricsMonitorBuilder {
     private Naming naming = Naming.defaultNaming();
     private Duration gaugeSendPeriod = Duration.ofSeconds(1);
     private MetricsFilter metricsFilter = MetricsFilter.ALL_ENABLED;
+    private String invalidCharactersRegex = StatsDMetricsMonitor.DEFAULT_INVALID_CHARACTERS_REGEX;
 
     public StatsDMetricsMonitorBuilder(String host, int port, String prefix, final ScheduledExecutorService scheduler) {
         this.host = host;
@@ -43,7 +44,12 @@ public class StatsDMetricsMonitorBuilder {
         return this;
     }
 
+    public StatsDMetricsMonitorBuilder withInvalidCharactersRegex(String invalidCharactersRegex) {
+        this.invalidCharactersRegex = invalidCharactersRegex;
+        return this;
+    }
+
     public StatsDMetricsMonitor build() {
-        return new StatsDMetricsMonitor(host, port, autoRegisterMetrics, prefix, naming, gaugeSendPeriod, scheduler, metricsFilter);
+        return new StatsDMetricsMonitor(host, port, autoRegisterMetrics, prefix, naming, gaugeSendPeriod, scheduler, metricsFilter, invalidCharactersRegex);
     }
 }
