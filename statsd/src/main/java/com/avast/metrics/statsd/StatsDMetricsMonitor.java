@@ -30,7 +30,7 @@ public class StatsDMetricsMonitor implements Monitor {
     protected final boolean autoRegisterMetric;
     protected final String invalidCharactersRegex;
 
-    public static String DEFAULT_INVALID_CHARACTERS_REGEX = "[^a-zA-Z0-9.]";
+    public static String DEFAULT_INVALID_CHARACTERS_REGEX = "[^a-zA-Z0-9.-]";
 
     protected final Map<String, ScheduledFuture<?>> gauges = new HashMap<>();
 
