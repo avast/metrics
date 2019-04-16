@@ -35,6 +35,7 @@ public class StatsDMetricsMonitor implements Monitor {
     protected final Map<String, ScheduledFuture<?>> gauges = new HashMap<>();
 
     public StatsDMetricsMonitor(String host, int port, boolean autoRegisterMetrics, String prefix, final Naming naming, final Duration gaugeSendPeriod, final ScheduledExecutorService scheduler, MetricsFilter metricsFilter, String invalidCharactersRegex) {
+        this.invalidCharactersRegex = invalidCharactersRegex;
         this.prefix = sanitizeNames(prefix);
         this.naming = naming;
         this.gaugeSendPeriod = gaugeSendPeriod;
@@ -42,7 +43,6 @@ public class StatsDMetricsMonitor implements Monitor {
         client = createStatsDClient(host, port, this.prefix);
         this.metricsFilter = metricsFilter;
         this.autoRegisterMetric = autoRegisterMetrics;
-        this.invalidCharactersRegex = invalidCharactersRegex;
     }
 
 
@@ -100,9 +100,9 @@ public class StatsDMetricsMonitor implements Monitor {
         this.gaugeSendPeriod = gaugeSendPeriod;
         this.metricsFilter = metricsFilter;
         this.autoRegisterMetric = monitor.isAutoRegisterMetric();
+        this.invalidCharactersRegex = invalidCharactersRegex;
         this.names.addAll(monitor.names);
         this.names.addAll(Arrays.stream(newNames).map(this::sanitizeNames).collect(Collectors.toList()));
-        this.invalidCharactersRegex = invalidCharactersRegex;
     }
 
     protected StatsDClient createStatsDClient(final String host, final int port, final String prefix) {

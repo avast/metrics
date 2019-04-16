@@ -120,7 +120,7 @@ public class StatsDMetricsMonitorTest {
 
             for (byte b = 32; b <= 126; ++b) {
                 char ch = (char) b;
-                if (!(Character.isAlphabetic(b) || Character.isDigit(b) || ch == '_' || ch == '.')) {
+                if (!(Character.isAlphabetic(b) || Character.isDigit(b) || ch == '_' || ch == '.' || ch == '-')) {
                     String name = "test" + ch;
                     assertEquals(monitor.named(name).getName(), "test_");
                     assertEquals(monitor.newMeter(name).getName(), "test_");
