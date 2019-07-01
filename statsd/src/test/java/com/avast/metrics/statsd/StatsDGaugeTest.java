@@ -21,7 +21,7 @@ public class StatsDGaugeTest {
             dGauge.send();
         }
 
-        verify(client, times(5)).recordGaugeValue(Matchers.eq(name), Matchers.eq(Math.PI), Matchers.anyDouble());
+        verify(client, times(5)).recordGaugeValue(Matchers.eq(name), Matchers.eq(Math.PI));
 
         assertEquals(Math.PI, dGauge.getValue(), 0);
     }
@@ -38,7 +38,7 @@ public class StatsDGaugeTest {
             dGauge.send();
         }
 
-        verify(client, times(5)).recordGaugeValue(Matchers.eq(name), Matchers.eq(Long.MAX_VALUE), Matchers.anyDouble());
+        verify(client, times(5)).recordGaugeValue(Matchers.eq(name), Matchers.eq(Long.MAX_VALUE));
 
         assertEquals(Long.MAX_VALUE, dGauge.getValue(), 0);
     }
@@ -55,7 +55,7 @@ public class StatsDGaugeTest {
             dGauge.send();
         }
 
-        verify(client, times(5)).recordGaugeValue(Matchers.eq(name), Matchers.eq((long) Integer.MAX_VALUE), Matchers.anyDouble());
+        verify(client, times(5)).recordGaugeValue(Matchers.eq(name), Matchers.eq((long) Integer.MAX_VALUE));
 
         assertEquals(Integer.MAX_VALUE, dGauge.getValue(), 0);
     }

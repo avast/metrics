@@ -63,11 +63,11 @@ public class StatsDGauge<T> implements Gauge<T>, StatsDMetric {
     }
 
     private void sendLongValue(long l) {
-        client.recordGaugeValue(name, l, sampleRate);
+        if (sampleRate == 1.0) client.recordGaugeValue(name, l); else client.recordGaugeValue(name, l, sampleRate);
     }
 
     private void sendDoubleValue(double d) {
-        client.recordGaugeValue(name, d, sampleRate);
+        if (sampleRate == 1.0) client.recordGaugeValue(name, d); else client.recordGaugeValue(name, d, sampleRate);
     }
 
     @Override
