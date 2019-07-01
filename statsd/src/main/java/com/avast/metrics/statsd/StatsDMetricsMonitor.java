@@ -188,7 +188,7 @@ public class StatsDMetricsMonitor implements Monitor {
                     existing.cancel(false);
                 }
 
-                final StatsDGauge<T> gauge = init(new StatsDGauge<>(client, metricName, supplier, config.getSampleRate()));
+                final StatsDGauge<T> gauge = init(new StatsDGauge<>(client, metricName, supplier));
 
                 final ScheduledFuture<?> scheduled = scheduler.scheduleAtFixedRate(gauge::send, 0, gaugeSendPeriod.toMillis(), TimeUnit.MILLISECONDS);
 
