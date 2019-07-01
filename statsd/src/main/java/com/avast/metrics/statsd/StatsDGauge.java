@@ -15,17 +15,11 @@ public class StatsDGauge<T> implements Gauge<T>, StatsDMetric {
     private final StatsDClient client;
     private final String name;
     private final Supplier<T> supplier;
-    private double sampleRate;
 
     StatsDGauge(final StatsDClient client, final String name, final Supplier<T> supplier) {
-        this(client, name, supplier, 1.0);
-    }
-
-    StatsDGauge(final StatsDClient client, final String name, final Supplier<T> supplier, double sampleRate) {
         this.client = client;
         this.name = name;
         this.supplier = supplier;
-        this.sampleRate = sampleRate;
     }
 
     @Override
@@ -63,11 +57,11 @@ public class StatsDGauge<T> implements Gauge<T>, StatsDMetric {
     }
 
     private void sendLongValue(long l) {
-        if (sampleRate == 1.0) client.recordGaugeValue(name, l); else client.recordGaugeValue(name, l, sampleRate);
+        client.recordGaugeValue(name, l);
     }
 
     private void sendDoubleValue(double d) {
-        if (sampleRate == 1.0) client.recordGaugeValue(name, d); else client.recordGaugeValue(name, d, sampleRate);
+        client.recordGaugeValue(name, d);
     }
 
     @Override
