@@ -1,9 +1,9 @@
 package com.avast.metrics.dropwizard;
 
 import com.avast.metrics.api.Naming;
-import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.ObjectNameFactory;
+import com.codahale.metrics.jmx.JmxReporter;
+import com.codahale.metrics.jmx.ObjectNameFactory;
 
 
 public class JmxMetricsMonitor extends MetricsMonitor {
