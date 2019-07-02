@@ -60,7 +60,8 @@ lazy val root = (project in file("."))
   .settings(
     name := "metrics",
     publish := {},
-    publishLocal := {}
+    publishLocal := {},
+    crossScalaVersions := Nil
   ).aggregate(api, scalaApi, core, dropwizardCommon, jmx, jmxAvast, graphite, filter, formatting, statsd, grpc)
 
 lazy val api = (project in file("api")).
