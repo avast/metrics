@@ -1,7 +1,7 @@
 package com.avast.metrics.dropwizard;
 
-import com.codahale.metrics.DefaultObjectNameFactory;
-import com.codahale.metrics.ObjectNameFactory;
+import com.codahale.metrics.jmx.DefaultObjectNameFactory;
+import com.codahale.metrics.jmx.ObjectNameFactory;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;

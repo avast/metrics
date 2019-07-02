@@ -1,30 +1,28 @@
 import sbt.Keys.libraryDependencies
 
-enablePlugins(CrossPerProjectPlugin)
-
 lazy val scalaSettings = Seq(
-  scalaVersion := "2.11.8",
+  scalaVersion := "2.12.8",
   scalacOptions += "-deprecation",
   scalacOptions += "-unchecked",
   scalacOptions += "-feature",
-  crossScalaVersions := Seq("2.11.8", "2.12.1"),
+  crossScalaVersions := Seq("2.12.8", "2.13.0"),
   libraryDependencies ++= Seq(
-    "org.scalatest" %% "scalatest" % "3.0.1" % "test"
+    "org.scalatest" %% "scalatest" % "3.0.8" % "test"
   )
 )
 
 lazy val javaSettings = Seq(
   crossPaths := false,
   autoScalaLibrary := false,
-  crossScalaVersions := Seq("2.11.8") // it's not really used; it's just about turning-off the crosscompilation
+  crossScalaVersions := Seq("2.12.8") // it's not really used; it's just about turning-off the crosscompilation
 )
 
 lazy val Versions = new {
-  val dropwizard = "3.2.2"
-  val typesafeConfig = "1.3.1"
-  val grpc = "1.10.0"
+  val dropwizard = "4.1.0"
+  val typesafeConfig = "1.3.4"
+  val grpc = "1.21.0"
   val slf4j = "1.7.25"
-  val assertj = "3.8.0"
+  val assertj = "3.12.2"
 }
 
 lazy val commonSettings = Seq(
@@ -52,8 +50,8 @@ lazy val commonSettings = Seq(
   libraryDependencies ++= Seq(
     "org.mockito" % "mockito-all" % "1.10.19" % "test",
     "junit" % "junit" % "4.12" % "test",
-    "com.novocode" % "junit-interface" % "0.10" % "test", // Required by sbt to execute JUnit tests
-    "ch.qos.logback" % "logback-classic" % "1.1.8" % "test"
+    "com.novocode" % "junit-interface" % "0.11" % "test", // Required by sbt to execute JUnit tests
+    "ch.qos.logback" % "logback-classic" % "1.2.3" % "test"
   ),
   testOptions += Tests.Argument(TestFrameworks.JUnit)
 )
@@ -62,7 +60,8 @@ lazy val root = (project in file("."))
   .settings(
     name := "metrics",
     publish := {},
-    publishLocal := {}
+    publishLocal := {},
+    crossScalaVersions := Nil
   ).aggregate(api, scalaApi, core, dropwizardCommon, jmx, jmxAvast, graphite, filter, formatting, statsd, grpc)
 
 lazy val api = (project in file("api")).
@@ -97,6 +96,7 @@ lazy val dropwizardCommon = (project in file("dropwizard-common")).
     name := "metrics-dropwizard-common",
     libraryDependencies ++= Seq(
       "io.dropwizard.metrics" % "metrics-core" % Versions.dropwizard,
+      "io.dropwizard.metrics" % "metrics-jmx" % Versions.dropwizard,
       "org.slf4j" % "slf4j-api" % Versions.slf4j
     )
   ).dependsOn(core)
@@ -145,7 +145,7 @@ lazy val grpc = (project in file("grpc")).
       "io.grpc" % "grpc-protobuf" % Versions.grpc % "test",
       "io.grpc" % "grpc-stub" % Versions.grpc % "test",
       "io.grpc" % "grpc-services" % Versions.grpc % "test",
-      "com.google.protobuf" % "protobuf-java" % "3.5.0" % "test"
+      "com.google.protobuf" % "protobuf-java" % "3.8.0" % "test"
     )
   ).dependsOn(core)
 
@@ -165,7 +165,7 @@ lazy val statsd = (project in file("statsd")).
     javaSettings,
     name := "metrics-statsd",
     libraryDependencies ++= Seq(
-      "com.datadoghq" % "java-dogstatsd-client" % "2.3",
-      "org.slf4j" % "slf4j-api" % "1.7.22"
+      "com.datadoghq" % "java-dogstatsd-client" % "2.8",
+      "org.slf4j" % "slf4j-api" % Versions.slf4j
     )
   ).dependsOn(core, filter)
