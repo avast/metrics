@@ -20,7 +20,7 @@ lazy val javaSettings = Seq(
 lazy val Versions = new {
   val dropwizard = "4.1.0"
   val typesafeConfig = "1.3.4"
-  val grpc = "1.22.0"
+  val grpc = "1.22.1"
   val slf4j = "1.7.25"
   val assertj = "3.12.2"
 }
