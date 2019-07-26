@@ -84,7 +84,9 @@ class MultiTimer implements Timer {
 
         @Override
         public long stopAndGetTime() {
-            return contexts.stream().map(TimeContext::stopAndGetTime).findFirst().get();
+            long result = contexts.get(0).stopAndGetTime();
+            contexts.stream().skip(1).forEach(TimeContext::stop);
+            return result;
         }
 
     }
