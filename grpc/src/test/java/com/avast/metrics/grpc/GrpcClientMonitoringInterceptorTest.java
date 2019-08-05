@@ -16,6 +16,8 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -31,6 +33,12 @@ public class GrpcClientMonitoringInterceptorTest {
         final Timer timer = mock(Timer.class);
         when(monitor.newTimer("TestApiService_GetSuccesses")).thenReturn(timer);
         doNothing().when(timer).update(Matchers.eq(Duration.ofMillis(42)));
+
+        AtomicReference<Supplier<Integer>> currentCallsSupplier = new AtomicReference<>();
+        when(monitor.newGauge(eq("TestApiService_GetCurrent"), any())).thenAnswer(invocation -> {
+            currentCallsSupplier.set(invocation.getArgumentAt(1, Supplier.class));
+            return null;
+        });
 
         final Clock clock = mock(Clock.class);
         when(clock.instant()).thenReturn(
@@ -64,6 +72,7 @@ public class GrpcClientMonitoringInterceptorTest {
         assertEquals(TestApiOuterClass.TestApi.GetResponse.newBuilder().putResults("name", 42).build(), response);
 
         verify(timer, times(1)).update(Matchers.eq(Duration.ofMillis(42)));
+        assertEquals(0, currentCallsSupplier.get().get().longValue());
     }
 
     @Test
@@ -74,6 +83,12 @@ public class GrpcClientMonitoringInterceptorTest {
         final Timer timer = mock(Timer.class);
         when(monitor.newTimer("TestApiService_GetFailures")).thenReturn(timer);
         doNothing().when(timer).update(Matchers.eq(Duration.ofMillis(42)));
+
+        AtomicReference<Supplier<Integer>> currentCallsSupplier = new AtomicReference<>();
+        when(monitor.newGauge(eq("TestApiService_GetCurrent"), any())).thenAnswer(invocation -> {
+            currentCallsSupplier.set(invocation.getArgumentAt(1, Supplier.class));
+            return null;
+        });
 
         final Clock clock = mock(Clock.class);
         when(clock.instant()).thenReturn(
@@ -109,6 +124,7 @@ public class GrpcClientMonitoringInterceptorTest {
         }
 
         verify(timer, times(1)).update(Matchers.eq(Duration.ofMillis(42)));
+        assertEquals(0, currentCallsSupplier.get().get().longValue());
     }
 }
 
