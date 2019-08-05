@@ -6,14 +6,15 @@ import io.grpc.*;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class GrpcClientMonitoringInterceptor implements ClientInterceptor {
-    private final TimersCache timers;
+    private final MetricsCache cache;
     private final Clock clock;
 
     public GrpcClientMonitoringInterceptor(final Monitor monitor, final Clock clock) {
         this.clock = clock;
-        timers = new TimersCache(monitor);
+        cache = new MetricsCache(monitor);
     }
 
     public GrpcClientMonitoringInterceptor(final Monitor monitor) {
@@ -22,8 +23,11 @@ public class GrpcClientMonitoringInterceptor implements ClientInterceptor {
 
     @Override
     public <ReqT, RespT> ClientCall<ReqT, RespT> interceptCall(final MethodDescriptor<ReqT, RespT> method, final CallOptions callOptions, final Channel next) {
-        final Instant start = clock.instant();
+        final String metricPrefix = MetricNaming.getMetricNamePrefix(method);
+        final AtomicInteger currentCalls = cache.getGaugedValue(metricPrefix + "Current");
 
+        final Instant start = clock.instant();
+        currentCalls.incrementAndGet();
         final ClientCall<ReqT, RespT> call = next.newCall(method, callOptions);
 
         return new ForwardingClientCall.SimpleForwardingClientCall<ReqT, RespT>(call) {
@@ -34,15 +38,14 @@ public class GrpcClientMonitoringInterceptor implements ClientInterceptor {
                             @Override
                             public void onClose(io.grpc.Status status, Metadata trailers) {
                                 final Duration duration = Duration.between(start, clock.instant());
-
+                                currentCalls.decrementAndGet();
                                 if (status.isOk()) {
-                                    timers.get(method.getFullMethodName().replace('/', '_') + "Successes")
+                                    cache.getTimer(metricPrefix + "Successes")
                                             .update(duration);
                                 } else {
-                                    timers.get(method.getFullMethodName().replace('/', '_') + "Failures")
+                                    cache.getTimer(metricPrefix + "Failures")
                                             .update(duration);
                                 }
-
                                 super.onClose(status, trailers);
                             }
                         },

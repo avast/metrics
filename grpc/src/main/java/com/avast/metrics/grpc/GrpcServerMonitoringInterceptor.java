@@ -6,14 +6,15 @@ import io.grpc.*;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class GrpcServerMonitoringInterceptor implements ServerInterceptor {
-    private final TimersCache timers;
+    private final MetricsCache cache;
     private final Clock clock;
 
     public GrpcServerMonitoringInterceptor(final Monitor monitor, final Clock clock) {
         this.clock = clock;
-        timers = new TimersCache(monitor);
+        cache = new MetricsCache(monitor);
     }
 
     public GrpcServerMonitoringInterceptor(final Monitor monitor) {
@@ -22,18 +23,23 @@ public class GrpcServerMonitoringInterceptor implements ServerInterceptor {
 
     @Override
     public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(final ServerCall<ReqT, RespT> call, final Metadata headers, final ServerCallHandler<ReqT, RespT> next) {
+        final String metricPrefix = MetricNaming.getMetricNamePrefix(call.getMethodDescriptor());
+        final AtomicInteger currentCalls = cache.getGaugedValue(metricPrefix + "Current");
+
         final Instant start = clock.instant();
+        currentCalls.incrementAndGet();
 
         final ServerCall<ReqT, RespT> newCall = new ForwardingServerCall.SimpleForwardingServerCall<ReqT, RespT>(call) {
             @Override
             public void close(final Status status, final Metadata trailers) {
                 final Duration duration = Duration.between(start, clock.instant());
+                currentCalls.decrementAndGet();
 
                 if (status.isOk()) {
-                    timers.get(call.getMethodDescriptor().getFullMethodName().replace('/', '_') + "Successes")
+                    cache.getTimer(metricPrefix + "Successes")
                             .update(duration);
                 } else {
-                    timers.get(call.getMethodDescriptor().getFullMethodName().replace('/', '_') + "Failures")
+                    cache.getTimer(metricPrefix + "Failures")
                             .update(duration);
                 }
 
