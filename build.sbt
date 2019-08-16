@@ -20,7 +20,7 @@ lazy val javaSettings = Seq(
 lazy val Versions = new {
   val dropwizard = "4.1.0"
   val typesafeConfig = "1.3.4"
-  val grpc = "1.22.1"
+  val grpc = "1.23.0"
   val slf4j = "1.7.25"
   val assertj = "3.12.2"
 }
@@ -145,7 +145,7 @@ lazy val grpc = (project in file("grpc")).
       "io.grpc" % "grpc-protobuf" % Versions.grpc % "test",
       "io.grpc" % "grpc-stub" % Versions.grpc % "test",
       "io.grpc" % "grpc-services" % Versions.grpc % "test",
-      "com.google.protobuf" % "protobuf-java" % "3.8.0" % "test"
+      "com.google.protobuf" % "protobuf-java" % "3.9.1" % "test"
     )
   ).dependsOn(core)
 
