@@ -5,6 +5,8 @@ lazy val scalaSettings = Seq(
   scalacOptions += "-deprecation",
   scalacOptions += "-unchecked",
   scalacOptions += "-feature",
+  scalacOptions += "-target:jvm-1.8",
+  javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
   crossScalaVersions := Seq("2.12.8", "2.13.0"),
   libraryDependencies ++= Seq(
     "org.scalatest" %% "scalatest" % "3.0.8" % "test"
@@ -51,7 +53,8 @@ lazy val commonSettings = Seq(
     "org.mockito" % "mockito-all" % "1.10.19" % "test",
     "junit" % "junit" % "4.12" % "test",
     "com.novocode" % "junit-interface" % "0.11" % "test", // Required by sbt to execute JUnit tests
-    "ch.qos.logback" % "logback-classic" % "1.2.3" % "test"
+    "ch.qos.logback" % "logback-classic" % "1.2.3" % "test",
+    "javax.annotation" % "javax.annotation-api" % "1.3.2" % "test" // for compatibility with JDK >8
   ),
   testOptions += Tests.Argument(TestFrameworks.JUnit)
 )
