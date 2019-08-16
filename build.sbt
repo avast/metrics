@@ -6,7 +6,7 @@ lazy val scalaSettings = Seq(
   scalacOptions += "-unchecked",
   scalacOptions += "-feature",
   scalacOptions += "-target:jvm-1.8",
-  javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
+  javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "--add-exports", "java.management/sun.management=ALL-UNNAMED"),
   crossScalaVersions := Seq("2.12.8", "2.13.0"),
   libraryDependencies ++= Seq(
     "org.scalatest" %% "scalatest" % "3.0.8" % "test"
