@@ -15,7 +15,6 @@ lazy val scalaSettings = Seq(
 lazy val javaSettings = Seq(
   crossPaths := false,
   autoScalaLibrary := false,
-  javacOptions ++= Seq("--add-exports", "java.management/sun.management=ALL-UNNAMED"),
   crossScalaVersions := Seq("2.12.8") // it's not really used; it's just about turning-off the crosscompilation
 )
 
