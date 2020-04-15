@@ -12,4 +12,8 @@ public class ErrorCategory {
             Status.Code.UNAUTHENTICATED,
             Status.Code.PERMISSION_DENIED
     ));
+    static Set<Status.Code> fatal = new HashSet<>(Arrays.asList(
+            Status.Code.INTERNAL,
+            Status.Code.UNKNOWN
+    ));
 }
