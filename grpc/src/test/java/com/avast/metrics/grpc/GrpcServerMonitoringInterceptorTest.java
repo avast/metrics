@@ -78,7 +78,7 @@ public class GrpcServerMonitoringInterceptorTest {
 
         final Monitor monitor = mock(Monitor.class);
         final Timer timer = mock(Timer.class);
-        when(monitor.newTimer("TestApiService_GetFailures")).thenReturn(timer);
+        when(monitor.newTimer("TestApiService_GetFatalServerFailures")).thenReturn(timer);
         doNothing().when(timer).update(Matchers.eq(Duration.ofMillis(42)));
 
         AtomicReference<Supplier<Integer>> currentCallsSupplier = new AtomicReference<>();
