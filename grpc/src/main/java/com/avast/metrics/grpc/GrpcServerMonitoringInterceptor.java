@@ -36,16 +36,16 @@ public class GrpcServerMonitoringInterceptor implements ServerInterceptor {
                 currentCalls.decrementAndGet();
 
                 if (ErrorCategory.fatal.contains(status.getCode())) {
-                    cache.getTimer(metricPrefix + "_FatalServerFailures")
+                    cache.getTimer(metricPrefix + "FatalServerFailures")
                             .update(duration);
-                } else if(ErrorCategory.client.contains(status.getCode())) {
-                    cache.getTimer(metricPrefix + "_ClientFailures")
+                } else if (ErrorCategory.client.contains(status.getCode())) {
+                    cache.getTimer(metricPrefix + "ClientFailures")
                             .update(duration);
                 } else if (status.isOk()) {
-                    cache.getTimer(metricPrefix + "_Successes")
+                    cache.getTimer(metricPrefix + "Successes")
                             .update(duration);
                 } else {
-                    cache.getTimer(metricPrefix + "_ServerFailures")
+                    cache.getTimer(metricPrefix + "ServerFailures")
                             .update(duration);
                 }
 
