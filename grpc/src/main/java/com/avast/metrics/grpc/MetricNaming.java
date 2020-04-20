@@ -7,6 +7,6 @@ class MetricNaming {
     private MetricNaming() {}
 
     static <ReqT, RespT>String getMetricNamePrefix(MethodDescriptor<ReqT, RespT> methodDescriptor) {
-        return methodDescriptor.getFullMethodName().replace('/', '_');
+        return methodDescriptor.getFullMethodName().replace('/', '_') + "_";
     }
 }

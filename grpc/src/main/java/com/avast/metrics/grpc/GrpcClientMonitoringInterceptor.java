@@ -39,13 +39,21 @@ public class GrpcClientMonitoringInterceptor implements ClientInterceptor {
                             public void onClose(io.grpc.Status status, Metadata trailers) {
                                 final Duration duration = Duration.between(start, clock.instant());
                                 currentCalls.decrementAndGet();
-                                if (status.isOk()) {
+
+                                if (ErrorCategory.fatal.contains(status.getCode())) {
+                                    cache.getTimer(metricPrefix + "FatalServerFailures")
+                                            .update(duration);
+                                } else if (ErrorCategory.client.contains(status.getCode())) {
+                                    cache.getTimer(metricPrefix + "ClientFailures")
+                                            .update(duration);
+                                } else if (status.isOk()) {
                                     cache.getTimer(metricPrefix + "Successes")
                                             .update(duration);
                                 } else {
-                                    cache.getTimer(metricPrefix + "Failures")
+                                    cache.getTimer(metricPrefix + "ServerFailures")
                                             .update(duration);
                                 }
+
                                 super.onClose(status, trailers);
                             }
                         },

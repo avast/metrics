@@ -32,11 +32,11 @@ public class GrpcServerMonitoringInterceptorTest {
 
         final Monitor monitor = mock(Monitor.class);
         final Timer timer = mock(Timer.class);
-        when(monitor.newTimer("TestApiService_GetSuccesses")).thenReturn(timer);
+        when(monitor.newTimer("TestApiService_Get_Successes")).thenReturn(timer);
         doNothing().when(timer).update(Matchers.eq(Duration.ofMillis(42)));
 
         AtomicReference<Supplier<Integer>> currentCallsSupplier = new AtomicReference<>();
-        when(monitor.newGauge(eq("TestApiService_GetCurrent"), any())).thenAnswer(invocation -> {
+        when(monitor.newGauge(eq("TestApiService_Get_Current"), any())).thenAnswer(invocation -> {
             currentCallsSupplier.set(invocation.getArgumentAt(1, Supplier.class));
             return null;
         });
@@ -78,11 +78,11 @@ public class GrpcServerMonitoringInterceptorTest {
 
         final Monitor monitor = mock(Monitor.class);
         final Timer timer = mock(Timer.class);
-        when(monitor.newTimer("TestApiService_GetFatalServerFailures")).thenReturn(timer);
+        when(monitor.newTimer("TestApiService_Get_FatalServerFailures")).thenReturn(timer);
         doNothing().when(timer).update(Matchers.eq(Duration.ofMillis(42)));
 
         AtomicReference<Supplier<Integer>> currentCallsSupplier = new AtomicReference<>();
-        when(monitor.newGauge(eq("TestApiService_GetCurrent"), any())).thenAnswer(invocation -> {
+        when(monitor.newGauge(eq("TestApiService_Get_Current"), any())).thenAnswer(invocation -> {
             currentCallsSupplier.set(invocation.getArgumentAt(1, Supplier.class));
             return null;
         });
