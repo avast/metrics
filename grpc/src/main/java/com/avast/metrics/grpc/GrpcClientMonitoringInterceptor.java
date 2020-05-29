@@ -23,8 +23,7 @@ public class GrpcClientMonitoringInterceptor implements ClientInterceptor {
 
     @Override
     public <ReqT, RespT> ClientCall<ReqT, RespT> interceptCall(final MethodDescriptor<ReqT, RespT> method, final CallOptions callOptions, final Channel next) {
-        final String metricPrefix = MetricNaming.getMetricNamePrefix(method);
-        final AtomicInteger currentCalls = cache.getGaugedValue(metricPrefix + "Current");
+        final AtomicInteger currentCalls = cache.getGaugedValue(method, "Current");
 
         final Instant start = clock.instant();
         currentCalls.incrementAndGet();
@@ -41,16 +40,16 @@ public class GrpcClientMonitoringInterceptor implements ClientInterceptor {
                                 currentCalls.decrementAndGet();
 
                                 if (ErrorCategory.fatal.contains(status.getCode())) {
-                                    cache.getTimer(metricPrefix + "FatalServerFailures")
+                                    cache.getTimer(method, "FatalServerFailures")
                                             .update(duration);
                                 } else if (ErrorCategory.client.contains(status.getCode())) {
-                                    cache.getTimer(metricPrefix + "ClientFailures")
+                                    cache.getTimer(method, "ClientFailures")
                                             .update(duration);
                                 } else if (status.isOk()) {
-                                    cache.getTimer(metricPrefix + "Successes")
+                                    cache.getTimer(method, "Successes")
                                             .update(duration);
                                 } else {
-                                    cache.getTimer(metricPrefix + "ServerFailures")
+                                    cache.getTimer(method, "ServerFailures")
                                             .update(duration);
                                 }
 

@@ -23,8 +23,8 @@ public class GrpcServerMonitoringInterceptor implements ServerInterceptor {
 
     @Override
     public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(final ServerCall<ReqT, RespT> call, final Metadata headers, final ServerCallHandler<ReqT, RespT> next) {
-        final String metricPrefix = MetricNaming.getMetricNamePrefix(call.getMethodDescriptor());
-        final AtomicInteger currentCalls = cache.getGaugedValue(metricPrefix + "Current");
+        MethodDescriptor<ReqT, RespT> method = call.getMethodDescriptor();
+        final AtomicInteger currentCalls = cache.getGaugedValue(method, "Current");
 
         final Instant start = clock.instant();
         currentCalls.incrementAndGet();
@@ -36,16 +36,16 @@ public class GrpcServerMonitoringInterceptor implements ServerInterceptor {
                 currentCalls.decrementAndGet();
 
                 if (ErrorCategory.fatal.contains(status.getCode())) {
-                    cache.getTimer(metricPrefix + "FatalServerFailures")
+                    cache.getTimer(method, "FatalServerFailures")
                             .update(duration);
                 } else if (ErrorCategory.client.contains(status.getCode())) {
-                    cache.getTimer(metricPrefix + "ClientFailures")
+                    cache.getTimer(method, "ClientFailures")
                             .update(duration);
                 } else if (status.isOk()) {
-                    cache.getTimer(metricPrefix + "Successes")
+                    cache.getTimer(method, "Successes")
                             .update(duration);
                 } else {
-                    cache.getTimer(metricPrefix + "ServerFailures")
+                    cache.getTimer(method, "ServerFailures")
                             .update(duration);
                 }
 

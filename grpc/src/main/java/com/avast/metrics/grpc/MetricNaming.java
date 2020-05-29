@@ -3,10 +3,10 @@ package com.avast.metrics.grpc;
 
 import io.grpc.MethodDescriptor;
 
-class MetricNaming {
+public class MetricNaming {
     private MetricNaming() {}
 
-    static <ReqT, RespT>String getMetricNamePrefix(MethodDescriptor<ReqT, RespT> methodDescriptor) {
-        return methodDescriptor.getFullMethodName().replace('/', '_') + "_";
+    public static <ReqT, RespT>String getMethodMonitorName(MethodDescriptor<ReqT, RespT> methodDescriptor) {
+        return methodDescriptor.getFullMethodName().replace('/', '_');
     }
 }
