@@ -42,7 +42,8 @@ public class JvmMetricsTest {
 
             assertThat((Double) monitor.findGauge("jvm.cpu.load").getValue())
                     .as("jvm.cpu.load")
-                    .isPositive();
+                    .isGreaterThanOrEqualTo(0)
+                    .isLessThanOrEqualTo(1);
         }
     }
 
@@ -145,19 +146,19 @@ public class JvmMetricsTest {
 
             assertThat((Long) monitor.findGauge("jvm.buffers.direct.instances").getValue())
                     .as("jvm.buffers.direct.instances")
-                    .isBetween(0L, 1000L);
+                    .isBetween(0L, 1024L * 1024);
 
             assertThat((Long) monitor.findGauge("jvm.buffers.direct.bytes").getValue())
                     .as("jvm.buffers.direct.bytes")
-                    .isBetween(0L, 20L * 1024L * 1024L);
+                    .isBetween(0L, 1024L * 1024 * 1024);
 
             assertThat((Long) monitor.findGauge("jvm.buffers.mapped.instances").getValue())
                     .as("jvm.buffers.mapped.instances")
-                    .isBetween(0L, 1000L);
+                    .isBetween(0L, 1024L * 1024);
 
             assertThat((Long) monitor.findGauge("jvm.buffers.mapped.bytes").getValue())
                     .as("jvm.buffers.mapped.bytes")
-                    .isBetween(0L, 20L * 1024L * 1024L);
+                    .isBetween(0L, 1024L * 1024 * 1024);
         }
     }
 

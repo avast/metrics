@@ -4,8 +4,7 @@ import com.avast.metrics.api
 import com.avast.metrics.scalaapi._
 import com.avast.metrics.scalaapi.perkey.{PerKeyMonitor, PerKeyOps}
 
-/**
-  * Adds `perKey` method, otherwise just forward method calls to [[com.avast.metrics.scalaapi.Monitor]]
+/** Adds `perKey` method, otherwise just forward method calls to [[com.avast.metrics.scalaapi.Monitor]]
   */
 private[perkey] class PerKeyMonitorImpl(monitor: com.avast.metrics.scalaapi.Monitor, perKeyOps: PerKeyOps) extends PerKeyMonitor {
   override def perKey: PerKeyOps = perKeyOps

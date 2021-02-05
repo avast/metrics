@@ -1,6 +1,5 @@
 package com.avast.metrics.scalaapi
 
-
 import java.time.Duration
 
 import scala.concurrent.{ExecutionContext, Future}
