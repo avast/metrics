@@ -29,8 +29,8 @@ private class TimerImpl(inner: JTimer) extends Timer {
   override def time[A](future: => Future[A])(implicit ec: ExecutionContext): Future[A] = {
     val context = inner.start()
     try {
-      future andThen {
-        case _ => context.stop()
+      future andThen { case _ =>
+        context.stop()
       }
     } catch {
       case NonFatal(ex) =>

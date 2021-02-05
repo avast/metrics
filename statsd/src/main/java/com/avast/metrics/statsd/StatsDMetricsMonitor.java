@@ -235,6 +235,7 @@ public class StatsDMetricsMonitor implements Monitor {
 
     @Override
     public void close() {
+        scheduler.shutdown();
         client.stop();
     }
 
