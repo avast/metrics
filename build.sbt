@@ -15,6 +15,7 @@ lazy val scalaSettings = Seq(
 lazy val javaSettings = Seq(
   crossPaths := false,
   autoScalaLibrary := false,
+  scalacOptions ~= { _.filterNot(_ == "-target:jvm-1.8") },
   crossScalaVersions := Seq("2.12.13") // it's not really used; it's just about turning-off the crosscompilation
 )
 
