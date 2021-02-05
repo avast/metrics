@@ -51,6 +51,7 @@ lazy val commonSettings = Seq(
 lazy val root = (project in file("."))
   .settings(
     name := "metrics",
+    commonSettings,
     publish := {},
     publishLocal := {},
     crossScalaVersions := Nil
