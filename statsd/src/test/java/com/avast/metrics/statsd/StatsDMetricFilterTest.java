@@ -5,11 +5,16 @@ import com.avast.metrics.api.*;
 import com.avast.metrics.filter.FilterConfig;
 import com.avast.metrics.filter.MetricsFilter;
 import com.avast.metrics.test.NoOpMonitor;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import static org.junit.Assert.assertTrue;
 
@@ -21,9 +26,22 @@ public class StatsDMetricFilterTest {
     private final Class noopHistogramClazz = NoOpMonitor.INSTANCE.newHistogram("testHistogram").getClass();
     private final Class noopTimerClazz = NoOpMonitor.INSTANCE.newTimer("testTimer").getClass();
 
+
+    private ScheduledExecutorService scheduler;
+
+    @Before
+    public void setUp() {
+        scheduler = Executors.newScheduledThreadPool(2);
+    }
+
+    @After
+    public void tearDown() {
+        scheduler.shutdown();
+    }
+
     @Test
     public void testAllDisabled() {
-        try (StatsDMetricsMonitor monitor = new StatsDMetricsMonitor("localhost", 80, "test-app", MetricsFilter.ALL_DISABLED)) {
+        try (StatsDMetricsMonitor monitor = new StatsDMetricsMonitor("localhost", 80, "test-app", Naming.defaultNaming(), Duration.ofSeconds(1), scheduler, MetricsFilter.ALL_DISABLED)) {
             Meter meter = monitor.newMeter("meter");
             Counter counter = monitor.newCounter("counter");
             Gauge gauge = monitor.newGauge("gauge", () -> "");
@@ -42,7 +60,7 @@ public class StatsDMetricFilterTest {
 
     @Test
     public void testAllEnabled() {
-        try (StatsDMetricsMonitor monitor = new StatsDMetricsMonitor("localhost", 80, "test-app", MetricsFilter.ALL_ENABLED)) {
+        try (StatsDMetricsMonitor monitor = new StatsDMetricsMonitor("localhost", 80, "test-app", Naming.defaultNaming(), Duration.ofSeconds(1), scheduler, MetricsFilter.ALL_ENABLED)) {
             Meter meter = monitor.newMeter("meter");
             Counter counter = monitor.newCounter("counter");
             Gauge gauge = monitor.newGauge("gauge", () -> "");
@@ -143,7 +161,7 @@ public class StatsDMetricFilterTest {
     }
 
     private StatsDMetricsMonitor buildMonitor(MetricsFilter metricsFilter) {
-        return new StatsDMetricsMonitor("localhost", 80, "statsd-prefix", metricsFilter);
+        return new StatsDMetricsMonitor("localhost", 80, "test-app", Naming.defaultNaming(), Duration.ofSeconds(1), scheduler, metricsFilter);
     }
 
     private MetricsFilter buildMetricsFilter(FilterConfig... filterConfigs) {
