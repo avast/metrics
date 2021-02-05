@@ -33,7 +33,6 @@ lazy val commonSettings = Seq(
   organizationName := "Avast",
   organizationHomepage := Some(url("https://avast.com")),
   homepage := Some(url("https://github.com/avast/metrics")),
-  version := sys.env.getOrElse("TRAVIS_TAG", "0.1-SNAPSHOT"),
   description := "Library for application monitoring",
   licenses ++= Seq("MIT" -> url(s"https://github.com/avast/metrics/blob/${version.value}/LICENSE")),
   developers := List(Developer("jakubjanecek", "Jakub Janecek", "jakub.janecek@avast.com", url("https://www.avast.com"))),
