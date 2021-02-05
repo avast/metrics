@@ -15,7 +15,7 @@ lazy val scalaSettings = Seq(
 lazy val javaSettings = Seq(
   crossPaths := false,
   autoScalaLibrary := false,
-  doc / javacOptions ~= { _.filterNot(_.startsWith("-target")) },
+  Compile / packageDoc / publishArtifact := false,
   crossScalaVersions := Seq("2.12.13") // it's not really used; it's just about turning-off the crosscompilation
 )
 
