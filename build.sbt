@@ -1,12 +1,15 @@
 import sbt.Keys.libraryDependencies
 
+val Scala212 = "2.12.13"
+val Scala213 = "2.13.4"
+
 lazy val scalaSettings = Seq(
-  scalaVersion := "2.12.13",
+  scalaVersion := Scala212,
   scalacOptions += "-deprecation",
   scalacOptions += "-unchecked",
   scalacOptions += "-feature",
   scalacOptions += "-target:jvm-1.8",
-  crossScalaVersions := Seq("2.12.13", "2.13.4"),
+  crossScalaVersions := Seq(Scala212, Scala213),
   libraryDependencies ++= Seq(
     "org.scalatest" %% "scalatest" % "3.0.8" % "test"
   )
@@ -15,8 +18,9 @@ lazy val scalaSettings = Seq(
 lazy val javaSettings = Seq(
   crossPaths := false,
   autoScalaLibrary := false,
-  Compile / packageDoc / publishArtifact := false,
-  crossScalaVersions := Seq("2.12.13") // it's not really used; it's just about turning-off the crosscompilation
+  javacOptions ++= Seq("-source", "1.8"),
+  compile / javacOptions ++= Seq("-target", "1.8"), // only `compile`, not `doc`, because Javadoc doesn't accept flag `-target`
+  crossScalaVersions := Seq(Scala212) // it's not really used; it's just about turning-off the crosscompilation
 )
 
 lazy val Versions = new {
@@ -37,7 +41,6 @@ lazy val commonSettings = Seq(
   licenses ++= Seq("MIT" -> url(s"https://github.com/avast/metrics/blob/${version.value}/LICENSE")),
   developers := List(Developer("jakubjanecek", "Jakub Janecek", "jakub.janecek@avast.com", url("https://www.avast.com"))),
   publishArtifact in Test := false,
-  javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
   libraryDependencies ++= Seq(
     "org.mockito" % "mockito-all" % "1.10.19" % "test",
     "junit" % "junit" % "4.12" % "test",
@@ -52,8 +55,7 @@ lazy val root = (project in file("."))
   .settings(
     name := "metrics",
     commonSettings,
-    publish := {},
-    publishLocal := {},
+    publish / skip := true,
     crossScalaVersions := Nil
   )
   .aggregate(api, scalaApi, core, dropwizardCommon, jmx, jmxAvast, graphite, filter, formatting, statsd, grpc)

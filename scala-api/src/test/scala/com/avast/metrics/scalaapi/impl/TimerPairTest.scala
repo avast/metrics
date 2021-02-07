@@ -3,8 +3,8 @@ package com.avast.metrics.scalaapi.impl
 import com.avast.metrics.api.Timer.TimeContext
 import com.avast.metrics.scalaapi.{Timer, TimerPair}
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfter, FlatSpec}
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
