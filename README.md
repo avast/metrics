@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/avast/metrics.svg?branch=master)](https://travis-ci.org/avast/metrics) [![Download](https://api.bintray.com/packages/avast/maven/metrics/images/download.svg) ](https://bintray.com/avast/maven/metrics/_latestVersion)
+[![Build](https://github.com/avast/metrics/workflows/Build/badge.svg)](https://github.com/avast/metrics/actions?query=workflow:Build) [![Version](https://badgen.net/maven/v/maven-central/com.avast.metrics/metrics-core)](https://repo1.maven.org/maven2/com/avast/metrics/)
 
 # Metrics
 
