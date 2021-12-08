@@ -53,6 +53,44 @@ public class GrpcServerMonitoringInterceptor implements ServerInterceptor {
             }
         };
 
-        return next.startCall(newCall, headers);
+        ServerCall.Listener<ReqT> nextListener;
+        try {
+            nextListener = next.startCall(newCall, headers);
+        } catch (RuntimeException e) {
+            cache.getMeter(method, "UnhandledExceptionFailures").mark();
+            throw e;
+        }
+
+        return new ForwardingServerCallListener.SimpleForwardingServerCallListener<ReqT>(nextListener) {
+            @Override
+            public void onMessage(final ReqT message) {
+                try {
+                    super.onMessage(message);
+                } catch (RuntimeException e) {
+                    cache.getMeter(method, "UnhandledExceptionFailures").mark();
+                    throw e;
+                }
+            }
+
+            @Override
+            public void onHalfClose() {
+                try {
+                    super.onHalfClose();}
+                catch (RuntimeException e) {
+                    cache.getMeter(method, "UnhandledExceptionFailures").mark();
+                    throw e;
+                }
+            }
+
+            @Override
+            public void onReady() {
+                try {
+                    super.onReady();}
+                catch (RuntimeException e) {
+                    cache.getMeter(method, "UnhandledExceptionFailures").mark();
+                    throw e;
+                }
+            }
+        };
     }
 }
