@@ -29,6 +29,7 @@ lazy val Versions = new {
   val grpc = "1.42.1"
   val slf4j = "1.7.30"
   val assertj = "3.12.2"
+  val catsEffect = "2.5.3"
 }
 
 lazy val commonSettings = Seq(
@@ -73,6 +74,18 @@ lazy val scalaApi = (project in file("scala-api"))
     name := "metrics-scala"
   )
   .dependsOn(api, jmx % "test")
+
+lazy val scalaEffectApi = (project in file("scala-effect-api"))
+  .settings(
+    commonSettings,
+    scalaSettings,
+    scalacOptions += "-language:higherKinds",
+    name := "metrics-scala-effect",
+    libraryDependencies ++= Seq(
+      "org.typelevel" %% "cats-effect" % Versions.catsEffect
+    )
+  )
+  .dependsOn(scalaApi, jmx % "test")
 
 lazy val core = (project in file("core"))
   .settings(

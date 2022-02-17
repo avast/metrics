@@ -10,8 +10,9 @@ Library for application monitoring. It's abstraction of metrics inspired by [Dro
 
 Main advantages of this library:
 1) Universal abstraction with misc. implementations
-1) Support of multiple exports at once (`MultiMonitor`)
-1) Scala API
+2) Support of multiple exports at once (`MultiMonitor`)
+3) Scala API
+4) Cats-Effect API
 
 The entry-point into the library is the interface `Monitor`. Your classes need to get an instance of a monitor which they can use to construct different metrics, e.g. meters, timers or histograms.
 Instances of the individuals metrics can be used to monitor your application.
@@ -91,11 +92,24 @@ a.inc()
 
 ```
 
-See [example in tests](scala-api/src/test/scala/com/avast/metrics/examples/PerKeyExample.scala).
+## Scala Effect API
+
+An easy-to-use Scala Effect API is available in `scala-effect-api` module. Wrap the Java `Monitor` by `scalaeffectapi.Monitor` to use the Cats-Effect version.
+
+```scala
+import com.avast.metrics.scalaeffectapi.Monitor
+import com.avast.metrics.dropwizard.JmxMetricsMonitor
+
+val javaMonitor = getJavaMonitor()
+val scalaEffectMonitor: F[Monitor[F]]  = Monitor(javaMonitor)
+val scalaEffectMonitorUnsafe: Monitor[F]  = Monitor.applyUnsafe(javaMonitor)
+```
+
+See [example in tests](scala-effect-api/src/test/scala/com/avast/metrics/examples/EffectMonitor.scala).
 
 ## Unit Testing
 There is a singleton [NoOpMonitor.INSTANCE](api/src/main/java/com/avast/metrics/test/NoOpMonitor.java) in the `metrics-api` submodule that can be used in tests.  
-There is also available `Monitor.noOp` for Scala API.
+There are also available `Monitor.noOp` for Scala API and `Monitor.noOp`/`Monitor.noOpUnsafe` for Scala Effect API.
 
 ## Disabling JMX
 Sometimes you want to globally disable JMX monitoring on the server. You can do that by setting system property `avastMetricsDisableJmx=true`. To do that from bash, you can use:
