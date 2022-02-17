@@ -3,12 +3,13 @@ package com.avast.metrics.scalaeffectapi
 import cats.Monad
 import cats.syntax.flatMap._
 import cats.syntax.functor._
+import com.avast.metrics.api.Timer.TimeContext
+
 import java.time.Duration
 
 trait Timer[F[_]] {
-  type Context
-  def start: F[Context]
-  def stop(context: Context): F[Duration]
+  def start: F[TimeContext]
+  def stop(context: TimeContext): F[Duration]
 }
 
 object Timer {

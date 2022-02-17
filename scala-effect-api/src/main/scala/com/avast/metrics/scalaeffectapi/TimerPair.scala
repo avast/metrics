@@ -6,10 +6,14 @@ import cats.syntax.functor._
 import java.time.Duration
 
 trait TimerPair[F[_]] {
-  type Context
-  def start: F[Context]
-  def stop(context: Context): F[Duration]
-  def stopFailure(context: Context): F[Duration]
+  trait TimerPairContext {
+    def stop: F[Duration]
+    def stopFailure: F[Duration]
+  }
+
+  def start: F[TimerPairContext]
+  def stop(context: TimerPairContext): F[Duration]
+  def stopFailure(context: TimerPairContext): F[Duration]
 }
 
 object TimerPair {
