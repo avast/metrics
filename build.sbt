@@ -80,7 +80,7 @@ lazy val scalaEffectApi = (project in file("scala-effect-api"))
     commonSettings,
     scalaSettings,
     scalacOptions += "-language:higherKinds",
-    name := "metrics-scala-effect",
+    name := "metrics-cats-effect2",
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-effect" % Versions.catsEffect
     )

@@ -101,8 +101,8 @@ import com.avast.metrics.scalaeffectapi.Monitor
 import com.avast.metrics.dropwizard.JmxMetricsMonitor
 
 val javaMonitor = getJavaMonitor()
-val scalaEffectMonitor: F[Monitor[F]]  = Monitor(javaMonitor)
-val scalaEffectMonitorUnsafe: Monitor[F]  = Monitor.applyUnsafe(javaMonitor)
+val scalaEffectMonitor: F[Monitor[F]]  = Monitor.wrapJava(javaMonitor)
+val scalaEffectMonitorUnsafe: Monitor[F]  = Monitor.wrapJavaUnsafe(javaMonitor)
 ```
 
 See [example in tests](scala-effect-api/src/test/scala/com/avast/metrics/examples/EffectMonitor.scala).

@@ -3,7 +3,6 @@ package com.avast.metrics.examples
 import cats.effect.{ExitCode, IO, IOApp, Timer}
 import com.avast.metrics.dropwizard.JmxMetricsMonitor
 import com.avast.metrics.scalaeffectapi.Monitor
-import com.avast.metrics.scalaeffectapi.Timer.Dsl.TimerOps
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.FiniteDuration
@@ -14,7 +13,7 @@ object EffectMonitor extends IOApp {
 
   override def run(args: List[String]): IO[ExitCode] = {
     for {
-      monitor <- Monitor[IO](jmxMetricsMonitor)
+      monitor <- Monitor.wrapJava[IO](jmxMetricsMonitor)
       counter = monitor.counter("counter")
       _ <- counter.inc
       timer = monitor.timer("timer")
