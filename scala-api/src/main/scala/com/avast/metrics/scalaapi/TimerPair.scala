@@ -1,7 +1,7 @@
 package com.avast.metrics.scalaapi
 
-import java.time.Duration
-
+import java.time.{Duration => JDuration}
+import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
 
 trait TimerPair {
@@ -12,6 +12,10 @@ trait TimerPair {
   }
 
   def start(): TimeContext
+
+  def update(duration: JDuration): Unit
+
+  def updateFailure(duration: JDuration): Unit
 
   def update(duration: Duration): Unit
 

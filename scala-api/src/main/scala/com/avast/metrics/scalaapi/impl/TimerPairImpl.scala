@@ -1,9 +1,9 @@
 package com.avast.metrics.scalaapi.impl
 
-import java.time.Duration
-
+import java.time.{Duration => JDuration}
 import com.avast.metrics.scalaapi.{Timer, TimerPair}
 
+import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
@@ -20,6 +20,10 @@ private class TimerPairImpl(success: Timer, failure: Timer) extends TimerPair {
       override def stopFailure(): Unit = failCtx.stop()
     }
   }
+
+  override def update(duration: JDuration): Unit = success.update(duration)
+
+  override def updateFailure(duration: JDuration): Unit = failure.update(duration)
 
   override def update(duration: Duration): Unit = success.update(duration)
 
