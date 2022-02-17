@@ -14,6 +14,8 @@ private class TimerImpl[F[_]: Sync](inner: STimer) extends Timer[F] {
 
   override def stop(context: TimeContext): F[Duration] = Sync[F].delay(Duration.ofNanos(context.stopAndGetTime()))
 
+  override def update(duration: Duration): F[Unit] = Sync[F].delay(inner.update(duration))
+
   override def time[A](block: F[A]): F[A] = {
     for {
       context <- start

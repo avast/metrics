@@ -9,7 +9,7 @@ trait TimerPair[F[_]] {
   }
 
   def start: F[TimerPairContext]
-  def stop(context: TimerPairContext): F[Duration]
-  def stopFailure(context: TimerPairContext): F[Duration]
+  def update(duration: Duration): F[Unit]
+  def updateFailure(duration: Duration): F[Unit]
   def time[T](action: F[T]): F[T]
 }

@@ -101,15 +101,14 @@ import com.avast.metrics.scalaeffectapi.Monitor
 import com.avast.metrics.dropwizard.JmxMetricsMonitor
 
 val javaMonitor = getJavaMonitor()
-val scalaEffectMonitor: F[Monitor[F]]  = Monitor.wrapJava(javaMonitor)
-val scalaEffectMonitorUnsafe: Monitor[F]  = Monitor.wrapJavaUnsafe(javaMonitor)
+val scalaEffectMonitor: Monitor[F]  = Monitor.wrapJava(javaMonitor)
 ```
 
 See [example in tests](scala-effect-api/src/test/scala/com/avast/metrics/examples/EffectMonitor.scala).
 
 ## Unit Testing
 There is a singleton [NoOpMonitor.INSTANCE](api/src/main/java/com/avast/metrics/test/NoOpMonitor.java) in the `metrics-api` submodule that can be used in tests.  
-There are also available `Monitor.noOp` for Scala API and `Monitor.noOp`/`Monitor.noOpUnsafe` for Scala Effect API.
+There are also available `Monitor.noOp` for Scala API and Scala Effect API.
 
 ## Disabling JMX
 Sometimes you want to globally disable JMX monitoring on the server. You can do that by setting system property `avastMetricsDisableJmx=true`. To do that from bash, you can use:

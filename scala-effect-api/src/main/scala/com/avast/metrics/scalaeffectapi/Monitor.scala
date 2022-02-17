@@ -23,24 +23,14 @@ trait Monitor[F[_]] extends AutoCloseable {
 
 object Monitor {
 
-  def wrapJava[F[_]: Sync](monitor: JMonitor): F[Monitor[F]] = Sync[F].delay(wrapJavaUnsafe(monitor))
-  def wrapJava[F[_]: Sync](monitor: JMonitor, naming: Naming): F[Monitor[F]] = Sync[F].delay(wrapJavaUnsafe(monitor, naming))
+  def wrapJava[F[_]: Sync](monitor: JMonitor): Monitor[F] = wrapJava(monitor, Naming.defaultNaming())
+  def wrapJava[F[_]: Sync](monitor: JMonitor, naming: Naming): Monitor[F] = wrap(SMonitor(monitor), naming)
 
-  def wrap[F[_]: Sync](monitor: SMonitor): F[Monitor[F]] = Sync[F].delay(wrapUnsafe(monitor))
-  def wrap[F[_]: Sync](monitor: SMonitor, naming: Naming): F[Monitor[F]] = Sync[F].delay(wrapUnsafe(monitor, naming))
+  def wrap[F[_]: Sync](monitor: SMonitor): Monitor[F] = wrap(monitor, Naming.defaultNaming())
+  def wrap[F[_]: Sync](monitor: SMonitor, naming: Naming): Monitor[F] = new impl.MonitorImpl(monitor, naming)
 
-  def wrapJavaUnsafe[F[_]: Sync](monitor: JMonitor): Monitor[F] = wrapJavaUnsafe(monitor, Naming.defaultNaming())
-  def wrapJavaUnsafe[F[_]: Sync](monitor: JMonitor, naming: Naming): Monitor[F] = wrapUnsafe(SMonitor(monitor), naming)
-
-  def wrapUnsafe[F[_]: Sync](monitor: SMonitor): Monitor[F] = wrapUnsafe(monitor, Naming.defaultNaming())
-  def wrapUnsafe[F[_]: Sync](monitor: SMonitor, naming: Naming): Monitor[F] = new impl.MonitorImpl(monitor, naming)
-
-  def noOp[F[_]: Sync](): F[Monitor[F]] = {
+  def noOp[F[_]: Sync](): Monitor[F] = {
     wrapJava(NoOpMonitor.INSTANCE)
-  }
-
-  def noOpUnsafe[F[_]: Sync](): Monitor[F] = {
-    wrapJavaUnsafe(NoOpMonitor.INSTANCE)
   }
 
 }

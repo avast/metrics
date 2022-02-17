@@ -19,16 +19,15 @@ private class TimerPairImpl[F[_]: Sync](success: Timer[F], failure: Timer[F]) ex
     }
   }
 
-  override def stop(context: TimerPairContext): F[Duration] = context.stop
+  override def update(duration: Duration): F[Unit] = Sync[F].delay(success.update(duration))
 
-  override def stopFailure(context: TimerPairContext): F[Duration] = context.stopFailure
+  override def updateFailure(duration: Duration): F[Unit] = Sync[F].delay(failure.update(duration))
 
   override def time[T](action: F[T]): F[T] = {
     Resource
       .makeCase(start) {
-        case (ctx, ExitCase.Completed) => stop(ctx).as(())
-        case (ctx, _) => stopFailure(ctx).as(())
+        case (ctx, ExitCase.Completed) => ctx.stop.as(())
+        case (ctx, _) => ctx.stopFailure.as(())
       }
   }.use(_ => action)
-
 }

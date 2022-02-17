@@ -12,11 +12,12 @@ object EffectMonitor extends IOApp {
   val jmxMetricsMonitor = new JmxMetricsMonitor("com.avast.some.app")
 
   override def run(args: List[String]): IO[ExitCode] = {
+    val monitor = Monitor.wrapJava[IO](jmxMetricsMonitor)
+    val counter = monitor.counter("counter")
+    val timer = monitor.timer("timer")
+
     for {
-      monitor <- Monitor.wrapJava[IO](jmxMetricsMonitor)
-      counter = monitor.counter("counter")
       _ <- counter.inc
-      timer = monitor.timer("timer")
       _ <- timer.time {
         Timer[IO](IO.timer(executionContext)).sleep(FiniteDuration(500, TimeUnit.MILLISECONDS))
       }
