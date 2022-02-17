@@ -15,9 +15,14 @@ private class TimerPairImpl[F[_]: Sync](success: Timer[F], failure: Timer[F]) ex
       succCtx <- success.start
       failCtx <- failure.start
     } yield new TimerPairContext {
-      override def stop: F[Duration] = success.stop(succCtx)
+      override def stop: F[Duration] = succCtx.stop
 
-      override def stopFailure: F[Duration] = failure.stop(failCtx)
+      override def stopFailure: F[Duration] = failCtx.stop
+
+      override def close(): Unit = {
+        succCtx.close()
+        failCtx.close()
+      }
     }
   }
 

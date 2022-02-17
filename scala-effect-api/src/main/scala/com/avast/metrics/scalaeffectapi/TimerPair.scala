@@ -4,7 +4,7 @@ import java.time.{Duration => JDuration}
 import scala.concurrent.duration.Duration
 
 trait TimerPair[F[_]] {
-  trait TimerPairContext {
+  trait TimerPairContext extends AutoCloseable {
     def stop: F[Duration]
     def stopFailure: F[Duration]
   }
