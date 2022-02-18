@@ -1,11 +1,11 @@
 package com.avast.metrics.scalaapi.impl
 
-import java.time.Duration
-
+import java.time.{Duration => JDuration}
 import com.avast.metrics.api.Timer.TimeContext
 import com.avast.metrics.api.{Timer => JTimer}
 import com.avast.metrics.scalaapi.Timer
 
+import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
@@ -13,7 +13,9 @@ private class TimerImpl(inner: JTimer) extends Timer {
 
   override def start(): TimeContext = inner.start()
 
-  override def update(duration: Duration): Unit = inner.update(duration)
+  override def update(duration: JDuration): Unit = inner.update(duration)
+
+  override def update(duration: Duration): Unit = update(JDuration.ofNanos(duration.toNanos))
 
   override def name: String = inner.getName
 
