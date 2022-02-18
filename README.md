@@ -12,7 +12,7 @@ Main advantages of this library:
 1) Universal abstraction with misc. implementations
 2) Support of multiple exports at once (`MultiMonitor`)
 3) Scala API
-4) Cats-Effect API
+4) Scala Effect API (cats-effect 2)
 
 The entry-point into the library is the interface `Monitor`. Your classes need to get an instance of a monitor which they can use to construct different metrics, e.g. meters, timers or histograms.
 Instances of the individuals metrics can be used to monitor your application.
