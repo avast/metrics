@@ -1,6 +1,6 @@
 package com.avast.metrics.examples
 
-import cats.effect.{ExitCode, IO, IOApp, Timer}
+import cats.effect.{ExitCode, IO, IOApp}
 import com.avast.metrics.dropwizard.JmxMetricsMonitor
 import com.avast.metrics.scalaeffectapi.Monitor
 
@@ -19,7 +19,7 @@ object EffectMonitor extends IOApp {
     for {
       _ <- counter.inc
       _ <- timer.time {
-        Timer[IO](IO.timer(executionContext)).sleep(FiniteDuration(500, TimeUnit.MILLISECONDS))
+        IO.sleep(FiniteDuration(500, TimeUnit.MILLISECONDS))
       }
     } yield ExitCode.Success
   }
