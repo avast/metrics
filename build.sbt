@@ -29,7 +29,7 @@ lazy val Versions = new {
   val grpc = "1.42.1"
   val slf4j = "1.7.30"
   val assertj = "3.12.2"
-  val catsEffect2 = "2.5.3"
+  val catsEffect3 = "3.3.5"
 }
 
 lazy val commonSettings = Seq(
@@ -59,7 +59,7 @@ lazy val root = (project in file("."))
     publish / skip := true,
     crossScalaVersions := Nil
   )
-  .aggregate(api, scalaApi, scalaCatsEffect2, core, dropwizardCommon, jmx, jmxAvast, graphite, filter, formatting, statsd, grpc)
+  .aggregate(api, scalaApi, scalaCatsEffect3, core, dropwizardCommon, jmx, jmxAvast, graphite, filter, formatting, statsd, grpc)
 
 lazy val api = (project in file("api")).settings(
   commonSettings,
@@ -75,14 +75,14 @@ lazy val scalaApi = (project in file("scala-api"))
   )
   .dependsOn(api, jmx % "test")
 
-lazy val scalaCatsEffect2 = (project in file("scala-effect-api"))
+lazy val scalaCatsEffect3 = (project in file("scala-effect-api"))
   .settings(
     commonSettings,
     scalaSettings,
     scalacOptions += "-language:higherKinds",
-    name := "metrics-cats-effect-2",
+    name := "metrics-cats-effect-3",
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-effect" % Versions.catsEffect2
+      "org.typelevel" %% "cats-effect" % Versions.catsEffect3
     )
   )
   .dependsOn(scalaApi, jmx % "test")
