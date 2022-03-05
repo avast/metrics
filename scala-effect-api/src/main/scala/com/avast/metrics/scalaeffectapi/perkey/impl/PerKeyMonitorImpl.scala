@@ -31,6 +31,6 @@ private[perkey] class PerKeyMonitorImpl[F[_]](monitor: Monitor[F], perKeyOps: Pe
 
   override def asJava: api.Monitor = monitor.asJava
 
-  override def unwrap: scalaapi.Monitor = monitor.unwrap
+  override def asPlainScala: scalaapi.Monitor = monitor.asPlainScala
 
 }

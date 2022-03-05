@@ -18,7 +18,7 @@ trait Monitor[F[_]] extends AutoCloseable {
   def gauge: GaugeFactory[F]
 
   def asJava: JMonitor
-  def unwrap: SMonitor
+  def asPlainScala: SMonitor
 }
 
 object Monitor {
