@@ -1,6 +1,6 @@
 package com.avast.metrics.scalaeffectapi.perkey.impl
 
-import com.avast.metrics.scalaeffectapi.{Gauge, Monitor}
+import com.avast.metrics.scalaeffectapi.{Gauge, Monitor, SettableGauge}
 import com.avast.metrics.scalaeffectapi.perkey.{PerKeyGaugeFactory, PerKeyMetric}
 
 import scala.collection.concurrent.TrieMap
@@ -8,13 +8,18 @@ import scala.collection.concurrent.TrieMap
 class PerKeyGaugeFactoryImpl[F[_]](monitor: Monitor[F]) extends PerKeyGaugeFactory[F] {
   private def emptyMap[M] = TrieMap.empty[String, M]
 
-  override def long(baseName: String): PerKeyMetric[Gauge[F, Long]] = {
+  override def long(baseName: String, replaceExisting: Boolean = false): PerKeyMetric[SettableGauge[F, Long]] = {
     val instanceBuilder = monitor.named(baseName)
-    new PerKeyMetricImpl[Gauge[F, Long]](emptyMap[Gauge[F, Long]], instanceBuilder.gauge.long)
+    new PerKeyMetricImpl[SettableGauge[F, Long]](emptyMap[SettableGauge[F, Long]], instanceBuilder.gauge.long(_, replaceExisting))
   }
 
-  override def double(baseName: String): PerKeyMetric[Gauge[F, Double]] = {
+  override def double(baseName: String, replaceExisting: Boolean = false): PerKeyMetric[SettableGauge[F, Double]] = {
     val instanceBuilder = monitor.named(baseName)
-    new PerKeyMetricImpl[Gauge[F, Double]](emptyMap[Gauge[F, Double]], instanceBuilder.gauge.double)
+    new PerKeyMetricImpl[SettableGauge[F, Double]](emptyMap[SettableGauge[F, Double]], instanceBuilder.gauge.double(_, replaceExisting))
+  }
+
+  override def forType[T](baseName: String, replaceExisting: Boolean = false)(gauge: () => T): PerKeyMetric[Gauge[F, T]] = {
+    val instanceBuilder = monitor.named(baseName)
+    new PerKeyMetricImpl[Gauge[F, T]](emptyMap[Gauge[F, T]], instanceBuilder.gauge.forType(_, replaceExisting)(gauge))
   }
 }
