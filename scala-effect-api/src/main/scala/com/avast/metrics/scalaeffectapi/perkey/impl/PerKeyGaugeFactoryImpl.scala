@@ -1,5 +1,6 @@
 package com.avast.metrics.scalaeffectapi.perkey.impl
 
+import cats.effect.std.Dispatcher
 import com.avast.metrics.scalaeffectapi.{Gauge, Monitor, SettableGauge}
 import com.avast.metrics.scalaeffectapi.perkey.{PerKeyGaugeFactory, PerKeyMetric}
 
@@ -18,8 +19,15 @@ class PerKeyGaugeFactoryImpl[F[_]](monitor: Monitor[F]) extends PerKeyGaugeFacto
     new PerKeyMetricImpl[SettableGauge[F, Double]](emptyMap[SettableGauge[F, Double]], instanceBuilder.gauge.double(_, replaceExisting))
   }
 
-  override def forType[T](baseName: String, replaceExisting: Boolean = false)(gauge: () => T): PerKeyMetric[Gauge[F, T]] = {
+  override def forType[T](baseName: String, replaceExisting: Boolean = false)(retrieveValue: () => T): PerKeyMetric[Gauge[F, T]] = {
     val instanceBuilder = monitor.named(baseName)
-    new PerKeyMetricImpl[Gauge[F, T]](emptyMap[Gauge[F, T]], instanceBuilder.gauge.forType(_, replaceExisting)(gauge))
+    new PerKeyMetricImpl[Gauge[F, T]](emptyMap[Gauge[F, T]], instanceBuilder.gauge.forType(_, replaceExisting)(retrieveValue))
+  }
+
+  override def forTypeWithUnsafeRun[T](baseName: String, replaceExisting: Boolean = false)(retrieveValue: F[T])(implicit
+      dispatcher: Dispatcher[F]
+  ): PerKeyMetric[Gauge[F, T]] = {
+    val instanceBuilder = monitor.named(baseName)
+    new PerKeyMetricImpl[Gauge[F, T]](emptyMap[Gauge[F, T]], instanceBuilder.gauge.forTypeWithUnsafeRun(_, replaceExisting)(retrieveValue))
   }
 }

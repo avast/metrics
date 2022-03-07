@@ -12,7 +12,7 @@ Main advantages of this library:
 1) Universal abstraction with misc. implementations
 2) Support of multiple exports at once (`MultiMonitor`)
 3) Scala API
-4) Scala Effect API (cats-effect 3) - If you need cats-effect 2 you can use version 2.9.0 of this library.
+4) Scala Effect API (cats-effect 3) - If you need cats-effect 2 you can use version 2.9.x of this library.
 
 The entry-point into the library is the interface `Monitor`. Your classes need to get an instance of a monitor which they can use to construct different metrics, e.g. meters, timers or histograms.
 Instances of the individuals metrics can be used to monitor your application.
@@ -105,6 +105,12 @@ val scalaEffectMonitor: Monitor[F]  = Monitor.wrapJava(javaMonitor)
 ```
 
 See [example in tests](scala-effect-api/src/test/scala/com/avast/metrics/examples/EffectMonitor.scala).
+
+### Auto init monitor 
+
+There is a special implementation of Scala Effect Monitor called [AutoInitMonitorImpl](scala-effect-api/src/main/scala/com/avast/metrics/scalaeffectapi/impl/AutoInitMonitorImpl.scala).
+This class extends standard implementation in a way that every metric is directly sent with its default value (typically zero) on its creation.
+This approach ensures that all metrics are created at the beginning. So you can easily prepare your dashboard even for rare error that is difficult to trigger.
 
 ## Unit Testing
 There is a singleton [NoOpMonitor.INSTANCE](api/src/main/java/com/avast/metrics/test/NoOpMonitor.java) in the `metrics-api` submodule that can be used in tests.  
