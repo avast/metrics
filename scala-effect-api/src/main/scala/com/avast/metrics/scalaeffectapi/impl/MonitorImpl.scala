@@ -32,6 +32,6 @@ private[scalaeffectapi] class MonitorImpl[F[_]: Sync](monitor: SMonitor, naming:
 
   override def asJava: JMonitor = monitor.asJava
 
-  override def unwrap: SMonitor = monitor
+  override def asPlainScala: SMonitor = monitor
 
 }
