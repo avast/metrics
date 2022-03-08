@@ -10,16 +10,19 @@ class PerKeyGaugeFactoryImpl[F[_]](monitor: Monitor[F]) extends PerKeyGaugeFacto
 
   override def long(baseName: String, replaceExisting: Boolean = false): PerKeyMetric[SettableGauge[F, Long]] = {
     val instanceBuilder = monitor.named(baseName)
-    new PerKeyMetricImpl[SettableGauge[F, Long]](emptyMap[SettableGauge[F, Long]], instanceBuilder.gauge.long(_, replaceExisting))
+    new PerKeyMetricImpl[SettableGauge[F, Long]](emptyMap[SettableGauge[F, Long]], instanceBuilder.gauge.settableLong(_, replaceExisting))
   }
 
   override def double(baseName: String, replaceExisting: Boolean = false): PerKeyMetric[SettableGauge[F, Double]] = {
     val instanceBuilder = monitor.named(baseName)
-    new PerKeyMetricImpl[SettableGauge[F, Double]](emptyMap[SettableGauge[F, Double]], instanceBuilder.gauge.double(_, replaceExisting))
+    new PerKeyMetricImpl[SettableGauge[F, Double]](
+      emptyMap[SettableGauge[F, Double]],
+      instanceBuilder.gauge.settableDouble(_, replaceExisting)
+    )
   }
 
   override def forType[T](baseName: String, replaceExisting: Boolean = false)(gauge: () => T): PerKeyMetric[Gauge[F, T]] = {
     val instanceBuilder = monitor.named(baseName)
-    new PerKeyMetricImpl[Gauge[F, T]](emptyMap[Gauge[F, T]], instanceBuilder.gauge.forType(_, replaceExisting)(gauge))
+    new PerKeyMetricImpl[Gauge[F, T]](emptyMap[Gauge[F, T]], instanceBuilder.gauge.generic(_, replaceExisting)(gauge))
   }
 }
