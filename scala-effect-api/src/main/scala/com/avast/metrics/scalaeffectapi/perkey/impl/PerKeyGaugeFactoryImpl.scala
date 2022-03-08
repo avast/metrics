@@ -1,6 +1,7 @@
 package com.avast.metrics.scalaeffectapi.perkey.impl
 
-import com.avast.metrics.scalaeffectapi.{Gauge, Monitor}
+import cats.effect.std.Dispatcher
+import com.avast.metrics.scalaeffectapi.{Gauge, Monitor, SettableGauge}
 import com.avast.metrics.scalaeffectapi.perkey.{PerKeyGaugeFactory, PerKeyMetric}
 
 import scala.collection.concurrent.TrieMap
@@ -8,13 +9,28 @@ import scala.collection.concurrent.TrieMap
 class PerKeyGaugeFactoryImpl[F[_]](monitor: Monitor[F]) extends PerKeyGaugeFactory[F] {
   private def emptyMap[M] = TrieMap.empty[String, M]
 
-  override def long(baseName: String): PerKeyMetric[Gauge[F, Long]] = {
+  override def settableLong(baseName: String, replaceExisting: Boolean = false): PerKeyMetric[SettableGauge[F, Long]] = {
     val instanceBuilder = monitor.named(baseName)
-    new PerKeyMetricImpl[Gauge[F, Long]](emptyMap[Gauge[F, Long]], instanceBuilder.gauge.long)
+    new PerKeyMetricImpl[SettableGauge[F, Long]](emptyMap[SettableGauge[F, Long]], instanceBuilder.gauge.settableLong(_, replaceExisting))
   }
 
-  override def double(baseName: String): PerKeyMetric[Gauge[F, Double]] = {
+  override def settableDouble(baseName: String, replaceExisting: Boolean = false): PerKeyMetric[SettableGauge[F, Double]] = {
     val instanceBuilder = monitor.named(baseName)
-    new PerKeyMetricImpl[Gauge[F, Double]](emptyMap[Gauge[F, Double]], instanceBuilder.gauge.double)
+    new PerKeyMetricImpl[SettableGauge[F, Double]](
+      emptyMap[SettableGauge[F, Double]],
+      instanceBuilder.gauge.settableDouble(_, replaceExisting)
+    )
+  }
+
+  override def generic[T](baseName: String, replaceExisting: Boolean = false)(retrieveValue: () => T): PerKeyMetric[Gauge[F, T]] = {
+    val instanceBuilder = monitor.named(baseName)
+    new PerKeyMetricImpl[Gauge[F, T]](emptyMap[Gauge[F, T]], instanceBuilder.gauge.generic(_, replaceExisting)(retrieveValue))
+  }
+
+  override def genericWithUnsafeRun[T](baseName: String, replaceExisting: Boolean = false)(retrieveValue: F[T])(implicit
+      dispatcher: Dispatcher[F]
+  ): PerKeyMetric[Gauge[F, T]] = {
+    val instanceBuilder = monitor.named(baseName)
+    new PerKeyMetricImpl[Gauge[F, T]](emptyMap[Gauge[F, T]], instanceBuilder.gauge.genericWithUnsafeRun(_, replaceExisting)(retrieveValue))
   }
 }
