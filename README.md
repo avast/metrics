@@ -106,12 +106,6 @@ val scalaEffectMonitor: Monitor[F]  = Monitor.wrapJava(javaMonitor)
 
 See [example in tests](scala-effect-api/src/test/scala/com/avast/metrics/examples/EffectMonitor.scala).
 
-### Auto init monitor 
-
-There is a special implementation of Scala Effect Monitor called [AutoInitMonitorImpl](scala-effect-api/src/main/scala/com/avast/metrics/scalaeffectapi/impl/AutoInitMonitorImpl.scala).
-This class extends standard implementation in a way that every metric is directly sent with its default value (typically zero) on its creation.
-This approach ensures that all metrics are created at the beginning. So you can easily prepare your dashboard even for rare error that is difficult to trigger.
-
 ## Unit Testing
 There is a singleton [NoOpMonitor.INSTANCE](api/src/main/java/com/avast/metrics/test/NoOpMonitor.java) in the `metrics-api` submodule that can be used in tests.  
 There are also available `Monitor.noOp` for Scala API and Scala Effect API.

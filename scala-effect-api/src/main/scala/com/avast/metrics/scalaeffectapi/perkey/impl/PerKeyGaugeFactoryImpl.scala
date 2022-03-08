@@ -9,25 +9,28 @@ import scala.collection.concurrent.TrieMap
 class PerKeyGaugeFactoryImpl[F[_]](monitor: Monitor[F]) extends PerKeyGaugeFactory[F] {
   private def emptyMap[M] = TrieMap.empty[String, M]
 
-  override def long(baseName: String, replaceExisting: Boolean = false): PerKeyMetric[SettableGauge[F, Long]] = {
+  override def settableLong(baseName: String, replaceExisting: Boolean = false): PerKeyMetric[SettableGauge[F, Long]] = {
     val instanceBuilder = monitor.named(baseName)
-    new PerKeyMetricImpl[SettableGauge[F, Long]](emptyMap[SettableGauge[F, Long]], instanceBuilder.gauge.long(_, replaceExisting))
+    new PerKeyMetricImpl[SettableGauge[F, Long]](emptyMap[SettableGauge[F, Long]], instanceBuilder.gauge.settableLong(_, replaceExisting))
   }
 
-  override def double(baseName: String, replaceExisting: Boolean = false): PerKeyMetric[SettableGauge[F, Double]] = {
+  override def settableDouble(baseName: String, replaceExisting: Boolean = false): PerKeyMetric[SettableGauge[F, Double]] = {
     val instanceBuilder = monitor.named(baseName)
-    new PerKeyMetricImpl[SettableGauge[F, Double]](emptyMap[SettableGauge[F, Double]], instanceBuilder.gauge.double(_, replaceExisting))
+    new PerKeyMetricImpl[SettableGauge[F, Double]](
+      emptyMap[SettableGauge[F, Double]],
+      instanceBuilder.gauge.settableDouble(_, replaceExisting)
+    )
   }
 
-  override def forType[T](baseName: String, replaceExisting: Boolean = false)(retrieveValue: () => T): PerKeyMetric[Gauge[F, T]] = {
+  override def generic[T](baseName: String, replaceExisting: Boolean = false)(retrieveValue: () => T): PerKeyMetric[Gauge[F, T]] = {
     val instanceBuilder = monitor.named(baseName)
-    new PerKeyMetricImpl[Gauge[F, T]](emptyMap[Gauge[F, T]], instanceBuilder.gauge.forType(_, replaceExisting)(retrieveValue))
+    new PerKeyMetricImpl[Gauge[F, T]](emptyMap[Gauge[F, T]], instanceBuilder.gauge.generic(_, replaceExisting)(retrieveValue))
   }
 
-  override def forTypeWithUnsafeRun[T](baseName: String, replaceExisting: Boolean = false)(retrieveValue: F[T])(implicit
+  override def genericWithUnsafeRun[T](baseName: String, replaceExisting: Boolean = false)(retrieveValue: F[T])(implicit
       dispatcher: Dispatcher[F]
   ): PerKeyMetric[Gauge[F, T]] = {
     val instanceBuilder = monitor.named(baseName)
-    new PerKeyMetricImpl[Gauge[F, T]](emptyMap[Gauge[F, T]], instanceBuilder.gauge.forTypeWithUnsafeRun(_, replaceExisting)(retrieveValue))
+    new PerKeyMetricImpl[Gauge[F, T]](emptyMap[Gauge[F, T]], instanceBuilder.gauge.genericWithUnsafeRun(_, replaceExisting)(retrieveValue))
   }
 }
