@@ -1,6 +1,7 @@
 package com.avast.metrics.scalaeffectapi.impl
 
-import cats.effect.{ExitCase, Resource, Sync}
+import cats.effect.Sync
+import cats.syntax.applicativeError._
 import cats.syntax.flatMap._
 import cats.syntax.functor._
 
@@ -35,10 +36,18 @@ private class TimerPairImpl[F[_]: Sync](success: Timer[F], failure: Timer[F]) ex
   override def updateFailure(duration: Duration): F[Unit] = Sync[F].delay(failure.update(duration))
 
   override def time[T](action: F[T]): F[T] = {
-    Resource
-      .makeCase(start) {
-        case (ctx, ExitCase.Completed) => ctx.stop.as(())
-        case (ctx, _) => ctx.stopFailure.as(())
-      }
-  }.use(_ => action)
+    for {
+      ctx <- start
+      result <- action.onError { case _ => ctx.stopFailure.void }
+      _ <- ctx.stop
+    } yield result
+  }
+
+  override def time[T](action: F[T])(successCheck: T => Boolean): F[T] = {
+    for {
+      ctx <- start
+      result <- action.onError { case _ => ctx.stopFailure.void }
+      _ <- if (successCheck(result)) ctx.stop else ctx.stopFailure
+    } yield result
+  }
 }
