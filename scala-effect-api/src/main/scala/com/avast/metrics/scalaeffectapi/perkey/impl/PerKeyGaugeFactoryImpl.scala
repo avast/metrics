@@ -1,7 +1,7 @@
 package com.avast.metrics.scalaeffectapi.perkey.impl
 
-import cats.data.NonEmptyList
 import cats.effect.std.Dispatcher
+import com.avast.metrics.scalaeffectapi.perkey.PerKeyHelper.MetricBuilder
 import com.avast.metrics.scalaeffectapi.{Gauge, Monitor, SettableGauge}
 import com.avast.metrics.scalaeffectapi.perkey.{PerKeyGaugeFactory, PerKeyHelper, PerKeyMetric}
 
@@ -10,7 +10,7 @@ import scala.collection.concurrent.TrieMap
 class PerKeyGaugeFactoryImpl[F[_]](monitor: Monitor[F]) extends PerKeyGaugeFactory[F] {
   private def emptyMap[M] = TrieMap.empty[String, M]
 
-  private def metricBuilder[T]: (String, (Monitor[F], String) => T) => NonEmptyList[String] => T = PerKeyHelper.metricBuilder(monitor)
+  private def metricBuilder[T]: (String, (Monitor[F], String) => T) => MetricBuilder[T] = PerKeyHelper.metricBuilder(monitor)
 
   override def settableLong(baseName: String, replaceExisting: Boolean = false): PerKeyMetric[SettableGauge[F, Long]] = {
     val instanceBuilder: (Monitor[F], String) => SettableGauge[F, Long] = (m, n) => m.gauge.settableLong(n, replaceExisting)

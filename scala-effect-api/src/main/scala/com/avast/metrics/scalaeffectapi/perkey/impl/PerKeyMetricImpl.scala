@@ -1,11 +1,12 @@
 package com.avast.metrics.scalaeffectapi.perkey.impl
 
 import cats.data.NonEmptyList
+import com.avast.metrics.scalaeffectapi.perkey.PerKeyHelper.MetricBuilder
 import com.avast.metrics.scalaeffectapi.perkey.PerKeyMetric
 
 import scala.collection.concurrent.{Map => CMap}
 
-private[perkey] class PerKeyMetricImpl[A](map: CMap[String, A], metricBuilder: NonEmptyList[String] => A) extends PerKeyMetric[A] {
+private[perkey] class PerKeyMetricImpl[A](map: CMap[String, A], metricBuilder: MetricBuilder[A]) extends PerKeyMetric[A] {
   override def forKey(name: String): A = {
     map.getOrElseUpdate(name, metricBuilder(NonEmptyList(name, Nil)))
   }

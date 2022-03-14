@@ -1,7 +1,7 @@
 package com.avast.metrics.scalaeffectapi.perkey.impl
 
-import cats.data.NonEmptyList
 import com.avast.metrics.scalaeffectapi._
+import com.avast.metrics.scalaeffectapi.perkey.PerKeyHelper.MetricBuilder
 import com.avast.metrics.scalaeffectapi.perkey.{PerKeyGaugeFactory, PerKeyHelper, PerKeyMetric, PerKeyOps}
 
 import scala.collection.concurrent.TrieMap
@@ -9,7 +9,7 @@ import scala.collection.concurrent.TrieMap
 private[perkey] class PerKeyOpsImpl[F[_]](monitor: Monitor[F]) extends PerKeyOps[F] {
   private def emptyMap[M] = TrieMap.empty[String, M]
 
-  private def metricBuilder[T]: (String, (Monitor[F], String) => T) => NonEmptyList[String] => T = PerKeyHelper.metricBuilder(monitor)
+  private def metricBuilder[T]: (String, (Monitor[F], String) => T) => MetricBuilder[T] = PerKeyHelper.metricBuilder(monitor)
 
   override def meter(baseName: String): PerKeyMetric[Meter[F]] = {
     val instanceBuilder: (Monitor[F], String) => Meter[F] = (m, n) => m.meter(n)
