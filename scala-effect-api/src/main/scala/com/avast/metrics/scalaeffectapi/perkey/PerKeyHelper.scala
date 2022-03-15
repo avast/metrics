@@ -12,8 +12,8 @@ private[perkey] object PerKeyHelper {
     if (keys.length == 1) {
       instanceBuilder(monitor.named(baseName), keys.last)
     } else {
-      val tailWithoutLats = keys.tail.drop(keys.length - 1)
-      instanceBuilder(monitor.named(baseName, keys.head, tailWithoutLats: _*), keys.last)
+      val tailWithoutLast = keys.tail.dropRight(1)
+      instanceBuilder(monitor.named(baseName, keys.head, tailWithoutLast: _*), keys.last)
     }
   }
 }
