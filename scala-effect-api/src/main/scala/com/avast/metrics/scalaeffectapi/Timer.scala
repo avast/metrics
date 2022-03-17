@@ -12,4 +12,5 @@ trait Timer[F[_]] {
   def update(duration: JDuration): F[Unit]
   def update(duration: Duration): F[Unit]
   def time[A](block: F[A]): F[A]
+  def time[A](block: F[A])(callback: Duration => F[Unit]): F[A]
 }

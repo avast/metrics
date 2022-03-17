@@ -31,4 +31,13 @@ private class TimerImpl[F[_]: Sync](inner: STimer) extends Timer[F] {
       _ <- context.stop
     } yield result
   }
+
+  override def time[A](block: F[A])(callback: Duration => F[Unit]): F[A] = {
+    for {
+      context <- start
+      result <- block
+      duration <- context.stop
+      _ <- callback(duration)
+    } yield result
+  }
 }

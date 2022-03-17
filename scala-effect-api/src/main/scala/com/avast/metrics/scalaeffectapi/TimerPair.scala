@@ -16,4 +16,5 @@ trait TimerPair[F[_]] {
   def updateFailure(duration: Duration): F[Unit]
   def time[T](action: F[T]): F[T]
   def time[T](action: F[T])(successCheck: T => Boolean): F[T]
+  def time[T](action: F[T])(successCheck: T => Boolean)(successCallback: Duration => F[Unit], failureCallback: Duration => F[Unit]): F[T]
 }
