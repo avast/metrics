@@ -5,6 +5,7 @@ import com.avast.metrics.api.Monitor;
 import com.avast.metrics.api.Timer;
 import io.grpc.MethodDescriptor;
 
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,6 +27,11 @@ class MetricsCache {
     public <ReqT, RespT> Meter getMeter(MethodDescriptor<ReqT, RespT> methodDescriptor, String name) {
         String methodMonitorName = MetricNaming.getMethodMonitorName(methodDescriptor);
         return meters.computeIfAbsent(methodMonitorName + name, (s) -> monitor.named(methodMonitorName).newMeter(name));
+    }
+
+    public <ReqT, RespT> Meter getMeter(MethodDescriptor<ReqT, RespT> methodDescriptor, String name1, String name2) {
+        String methodMonitorName = MetricNaming.getMethodMonitorName(methodDescriptor);
+        return meters.computeIfAbsent(methodMonitorName + name1 + name2, (s) -> monitor.named(methodMonitorName, name1).newMeter(name2));
     }
 
     public <ReqT, RespT> AtomicInteger getGaugedValue(MethodDescriptor<ReqT, RespT> methodDescriptor, String name) {
