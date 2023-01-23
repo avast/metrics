@@ -1,5 +1,6 @@
 package com.avast.metrics.grpc;
 
+import com.avast.metrics.api.Meter;
 import com.avast.metrics.api.Monitor;
 import com.avast.metrics.api.Timer;
 import io.grpc.ManagedChannel;
@@ -44,6 +45,12 @@ public class GrpcServerMonitoringInterceptorTest {
             return null;
         });
 
+        final Monitor callsMonitor = mock(Monitor.class);
+        when(monitor.named("TestApiService_Get", "Calls")).thenReturn(callsMonitor);
+
+        final Meter callsMeter = mock(Meter.class);
+        when(callsMonitor.newMeter(eq("count"))).thenReturn(callsMeter);
+
         final Clock clock = mock(Clock.class);
         when(clock.instant()).thenReturn(
                 Instant.ofEpochMilli(0),
@@ -73,6 +80,7 @@ public class GrpcServerMonitoringInterceptorTest {
 
         verify(timer, times(1)).update(Matchers.eq(Duration.ofMillis(42)));
         assertEquals(0, currentCallsSupplier.get().get().longValue());
+        verify(callsMeter, times(1)).mark();
     }
 
     @Test
@@ -92,6 +100,12 @@ public class GrpcServerMonitoringInterceptorTest {
             currentCallsSupplier.set(invocation.getArgumentAt(1, Supplier.class));
             return null;
         });
+
+        final Monitor callsMonitor = mock(Monitor.class);
+        when(monitor.named("TestApiService_Get", "Calls")).thenReturn(callsMonitor);
+
+        final Meter callsMeter = mock(Meter.class);
+        when(callsMonitor.newMeter(eq("count"))).thenReturn(callsMeter);
 
         final Clock clock = mock(Clock.class);
         when(clock.instant()).thenReturn(
@@ -124,6 +138,7 @@ public class GrpcServerMonitoringInterceptorTest {
 
         verify(timer, times(1)).update(Matchers.eq(Duration.ofMillis(42)));
         assertEquals(0, currentCallsSupplier.get().get().longValue());
+        verify(callsMeter, times(1)).mark();
     }
 }
 
