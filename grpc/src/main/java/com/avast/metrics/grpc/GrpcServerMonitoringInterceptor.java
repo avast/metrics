@@ -24,8 +24,10 @@ public class GrpcServerMonitoringInterceptor implements ServerInterceptor {
     @Override
     public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(final ServerCall<ReqT, RespT> call, final Metadata headers, final ServerCallHandler<ReqT, RespT> next) {
         MethodDescriptor<ReqT, RespT> method = call.getMethodDescriptor();
-        final AtomicInteger currentCalls = cache.getGaugedValue(method, "Current");
 
+        cache.getMeter(method, "Calls", "count").mark();
+
+        final AtomicInteger currentCalls = cache.getGaugedValue(method, "Current");
         final Instant start = clock.instant();
         currentCalls.incrementAndGet();
 
