@@ -6,6 +6,7 @@ import io.grpc.*;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class GrpcServerMonitoringInterceptor implements ServerInterceptor {
@@ -27,15 +28,17 @@ public class GrpcServerMonitoringInterceptor implements ServerInterceptor {
 
         cache.getMeter(method, "Calls", "count").mark();
 
-        final AtomicInteger currentCalls = cache.getGaugedValue(method, "Current");
+        final AtomicInteger currentCalls = cache.getGaugedValueByHostname(method, "CurrentByHostname");
         final Instant start = clock.instant();
+
         currentCalls.incrementAndGet();
+        final CurrentCallsReleaser currentCallsReleaser = new CurrentCallsReleaser(currentCalls);
 
         final ServerCall<ReqT, RespT> newCall = new ForwardingServerCall.SimpleForwardingServerCall<ReqT, RespT>(call) {
             @Override
             public void close(final Status status, final Metadata trailers) {
                 final Duration duration = Duration.between(start, clock.instant());
-                currentCalls.decrementAndGet();
+                currentCallsReleaser.release();
 
                 if (ErrorCategory.fatal.contains(status.getCode())) {
                     cache.getTimer(method, "FatalServerFailures")
@@ -59,6 +62,7 @@ public class GrpcServerMonitoringInterceptor implements ServerInterceptor {
         try {
             nextListener = next.startCall(newCall, headers);
         } catch (RuntimeException e) {
+            currentCallsReleaser.release();
             cache.getMeter(method, "UnhandledExceptionFailures").mark();
             throw e;
         }
@@ -69,6 +73,7 @@ public class GrpcServerMonitoringInterceptor implements ServerInterceptor {
                 try {
                     super.onMessage(message);
                 } catch (RuntimeException e) {
+                    currentCallsReleaser.release();
                     cache.getMeter(method, "UnhandledExceptionFailures").mark();
                     throw e;
                 }
@@ -79,6 +84,7 @@ public class GrpcServerMonitoringInterceptor implements ServerInterceptor {
                 try {
                     super.onHalfClose();}
                 catch (RuntimeException e) {
+                    currentCallsReleaser.release();
                     cache.getMeter(method, "UnhandledExceptionFailures").mark();
                     throw e;
                 }
@@ -89,10 +95,25 @@ public class GrpcServerMonitoringInterceptor implements ServerInterceptor {
                 try {
                     super.onReady();}
                 catch (RuntimeException e) {
+                    currentCallsReleaser.release();
                     cache.getMeter(method, "UnhandledExceptionFailures").mark();
                     throw e;
                 }
             }
         };
+    }
+
+    private static class CurrentCallsReleaser {
+        private final AtomicInteger currentCalls;
+        private final AtomicBoolean acquired = new AtomicBoolean(true);
+        CurrentCallsReleaser(AtomicInteger currentCalls) {
+            this.currentCalls = currentCalls;
+        }
+
+        void release() {
+            if(acquired.compareAndSet(true, false)) {
+                currentCalls.decrementAndGet();
+            }
+        }
     }
 }
