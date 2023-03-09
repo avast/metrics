@@ -42,4 +42,13 @@ class MetricsCache {
             return v;
         });
     }
+
+    public <ReqT, RespT> AtomicInteger getGaugedValueByHostname(MethodDescriptor<ReqT, RespT> methodDescriptor, String name) {
+        String methodMonitorName = MetricNaming.getMethodMonitorName(methodDescriptor);
+        return gaugedValues.computeIfAbsent(methodMonitorName + name + MetricNaming.getHostname(), n -> {
+            AtomicInteger v = new AtomicInteger();
+            monitor.named(methodMonitorName, name).newGauge(MetricNaming.getHostname(), v::get);
+            return v;
+        });
+    }
 }
