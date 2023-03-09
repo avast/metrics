@@ -40,19 +40,17 @@ public class GrpcServerMonitoringInterceptor implements ServerInterceptor {
                 final Duration duration = Duration.between(start, clock.instant());
                 currentCallsReleaser.release();
 
-                if (ErrorCategory.fatal.contains(status.getCode())) {
-                    cache.getTimer(method, "FatalServerFailures")
-                            .update(duration);
+                String metricName = "ServerFailures";
+                if (status.isOk()) {
+                    metricName = "Successes";
+                } else if (status.getCode() == Status.Code.RESOURCE_EXHAUSTED) {
+                    metricName = "ResourceExhausteds";
+                } else if (ErrorCategory.fatal.contains(status.getCode())) {
+                    metricName = "FatalServerFailures";
                 } else if (ErrorCategory.client.contains(status.getCode())) {
-                    cache.getTimer(method, "ClientFailures")
-                            .update(duration);
-                } else if (status.isOk()) {
-                    cache.getTimer(method, "Successes")
-                            .update(duration);
-                } else {
-                    cache.getTimer(method, "ServerFailures")
-                            .update(duration);
+                    metricName = "ClientFailures";
                 }
+                cache.getTimer(method, metricName).update(duration);
 
                 super.close(status, trailers);
             }
