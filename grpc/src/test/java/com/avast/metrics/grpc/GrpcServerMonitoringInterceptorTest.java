@@ -10,6 +10,7 @@ import io.grpc.StatusRuntimeException;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
 import io.grpc.stub.StreamObserver;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 
@@ -31,16 +32,20 @@ public class GrpcServerMonitoringInterceptorTest {
     public void testOk() throws IOException {
         final String channelName = UUID.randomUUID().toString();
 
+        MetricNaming.setHostname("testhost");
+
         final Monitor monitor = mock(Monitor.class);
         final Monitor methodMonitor = mock(Monitor.class);
+        final Monitor currentByHostnameMonitor = mock(Monitor.class);
         when(monitor.named("TestApiService_Get")).thenReturn(methodMonitor);
+        when(monitor.named("TestApiService_Get", "CurrentByHostname")).thenReturn(currentByHostnameMonitor);
 
         final Timer timer = mock(Timer.class);
         when(methodMonitor.newTimer("Successes")).thenReturn(timer);
         doNothing().when(timer).update(Matchers.eq(Duration.ofMillis(42)));
 
         AtomicReference<Supplier<Integer>> currentCallsSupplier = new AtomicReference<>();
-        when(methodMonitor.newGauge(eq("Current"), any())).thenAnswer(invocation -> {
+        when(currentByHostnameMonitor.newGauge(eq("testhost"), any())).thenAnswer(invocation -> {
             currentCallsSupplier.set(invocation.getArgumentAt(1, Supplier.class));
             return null;
         });
@@ -87,16 +92,20 @@ public class GrpcServerMonitoringInterceptorTest {
     public void testFailure() throws IOException {
         final String channelName = UUID.randomUUID().toString();
 
+        MetricNaming.setHostname("testhost");
+
         final Monitor monitor = mock(Monitor.class);
         final Monitor methodMonitor = mock(Monitor.class);
+        final Monitor currentByHostnameMonitor = mock(Monitor.class);
         when(monitor.named("TestApiService_Get")).thenReturn(methodMonitor);
+        when(monitor.named("TestApiService_Get", "CurrentByHostname")).thenReturn(currentByHostnameMonitor);
 
         final Timer timer = mock(Timer.class);
         when(methodMonitor.newTimer("FatalServerFailures")).thenReturn(timer);
         doNothing().when(timer).update(Matchers.eq(Duration.ofMillis(42)));
 
         AtomicReference<Supplier<Integer>> currentCallsSupplier = new AtomicReference<>();
-        when(methodMonitor.newGauge(eq("Current"), any())).thenAnswer(invocation -> {
+        when(currentByHostnameMonitor.newGauge(eq("testhost"), any())).thenAnswer(invocation -> {
             currentCallsSupplier.set(invocation.getArgumentAt(1, Supplier.class));
             return null;
         });
