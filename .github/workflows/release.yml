@@ -17,8 +17,8 @@ jobs:
         run: sbt test
       - name: Release
         env:
-          PGP_SECRET: ${{ secrets.PGP_SECRET }}
-          PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+          PGP_SECRET: ${{ secrets.PGP_SECRET_NEW }}
+          PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE_NEW }}
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
         run: sbt ci-release
