@@ -31,8 +31,14 @@ public class GrpcServerMonitoringInterceptor implements ServerInterceptor {
         final AtomicInteger currentCalls = cache.getGaugedValueByHostname(method, "CurrentByHostname");
         final Instant start = clock.instant();
 
+        CurrentCallsReleaser currentCallsReleaser;
         currentCalls.incrementAndGet();
-        final CurrentCallsReleaser currentCallsReleaser = new CurrentCallsReleaser(currentCalls);
+        try {
+            currentCallsReleaser = new CurrentCallsReleaser(currentCalls);
+        } catch(Throwable ex) {
+            currentCalls.decrementAndGet();
+            throw ex;
+        }
 
         final ServerCall<ReqT, RespT> newCall = new ForwardingServerCall.SimpleForwardingServerCall<ReqT, RespT>(call) {
             @Override
@@ -112,6 +118,11 @@ public class GrpcServerMonitoringInterceptor implements ServerInterceptor {
             if(acquired.compareAndSet(true, false)) {
                 currentCalls.decrementAndGet();
             }
+        }
+
+        @Override
+        protected void finalize() {
+            release();
         }
     }
 }
