@@ -209,7 +209,7 @@ lazy val statsd = (project in file("statsd"))
     javaSettings,
     name := "metrics-statsd",
     libraryDependencies ++= Seq(
-      "com.datadoghq" % "java-dogstatsd-client" % "2.11.0",
+      "com.datadoghq" % "java-dogstatsd-client" % "2.13.1",
       "org.slf4j" % "slf4j-api" % Versions.slf4j
     )
   )
