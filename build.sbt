@@ -34,7 +34,6 @@ lazy val Versions = new {
 }
 
 lazy val commonSettings = Seq(
-  sonatypeProfileName := "com.avast",
   organization := "com.avast.metrics",
   organizationName := "Avast",
   organizationHomepage := Some(url("https://avast.com")),
