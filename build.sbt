@@ -1,7 +1,7 @@
 import sbt.Keys.libraryDependencies
 
-val Scala212 = "2.12.13"
-val Scala213 = "2.13.4"
+val Scala212 = "2.12.20"
+val Scala213 = "2.13.16"
 
 lazy val scalaSettings = Seq(
   scalaVersion := Scala212,
