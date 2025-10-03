@@ -41,7 +41,7 @@ lazy val commonSettings = Seq(
   description := "Library for application monitoring",
   licenses ++= Seq("MIT" -> url(s"https://github.com/avast/metrics/blob/${version.value}/LICENSE")),
   developers := List(Developer("jakubjanecek", "Jakub Janecek", "jakub.janecek@avast.com", url("https://www.avast.com"))),
-  publishArtifact in Test := false,
+  Test / publishArtifact := false,
   libraryDependencies ++= Seq(
     "org.mockito" % "mockito-all" % "1.10.19" % "test",
     "junit" % "junit" % "4.12" % "test",
