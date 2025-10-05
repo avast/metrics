@@ -28,7 +28,7 @@ lazy val Versions = new {
   val typesafeConfig = "1.4.1"
   val grpc = "1.42.1"
   val slf4j = "1.7.36"
-  val assertj = "3.12.2"
+  val assertj = "3.27.6"
   val catsEffect2 = "2.5.5"
   val catsEffect3 = "3.3.5"
 }
