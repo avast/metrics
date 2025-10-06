@@ -186,7 +186,7 @@ lazy val grpc = (project in file("grpc"))
       "io.grpc" % "grpc-protobuf" % Versions.grpc % "test",
       "io.grpc" % "grpc-stub" % Versions.grpc % "test",
       "io.grpc" % "grpc-services" % Versions.grpc % "test",
-      "com.google.protobuf" % "protobuf-java" % "3.25.8" % "test"
+      "com.google.protobuf" % "protobuf-java" % "4.32.1" % "test"
     )
   )
   .dependsOn(core)
