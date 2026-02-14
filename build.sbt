@@ -46,7 +46,7 @@ lazy val commonSettings = Seq(
     "org.mockito" % "mockito-all" % "1.10.19" % "test",
     "junit" % "junit" % "4.13.2" % "test",
     "com.github.sbt" % "junit-interface" % "0.13.3" % "test", // Required by sbt to execute JUnit tests
-    "ch.qos.logback" % "logback-classic" % "1.5.29" % "test",
+    "ch.qos.logback" % "logback-classic" % "1.5.30" % "test",
     "javax.annotation" % "javax.annotation-api" % "1.3.2" % "test" // for compatibility with JDK >8
   ),
   testOptions += Tests.Argument(TestFrameworks.JUnit)
