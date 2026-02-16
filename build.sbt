@@ -11,7 +11,7 @@ lazy val scalaSettings = Seq(
   scalacOptions += "-target:jvm-1.8",
   crossScalaVersions := Seq(Scala212, Scala213),
   libraryDependencies ++= Seq(
-    "org.scalatest" %% "scalatest" % "3.0.9" % "test"
+    "org.scalatest" %% "scalatest" % "3.2.19" % "test"
   )
 )
 
