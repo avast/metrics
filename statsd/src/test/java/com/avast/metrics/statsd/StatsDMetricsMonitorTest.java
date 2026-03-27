@@ -1,5 +1,6 @@
 package com.avast.metrics.statsd;
 
+import com.avast.metrics.api.Gauge;
 import com.timgroup.statsd.StatsDClient;
 import org.junit.Test;
 import org.mockito.Matchers;
@@ -94,18 +95,37 @@ public class StatsDMetricsMonitorTest {
     @Test
     public void failsForGaugeIfNotReplacing() {
         try (final StatsDMetricsMonitor monitor = new StatsDMetricsMonitor("", 1234, "com.avast.domain")) {
-            final String name = TestUtils.randomString();
+            final String nameFolder = TestUtils.randomString();
+            final String nameGauge = TestUtils.randomString();
 
-            assertNotNull(monitor.newGauge(name, () -> Math.PI));
+            StatsDMetricsMonitor folder = monitor.named(nameFolder);
 
-            monitor.newGauge(name, true, () -> Math.PI); // ok
+            assertNotNull(folder.newGauge(nameGauge, () -> Math.PI));
+            folder.newGauge(nameGauge, true, () -> Math.PI); // ok
 
             try {
-                monitor.newGauge(name, false, () -> Math.PI);
+                folder.newGauge(nameGauge, false, () -> Math.PI);
                 fail("Exception should have been thrown");
             } catch (IllegalStateException e) {
                 // ok
             }
+        }
+    }
+
+    @Test
+    public void testGaugeRemovalWorks() {
+        try (final StatsDMetricsMonitor monitor = new StatsDMetricsMonitor("", 1234, "com.avast.domain")) {
+            final String nameFolder = TestUtils.randomString();
+            final String nameGauge = TestUtils.randomString();
+
+            StatsDMetricsMonitor folder = monitor.named(nameFolder);
+
+            Gauge<Double> gauge = folder.newGauge(nameGauge, () -> Math.PI);
+            assertNotNull(gauge);
+
+            assertEquals(1, folder.gauges.size());
+            folder.remove(gauge);
+            assertEquals(0, folder.gauges.size());
         }
     }
 }

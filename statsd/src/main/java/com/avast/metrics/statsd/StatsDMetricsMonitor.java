@@ -183,7 +183,7 @@ public class StatsDMetricsMonitor implements Monitor {
 
                 if (existing != null) {
                     if (!replaceExisting)
-                        throw new IllegalStateException("Gauge with name '" + name + "' is already registered");
+                        throw new IllegalStateException("Gauge with name '" + metricName + "' is already registered");
 
                     existing.cancel(false);
                 }
@@ -192,7 +192,7 @@ public class StatsDMetricsMonitor implements Monitor {
 
                 final ScheduledFuture<?> scheduled = scheduler.scheduleAtFixedRate(gauge::send, 0, gaugeSendPeriod.toMillis(), TimeUnit.MILLISECONDS);
 
-                gauges.put(name, scheduled);
+                gauges.put(metricName, scheduled);
 
                 return gauge;
             }
