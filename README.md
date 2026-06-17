@@ -1,3 +1,5 @@
+# This project is no longer maintained.
+
 [![Build](https://github.com/avast/metrics/workflows/Build/badge.svg)](https://github.com/avast/metrics/actions?query=workflow:Build) [![Version](https://badgen.net/maven/v/maven-central/com.avast.metrics/metrics-core)](https://repo1.maven.org/maven2/com/avast/metrics/)
 
 # Metrics
