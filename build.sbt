@@ -30,7 +30,7 @@ lazy val Versions = new {
   val slf4j = "2.0.17"
   val assertj = "3.27.7"
   val catsEffect2 = "2.5.5"
-  val catsEffect3 = "3.7.0"
+  val catsEffect3 = "3.7.1"
 }
 
 lazy val commonSettings = Seq(
